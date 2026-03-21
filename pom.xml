@@ -1,0 +1,11 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>br.ufpr.dac.bantads</groupId>
+    <artifactId>bantads</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>ms-auth</module>
+    </modules>
+</project>
