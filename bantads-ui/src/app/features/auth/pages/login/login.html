@@ -1,0 +1,167 @@
+<section>
+    <div class="area-logo">
+        <div>
+            <p class="flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-loader-pinwheel-icon lucide-loader-pinwheel">
+                    <path d="M22 12a1 1 0 0 1-10 0 1 1 0 0 0-10 0" />
+                    <path d="M7 20.7a1 1 0 1 1 5-8.7 1 1 0 1 0 5-8.6" />
+                    <path d="M7 3.3a1 1 0 1 1 5 8.6 1 1 0 1 0 5 8.6" />
+                    <circle cx="12" cy="12" r="10" />
+                </svg>
+                Bantads
+            </p>
+            <h1>Get Started whit Us</h1>
+            <h2>Complete o cadastro e realize operações</h2>
+            <button (click)="trocarEstado()">
+                {{isLogin ? "Cadastrar" : "Login"}}
+            </button>
+
+        </div>
+    </div>
+
+    <div class="area-sign">
+        <div class="area-sign-content">
+
+            <div class="flex mb-5 flex-col items-center justify-center">
+                <h1>Sign Up Account</h1>
+                <h2>Realize o cadastro ou entre na sua conta.</h2>
+            </div>
+
+            <hr class="linha">
+
+            <div class="form-container">
+                @if (isLogin) {
+                <form class="form">
+
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" placeholder="eg. johnfrans@gmail.com">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Password</label>
+                        <input type="password" placeholder="Enter your password">
+                        <small>Must be at least 8 characters.</small>
+                    </div>
+
+                    <button type="submit" [routerLink]="['/client/dashboard']">Login</button>
+
+                    <p class="login-text">
+                        Dont have an account? <span (click)="trocarEstado()">Register</span>
+                    </p>
+                </form>
+                }
+
+                @if (!isLogin) {
+                <form class="form-register">
+
+                    @switch (step) {
+
+                    <!-- STEP 1: Dados pessoais -->
+                    @case (1) {
+                    <div class="input-group">
+                        <label>Nome</label>
+                        <input type="text" placeholder="Seu nome completo">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" placeholder="seuemail@email.com">
+                    </div>
+
+                    <div class="input-group">
+                        <label>CPF</label>
+                        <input type="text" placeholder="000.000.000-00">
+                    </div>
+
+
+                    }
+
+                    <!-- STEP 2: Dados Pessoais -->
+                    @case (2) {
+                    <div class="input-group">
+                        <label>Salário</label>
+                        <input type="number" placeholder="R$ 0,00">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Função</label>
+                        <input type="text" placeholder="Função, alista desenvolvedor...">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Telefone</label>
+                        <input type="text" placeholder="(00) 00000-0000">
+                    </div>
+
+                    }
+                    <!-- STEP 3: Endereço -->
+                    @case (3) {
+                    <div class="input-group">
+                        <label>CEP</label>
+                        <input type="text" placeholder="00000-000">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Cidade</label>
+                        <input type="text" placeholder="Sua cidade">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Estado</label>
+                        <input type="text" placeholder="UF">
+                    </div>
+                    }
+
+                    @case (4) {
+                    <div class="input-group">
+                        <label>Logradouro</label>
+                        <input type="text" placeholder="Rua, Avenida...">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Número</label>
+                        <input type="text" placeholder="123">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Complemento</label>
+                        <input type="text" placeholder="Apto, bloco...">
+                    </div>
+
+                    }
+
+                    }
+
+                    <!-- BOTÕES -->
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+
+                        @if (step > 1) {
+                        <button type="button" (click)="prevStep()" class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-undo2-icon lucide-undo-2">
+                                <path d="M9 14 4 9l5-5" />
+                                <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11" />
+                            </svg>
+                        </button>
+                        }
+
+                        @if (step < 4) { <button type="button" (click)="nextStep()">Avançar</button>
+                            }
+
+                            @if (step === 4) {
+                            <button type="submit">Cadastrar</button>
+                            }
+
+                    </div>
+
+                </form>
+                }
+            </div>
+
+        </div>
+    </div>
+</section>

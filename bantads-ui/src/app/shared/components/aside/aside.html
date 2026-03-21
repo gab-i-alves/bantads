@@ -1,0 +1,78 @@
+<mat-sidenav-container class="container">
+
+    <!-- Sidebar -->
+    <mat-sidenav #sidenav mode="side" opened>
+        <mat-nav-list class="h-full bg-[#]">
+
+            <h1 class="flex items-center gap-2 text-[1.7rem] p-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-loader-pinwheel-icon lucide-loader-pinwheel">
+                    <path d="M22 12a1 1 0 0 1-10 0 1 1 0 0 0-10 0" />
+                    <path d="M7 20.7a1 1 0 1 1 5-8.7 1 1 0 1 0 5-8.6" />
+                    <path d="M7 3.3a1 1 0 1 1 5 8.6 1 1 0 1 0 5 8.6" />
+                    <circle cx="12" cy="12" r="10" />
+                </svg>
+                Bantads
+            </h1>
+
+            <div class="mb-6">
+                <h3 class="text-xs text-gray-400 uppercase px-4 mb-2">
+                    Geral
+                </h3>
+
+                <a mat-list-item routerLink="/" routerLinkActive="bg-gray-200 rounded-lg">
+                    <mat-icon class="mr-3">dashboard</mat-icon>
+                    <span>Dashboard</span>
+                </a>
+
+                <a mat-list-item routerLink="/extrato" routerLinkActive="bg-gray-200 rounded-lg">
+                    <mat-icon class="mr-3">receipt_long</mat-icon>
+                    <span>Extrato</span>
+                </a>
+            </div>
+
+            <!-- Seção transações -->
+            <div class="mb-6">
+                <h3 class="text-xs text-gray-400 uppercase px-4 mb-2">
+                    Transações
+                </h3>
+
+                <a mat-list-item routerLink="/transferir" routerLinkActive="bg-gray-200 rounded-lg">
+                    <span>Transferir</span>
+                </a>
+
+                <a mat-list-item routerLink="/depositar" routerLinkActive="bg-gray-200 rounded-lg">
+                    <mat-icon class="mr-3">south</mat-icon>
+                    <span>Depositar</span>
+                </a>
+
+                <a mat-list-item routerLink="/sacar" routerLinkActive="bg-gray-200 rounded-lg">
+                    <mat-icon class="mr-3">north</mat-icon>
+                    <span>Sacar</span>
+                </a>
+            </div>
+        </mat-nav-list>
+    </mat-sidenav>
+
+    <!-- Conteúdo -->
+    <mat-sidenav-content>
+
+        <mat-toolbar>
+            <button mat-icon-button (click)="sidenav.toggle()" class="mt-3">
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="transition-transform duration-300"
+                    [class.rotate-180]="sidenav.opened" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-panel-right-close-icon lucide-panel-right-close">
+                    <rect width="18" height="18" x="3" y="3" rx="2" />
+                    <path d="M15 3v18" />
+                    <path d="m8 9 3 3-3 3" />
+                </svg>
+
+            </button>
+        </mat-toolbar>
+
+    </mat-sidenav-content>
+
+</mat-sidenav-container>
