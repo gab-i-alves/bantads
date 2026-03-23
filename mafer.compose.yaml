@@ -1,0 +1,50 @@
+services:
+    postgres:
+        image: postgres:17-alpine
+        restart: unless-stopped
+        ports:
+            - ${POSTGRES_PORT}:5432
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: bantads
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+            - ./scripts/init-postgres.sql:/docker-entrypoint-initdb.d/init.sql
+    mongo:
+        image: mongo:7-jammy
+        restart: unless-stopped
+        ports:
+            - ${MONGO_PORT}:27017
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+        volumes:
+            - mongo-data:/data/db
+    rabbit:
+        image: rabbitmq:4.2.5-alpine
+        restart: unless-stopped
+        ports:
+            - ${RABBIT_AMQP_PORT}:5672
+            - ${RABBIT_UI_PORT}:15672
+        environment:
+            RABBIT_DEFAULT_USER: ${RABBIT_DEFAULT_USER}
+            RABBIT_DEFAULT_PASS: ${RABBIT_DEFAULT_PASS}
+        volumes:
+            - rabbitmq-data:/var/lib/rabbitmq/
+    ms-cliente:
+        build: ./ms-cliente
+        restart: unless-stopped
+        ports:
+            - "8081:8081"
+        environment:
+            DB_HOST: postgres
+            DB_PORT: 5432
+            DB_USER: ${POSTGRES_USER}
+            DB_PASS: ${POSTGRES_PASSWORD}
+        depends_on:
+            - postgres
+volumes:
+    postgres-data:
+    mongo-data:
+    rabbitmq-data:
