@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/reboot")
 public class RebootController {
@@ -15,7 +17,7 @@ public class RebootController {
     private RebootService rebootService;
 
     @GetMapping
-    public Account reboot() {
+    public List<Account> reboot() {
         return rebootService.initialize();
     }
 
