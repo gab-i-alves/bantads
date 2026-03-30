@@ -1,0 +1,72 @@
+<app-header></app-header>
+
+<section class="max-w-[1200px] m-auto pt-10 pb-20">
+    <div class="space-y-6">
+
+        @for (group of groupedTransactions; track group.date) {
+
+        <section class="max-w-[1200px] m-auto pt-2 border-b border-gray-800 pt-10 pb-4">
+            <div class="flex justify-between items-end mb-4 ml-1">
+                <h3 class="text-[17px] text-gray-400 font-bold">
+                    {{ group.label }}
+                </h3>
+                <div class="text-right">
+                    <p class="text-[10px] text-gray-500 uppercase">Saldo do dia</p>
+                    <p class="text-sm font-mono text-white">R$ {{ group.dailyBalance }}</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-4 px-4 text-[10px] text-gray-500 uppercase mb-2">
+                <span>Data/Hora & Operação</span>
+                <span class="text-center">Origem/Destino</span>
+                <span class="text-center">Detalhes</span>
+                <span class="text-right">Valor</span>
+            </div>
+
+            <div class="space-y-2">
+                @for (item of group.items; track item.id) {
+
+                <div class="transaction-item p-4 rounded-xl grid grid-cols-4 items-center border border-transparent"
+                    [class.text-blue-500]="item.tipo === 'entrada'" [class.text-red-500]="item.tipo === 'saida'">
+
+                    <div class="flex items-center gap-4">
+                        <div class="icon-container w-10 h-10 rounded-lg flex items-center justify-center bg-opacity-10"
+                            [class.bg-blue-500]="item.tipo === 'entrada'" [class.bg-red-500]="item.tipo === 'saida'">
+                            <i [class]="item.icon"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-semibold uppercase">{{ item.operacao }}</h4>
+                            <p class="text-[11px] opacity-80">{{ item.dataHora }}</p>
+                        </div>
+                    </div>
+
+                    <div class="text-center text-xs">
+                        @if (item.operacao === 'TRANSFERENCIA') {
+                        <span class="font-medium">{{ item.clienteRelacionado }}</span>
+                        } @else {
+                        <span class="opacity-30">---</span>
+                        }
+                    </div>
+
+                    <div class="text-center text-[11px] opacity-80 italic">
+                        {{ item.description }}
+                    </div>
+
+                    <div class="text-sm font-bold text-right">
+                        {{ item.tipo === 'entrada' ? '(+)' : '(-)' }} R$ {{ item.amount }}
+                    </div>
+
+                </div>
+
+                } @empty {
+                <div class="p-8 text-center text-gray-600 italic text-sm">
+                    Sem movimentações neste dia.
+                </div>
+                }
+            </div>
+        </section>
+
+        }
+
+    </div>
+</section>

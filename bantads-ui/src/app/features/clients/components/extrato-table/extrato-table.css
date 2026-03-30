@@ -1,0 +1,125 @@
+/* SEÇÃO DE ATIVIDADE RECENTE */
+.activity-section {
+    width: 100%;
+    max-width: 1200px;
+    color: white;
+    margin: 30px auto 60px auto;
+}
+
+.activity-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+/* CONFIGURAÇÃO DA TABELA */
+.activity-table {
+    width: 100%;
+    border-collapse: separate;
+    /* Importante para manter o border-radius nos itens */
+    border-spacing: 0 12px;
+    margin-top: -12px;
+    /* Compensa o spacing do topo */
+}
+
+/* Estilo da Linha (Equivalente ao .activity-item) */
+.activity-table tr {
+    background-color: rgba(255, 255, 255, 0.03);
+    transition: background 0.2s ease;
+    cursor: pointer;
+}
+
+.activity-table tr:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Células da Tabela */
+.activity-table td {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Arredondamento das pontas da linha */
+.activity-table td:first-child {
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+    border-top-left-radius: 16px;
+    border-bottom-left-radius: 16px;
+}
+
+.activity-table td:last-child {
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+    text-align: right;
+}
+
+/* Elementos Internos */
+.activity-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.activity-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.activity-details h4 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.activity-details p {
+    margin: 4px 0 0 0;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.activity-value {
+    font-size: 15px;
+    font-weight: 600;
+    display: block;
+}
+
+.activity-value.negative {
+    color: #ffffff;
+}
+
+.activity-value.positive {
+    color: #4ade80;
+}
+
+.activity-category {
+    display: block;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+
+.view-all {
+    display: block;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 12px;
+    text-decoration: none;
+    margin-top: 24px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.2s;
+}
+
+.view-all:hover {
+    color: #ffffff;
+}

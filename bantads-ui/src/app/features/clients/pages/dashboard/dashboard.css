@@ -1,0 +1,88 @@
+section {
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+    padding-bottom: 30px;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+
+
+}
+
+.content-small-cards {
+    padding: 20px;
+    border-radius: 20px;
+    background: url('../../../../assets/images/background02.jpg');
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+/* Estilo base dos links */
+.badge-link {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    text-decoration: none;
+    border-radius: 50px;
+    /* Bordas bem arredondadas */
+    background-color: #1a1a1a;
+    /* Cor padrão escura */
+    color: #c084fc;
+    /* Roxo claro para o texto/ícones */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Ícones SVG */
+.icon-wrapper {
+    width: 24px;
+    height: 24px;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-wrapper svg {
+    width: 100%;
+    height: 100%;
+}
+
+.badge-link span {
+    font-weight: 600;
+    font-size: 16px;
+    flex-grow: 1;
+}
+
+.arrow {
+    width: 18px;
+    height: 18px;
+    opacity: 0.7;
+    transition: transform 0.3s ease;
+}
+
+/* Efeito de Hover */
+.badge-link:hover {
+    background-color: #262626;
+    transform: translateX(5px);
+    color: #d8b4fe;
+}
+
+.badge-link:hover .arrow {
+    transform: translateX(3px);
+    opacity: 1;
+}
+
+/* Animação de clique */
+.badge-link:active {
+    transform: scale(0.97);
+}
