@@ -1,0 +1,84 @@
+.form-register {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.row {
+    display: flex;
+    gap: 12px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+label {
+    /* color: #aaa; */
+    color: #fff;
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+
+input {
+    background: #1a1a1a;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    color: #fff;
+    font-size: 14px;
+}
+
+input::placeholder {
+    color: #666;
+}
+
+small {
+    color: #666;
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+.form button {
+    margin-top: 10px;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: #e5e5e5;
+    color: #000;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+.login-text {
+    text-align: center;
+    color: #777;
+    font-size: 12px;
+}
+
+.login-text span {
+    color: #fff;
+    cursor: pointer;
+}
+
+button {
+    cursor: pointer;
+}
+
+.form-register button {
+    border: 1px solid white;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+
+.header-profile {
+    background: url('../../../../assets/images/background02.jpg');
+    background-size: cover;
+}

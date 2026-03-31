@@ -1,0 +1,32 @@
+/* Cores base para o tema dark */
+.card-bg {
+    background-color: #1a1a1c;
+}
+
+.transaction-item {
+    background-color: #1a1a1c;
+    transition: all 0.2s ease;
+}
+
+/* Efeito de hover suave mantendo a cor do texto */
+.transaction-item:hover {
+    transform: translateX(4px);
+    background-color: #222224;
+    border-color: currentColor;
+    /* Usa a cor do texto (azul ou vermelho) na borda */
+}
+
+/* Ajuste para ícones herdarem a cor do texto pai */
+.transaction-item i {
+    color: inherit;
+}
+
+.text-blue-500 {
+    color: #3b82f6;
+    /* Azul conforme requisito de entrada */
+}
+
+.text-red-500 {
+    color: #ef4444;
+    /* Vermelho conforme requisito de saída */
+}

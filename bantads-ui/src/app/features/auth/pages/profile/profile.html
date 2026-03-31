@@ -1,0 +1,128 @@
+<app-header></app-header>
+<section
+    class=" header-profile border rounded-[10px] p-4 max-w-[820px] m-auto flex justify-between items-center pt-10 pb-10">
+    <div class="flex gap-4">
+        <div class="border bg-purple-700 p-4 rounded-[50%] w-16 h-16 flex items-center justify-center text-white text-xl
+        font-bold">
+            TG
+        </div>
+
+        <div class="flex flex-col items-center justify-center mt-4 gap-2">
+            <h1 class="text-2xl font-bold">Thiago Cordeiro</h1>
+            <p class="text-gray-600">
+            </p>
+        </div>
+    </div>
+    <div>
+        <h1>Saldo: <span>R$ 1.000,00</span></h1>
+        <h1>Limite: <span>R$ 1.000,00</span></h1>
+        <h1>gerente: <span>John Doe</span></h1>
+    </div>
+</section>
+
+<section class="max-w-[800px] m-auto ">
+    <form class="form-register mt-10">
+
+        @switch (step) {
+
+        <!-- STEP 1: Dados pessoais -->
+        @case (1) {
+        <div class="input-group">
+            <label>Nome</label>
+            <input type="text" placeholder="Seu nome completo">
+        </div>
+
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" placeholder="seuemail@email.com">
+        </div>
+
+        <div class="input-group">
+            <label>CPF</label>
+            <input type="text" placeholder="000.000.000-00">
+        </div>
+
+
+        }
+
+        <!-- STEP 2: Dados Pessoais -->
+        @case (2) {
+        <div class="input-group">
+            <label>Salário</label>
+            <input type="number" placeholder="R$ 0,00">
+        </div>
+
+        <div class="input-group">
+            <label>Função</label>
+            <input type="text" placeholder="Função, alista desenvolvedor...">
+        </div>
+
+        <div class="input-group">
+            <label>Telefone</label>
+            <input type="text" placeholder="(00) 00000-0000">
+        </div>
+
+        }
+        <!-- STEP 3: Endereço -->
+        @case (3) {
+        <div class="input-group">
+            <label>CEP</label>
+            <input type="text" placeholder="00000-000">
+        </div>
+
+        <div class="input-group">
+            <label>Cidade</label>
+            <input type="text" placeholder="Sua cidade">
+        </div>
+
+        <div class="input-group">
+            <label>Estado</label>
+            <input type="text" placeholder="UF">
+        </div>
+        }
+
+        @case (4) {
+        <div class="input-group">
+            <label>Logradouro</label>
+            <input type="text" placeholder="Rua, Avenida...">
+        </div>
+
+        <div class="input-group">
+            <label>Número</label>
+            <input type="text" placeholder="123">
+        </div>
+
+        <div class="input-group">
+            <label>Complemento</label>
+            <input type="text" placeholder="Apto, bloco...">
+        </div>
+
+        }
+
+        }
+
+        <!-- BOTÕES -->
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+
+            @if (step > 1) {
+            <button type="button" (click)="prevStep()" class="flex gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-undo2-icon lucide-undo-2">
+                    <path d="M9 14 4 9l5-5" />
+                    <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11" />
+                </svg>
+            </button>
+            }
+
+            @if (step < 4) { <button type="button" (click)="nextStep()">Avançar</button>
+                }
+
+                @if (step === 4) {
+                <button type="submit">Salvar</button>
+                }
+
+        </div>
+
+    </form>
+</section>

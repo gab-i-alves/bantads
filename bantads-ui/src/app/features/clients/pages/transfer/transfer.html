@@ -1,0 +1,42 @@
+<app-header></app-header>
+<section class="flex items-center justify-center mt-10">
+    <div class="w-full max-w-md">
+        <div class="text-center mb-12">
+            <h2 class="text-[10px] tracking-[0.2em] text-gray-400 font-bold uppercase mb-4">
+                VALOR DO TRANSFERÊNCIA
+            </h2>
+            <div class="flex items-center justify-center">
+                <span class="text-3xl font-bold text-purple-500 mr-2 mt-2">R$</span>
+                <input type="text" [value]="amount" (input)="formatCurrency($event.target.value)"
+                    class="bg-transparent text-6xl font-medium outline-none text-center w-full max-w-[240px] focus:border-b-2 border-purple-500 transition-all pb-2" />
+            </div>
+        </div>
+
+        <div class="anim-container" (click)="triggerDeposit()" [class.active]="isActive">
+            <div class="left-side">
+                <div class="card">
+                    <div class="card-line"></div>
+                    <div class="buttons"></div>
+                </div>
+                <div class="post">
+                    <div class="post-line"></div>
+                    <div class="screen">
+                        <div class="dollar">$</div>
+                    </div>
+                </div>
+            </div>
+            <div class="right-side">
+                <div class="new">Confirmar Transferência</div>
+                <svg viewBox="0 0 451.846 451.847" class="arrow" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#ffffff"
+                        d="M345.441 248.292L151.154 442.573c-12.359 12.365-32.397 12.365-44.75 0-12.354-12.354-12.354-32.391 0-44.744L278.318 225.92 106.409 54.017c-12.354-12.359-12.354-32.394 0-44.748 12.354-12.359 32.391-12.359 44.75 0l194.287 194.284c6.177 6.18 9.262 14.271 9.262 22.366 0 8.099-3.091 16.196-9.267 22.373z">
+                    </path>
+                </svg>
+            </div>
+        </div>
+
+        <p class="text-center text-[10px] text-gray-600 uppercase tracking-widest mt-6">
+            Transação Segura
+        </p>
+    </div>
+</section>
