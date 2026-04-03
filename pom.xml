@@ -9,5 +9,6 @@
         <module>ms-auth</module>
         <module>ms-cliente</module>
         <module>ms-conta</module>
+        <module>ms-funcionario</module>
     </modules>
 </project>
