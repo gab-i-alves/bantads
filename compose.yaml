@@ -59,6 +59,20 @@ services:
         JWT_SECRET: ${JWT_SECRET}
       depends_on:
         - mongo
+    ms-funcionario:
+      build: ./ms-funcionario
+      restart: unless-stopped
+      ports:
+        - "8083:8080"
+      environment:
+        DB_HOST: postgres
+        DB_PORT: 5432
+        DB_USER: ${POSTGRES_USER}
+        DB_PASS: ${POSTGRES_PASSWORD}
+      depends_on:
+        - postgres
+      volumes:
+        - ./ms-funcionario/src:/app/src
 
 volumes:
     postgres-data:
