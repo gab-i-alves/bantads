@@ -110,6 +110,7 @@ Acesse `http://localhost:4200`.
 Para resetar os bancos pro estado inicial da spec:
 
 ```bash
+curl http://localhost:8081/reboot   # ms-cliente
 curl http://localhost:8082/reboot   # ms-auth
 curl http://localhost:8083/reboot   # ms-conta
 ```
@@ -128,6 +129,7 @@ curl http://localhost:8083/reboot   # ms-conta
 | PUT | `/clientes/{cpf}` | Alterar perfil | R4 |
 | POST | `/clientes/{cpf}/aprovar` | Aprovar cliente | R10 |
 | POST | `/clientes/{cpf}/rejeitar` | Rejeitar cliente | R11 |
+| GET | `/reboot` | Reset dos dados | — |
 
 ### MS Conta (porta 8083)
 
