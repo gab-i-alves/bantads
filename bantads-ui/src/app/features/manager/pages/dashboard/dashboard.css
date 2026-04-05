@@ -1,0 +1,226 @@
+.table-container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+table {
+  width: 100%;
+  table-layout: fixed;
+  /* controla proporção */
+  border-collapse: separate;
+  border-spacing: 0 14px;
+}
+
+th {
+  text-align: left;
+  font-size: 12px;
+  color: #6b7280;
+  padding-bottom: 10px;
+  padding-left: 17px;
+}
+
+/* proporção das colunas */
+th:nth-child(1),
+td:nth-child(1) {
+  width: 25%;
+}
+
+th:nth-child(2),
+td:nth-child(2) {
+  width: 20%;
+}
+
+th:nth-child(3),
+td:nth-child(3) {
+  width: 20%;
+}
+
+th:nth-child(4),
+td:nth-child(4) {
+  width: 15%;
+}
+
+td {
+  background: #080808;
+  padding: 18px;
+}
+
+tr td:first-child {
+  border-radius: 12px 0 0 12px;
+}
+
+tr td:last-child {
+  border-radius: 0 12px 12px 0;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.cpf {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.salary {
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-recusar {
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+.btn-aprovar {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: white;
+}
+
+/* button aprove pedding */
+.button {
+  width: 240px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 0px 15px;
+  background-color: rgb(17, 17, 17);
+  border: 1px solid white;
+  border-radius: 10px;
+  color: white;
+  border: none;
+  position: relative;
+  cursor: pointer;
+  transition-duration: 0.2s;
+}
+
+.dot {
+  position: relative;
+  left: 0;
+  bottom: 35px;
+  transform: translate(-50%, -50%);
+  width: 15px;
+  height: 15px;
+  background-color: rgb(194, 3, 3);
+  border-radius: 100%;
+}
+
+.bell {
+  width: 13px;
+}
+
+.bell path {
+  fill: rgb(187, 13, 255);
+}
+
+.button:hover {
+  background-color: rgb(77, 77, 77);
+  transition-duration: 0.2s;
+}
+
+
+
+
+/* From Uiverse.io by joe-watson-sbf */
+.card {
+  width: 100%;
+  height: 254px;
+  border-radius: 8px;
+  background: #080808;
+  display: flex;
+  gap: 5px;
+  padding: .4em;
+}
+
+/* Estilo de cada item individual (antigo p) */
+.card-item {
+  height: 100%;
+  flex: 1;
+  overflow: hidden;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all .5s ease;
+  background: #080808;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* Expansão ao passar o mouse */
+.card-item:hover {
+  flex: 4;
+  background: #2a2a2a;
+}
+
+/* Estilização do Ícone */
+.icon {
+  transition: transform 0.5s ease;
+  transform: translateY(0) scale(1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Animação do ícone: sobe e aumenta um pouco */
+.card-item:hover .icon {
+  transform: translateY(-20px) scale(1.2);
+}
+
+/* Estilização do Texto */
+.text {
+  position: absolute;
+  bottom: 35%;
+  text-transform: uppercase;
+  color: #ffffff;
+  letter-spacing: .1em;
+  font-size: 0.9rem;
+  text-align: center;
+  white-space: nowrap;
+  /* Impede quebra de linha */
+
+  /* Estado inicial: invisível e levemente para baixo */
+  opacity: 0;
+  transform: translateY(20px);
+  /* Quando o mouse SAI, o texto some rápido (sem delay) */
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+
+/* Animação do texto: aparece DEPOIS do ícone */
+.card-item:hover .text {
+  opacity: 1;
+  transform: translateY(0);
+  /* O delay de 0.3s é o que faz ele aparecer "depois" */
+  transition: opacity 0.4s ease 0.3s, transform 0.4s ease 0.3s;
+}

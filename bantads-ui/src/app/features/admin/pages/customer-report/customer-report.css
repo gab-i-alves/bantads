@@ -1,0 +1,173 @@
+/* input */ 
+.input {
+  color: #fff;
+  font-size: 0.9rem;
+  background-color: transparent;
+  min-width: 500px;
+  width: 100%;
+  box-sizing: border-box;
+  padding-inline: 0.5em;
+  padding-block: 0.7em;
+  border: none;
+  border-bottom: var(--border-height) solid var(--border-before-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.input-border {
+  position: absolute;
+  background: var(--border-after-color);
+  height: 2px;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  transform: scaleX(0%);
+  transition: transform 0.3s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+}
+
+.input:focus {
+  outline: none;
+}
+
+.input:focus + .input-border {
+  transform: scaleX(100%);
+}
+
+.form-control {
+  position: relative;
+  --width-of-input: 300px;
+}
+
+.input-alt {
+  font-size: 1.2rem;
+  padding-inline: 1em;
+  padding-block: 0.8em;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.input-border-alt {
+  height: 3px;
+  background: linear-gradient(90deg, #f264ff 0%, #ca59ff 50%, #8747ff 100%);
+  transition: transform 0.4s cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+.input-alt:focus + .input-border-alt {
+  transform: scaleX(100%);
+}
+
+
+/* table */
+.table-container {
+  max-width: 1200px;
+  margin: auto;
+  overflow-x: auto; /* scroll lateral */
+}
+
+
+/* barra de rolagem */
+.table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+/* fundo do scroll */
+.table-container::-webkit-scrollbar-track {
+  background: #0f0f0f;
+  border-radius: 10px;
+}
+
+/* parte que se move */
+.table-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  border-radius: 10px;
+}
+
+/* hover */
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #6d28d9, #9333ea);
+}
+
+table {
+  width: 100%;
+  min-width: 1500px;
+  table-layout: fixed;
+  /* controla proporção */
+  border-collapse: separate;
+  border-spacing: 0 14px;
+}
+
+th {
+  text-align: left;
+  font-size: 12px;
+  color: #6b7280;
+  padding-bottom: 10px;
+  padding-left: 17px;
+}
+
+/* proporção das colunas */
+/* proporção das colunas */
+
+th:nth-child(1), td:nth-child(1) { width: 250px; } /* nome */
+
+th:nth-child(2), td:nth-child(2) { width : 150px; } /* cpf */
+
+th:nth-child(3), td:nth-child(3) { width : 250px; } /* email */
+
+th:nth-child(4), td:nth-child(4) { width : 150px; } /* conta */
+
+th:nth-child(5), td:nth-child(5) { width : 150px; } /* salario */
+
+th:nth-child(6), td:nth-child(6) { width : 150px; } /* cidade */
+
+th:nth-child(7), td:nth-child(7) { width : 100px; } /* estado */
+
+th:nth-child(8), td:nth-child(8) { width : 150px; } /* saldo */
+
+th:nth-child(9), td:nth-child(9) { width : 150px; } /* limite */
+
+th:nth-child(10), td:nth-child(10) { width : 200px; } /* gerente */
+
+th:nth-child(11), td:nth-child(11) { width : 150px; } /* cpf gerente */
+
+td {
+  background: #080808;
+  padding: 18px;
+}
+
+tr td:first-child {
+  border-radius: 12px 0 0 12px;
+}
+
+tr td:last-child {
+  border-radius: 0 12px 12px 0;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.cpf {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.salary {
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}

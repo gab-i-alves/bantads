@@ -1,0 +1,84 @@
+<app-header-admin></app-header-admin>
+
+<section class="max-w-[1200px] m-auto flex justify-between gap-3 my-[20px]">
+    <div class="flex flex-col gap-3">
+        <h1 class="text-[30px] font-[700]">Gerenciar Gerentes</h1>
+        <p>Bem-vindo Admin, gerencie os gerentes.</p>
+    </div>
+
+    <button
+        (click)="toggleAdicionarGerente()"
+        class="inline-block cursor-pointer items-center justify-center rounded-xl border-[1.58px] border-zinc-600 bg-zinc-950 px-5 py-3 font-medium text-slate-200 shadow-md transition-all duration-300 hover:[transform:translateY(-.335rem)] hover:shadow-xl">
+        Adicionar Gerente
+    </button>
+
+</section>
+
+<section>
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>NOME</th>
+                    <th>CPF</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @for (gerente of gerentes; track gerente.cpf) {
+                @if(gerente) {
+                <tr>
+                    <td>
+                        <div class="user">
+                            <div class="avatar">{{gerente.nome.charAt(0) + gerente.nome.split(' ')[1].charAt(0)}}</div>
+                            <span>{{gerente.nome}}</span>
+                        </div>
+                    </td>
+                    <td class="cpf">{{gerente.cpf}}</td>
+                    <td class="salary">{{gerente.email}}</td>
+                    <td>{{gerente.telefone}}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-editar" (click)="toggleeditarGerente(gerente)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-square-pen-icon lucide-square-pen">
+                                    <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                    <path
+                                        d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
+                                </svg>
+                            </button>
+                            <button class="btn btn-excluir">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-trash-2-icon lucide-trash-2">
+                                    <path d="M3 6h18" />
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                                    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                }
+                }
+
+            </tbody>
+        </table>
+
+    </div>
+</section>
+
+@if(adicionarGerenteIsActive()) {
+    <app-new-manager (fecharModal)="fecharModalAdicionar()" (adicionarGerente)="adicionarNovoGerente($event)"></app-new-manager>
+}
+
+@if(editarGerenteIsActive()) {
+    <app-edit-manager (fecharModal)="fecharModalEditar()"></app-edit-manager>
+}

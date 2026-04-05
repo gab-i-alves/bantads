@@ -1,0 +1,63 @@
+<app-header-admin></app-header-admin>
+
+<section class="container flex flex-col gap-3 my-[20px]">
+    <h1 class="text-[30px] font-[700]">Dashboard</h1>
+    <p>Bem-vindo Admin, visualize os dados dos gerentes.</p>
+</section>
+
+<section class="dashboard-container">
+    @for(gerente of topGerentes; track gerente.id; let i = $index) {
+    <div class="card">
+
+        <div class="card-header">
+            <h2>{{ gerente.nome }}</h2>
+            @switch(i) {
+            @case(0) {
+            <div class="rank">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#F59E0B"
+                    stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                        d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+                </svg>
+            </div>
+            }
+            @case(1) {
+            <div class="rank">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke="none"
+                    fill="#9CA3AF" stroke-width="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                        d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+                </svg>
+            </div>
+            }
+            @case(2) {
+            <div class="rank">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                    fill="#CD7F32" stroke="none" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                        d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+                </svg>
+            </div>
+            }
+            }
+        </div>
+        <div class="card-body">
+            <p>
+                Clientes
+                <span>{{ gerente.clientes }}</span>
+            </p>
+            <p class="positivo">
+                Saldo positivo
+                <span>R$ {{ gerente.saldoPositivo }}</span>
+            </p>
+
+            <p class="negativo">
+                Saldo negativo
+                <span>R$ {{ gerente.saldoNegativo }}</span>
+            </p>
+        </div>
+
+    </div>
+    }
+</section>
