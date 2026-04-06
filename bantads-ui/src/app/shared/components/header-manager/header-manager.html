@@ -30,17 +30,17 @@
                     </div>
 
                     <span class="text-sm font-medium text-gray-300 hidden md:block">
-                        Minha Conta
+                        {{meusDados.nome ? meusDados.nome : 'gerente'}}
                     </span>
 
                     <i class="fas fa-chevron-down text-[10px] text-gray-500 group-open:rotate-180 transition-transform">
                     </i>
                 </div>
             </summary>
-            
+
 
             <!-- Dropdown -->
-            <div class="z-10 absolute right-0 mt-2  bg-[#0f0f0f] border border-white/10 rounded-xl shadow-xl p-2">
+            <!-- <div class="z-10 absolute right-0 mt-2  bg-[#0f0f0f] border border-white/10 rounded-xl shadow-xl p-2">
 
                 <a [routerLink]="['/perfil']"
                     class="flex justify-around items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-white/5 rounded-lg transition">
@@ -55,7 +55,7 @@
 
                     Sair
                 </button>
-            </div>
+            </div> -->
         </details>
     </div>
 </header>

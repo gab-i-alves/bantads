@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
-import { Header } from '../../../../shared/components/header/header';
+import { Component, inject, signal } from '@angular/core';
 import { HeaderManager } from '../../../../shared/components/header-manager/header-manager';
 import { AproveClient } from '../../components/aprove-client/aprove-client';
+import { ClientService } from '../../../../core/services/client.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 type PedidoAutocadastro = {
   cpf: string;
@@ -20,39 +21,14 @@ type PedidoAutocadastro = {
 export class DashboardManager {
   selectedPedido = signal<PedidoAutocadastro | null>(null);
   isModalOpen = signal(false);
-  
-  pedidos: PedidoAutocadastro[] = [
-    {
-      cpf: "123.456.789-00",
-      nome: "João Silva",
-      salario: 5000,
-      aprovado: null
-    },
-    {
-      cpf: "987.654.321-11",
-      nome: "Maria Oliveira",
-      salario: 12450,
-      aprovado: null
-    },
-    {
-      cpf: "456.123.789-99",
-      nome: "Ricardo Costa",
-      salario: 3200,
-      aprovado: null
-    },
-    {
-      cpf: "321.654.987-22",
-      nome: "Ana Amaral",
-      salario: 8900,
-      aprovado: null
-    },
-    {
-      cpf: "741.852.963-00",
-      nome: "Fernando Pereira",
-      salario: 21000,
-      aprovado: null
-    }
-  ];
+
+  clientService = inject(ClientService);
+  authService = inject(AuthService);
+
+  clientesPendentes: any;
+  ngOnInit() {
+    this.clientesPendentes = this.clientService.getClientesByGerente(this.authService.getUsuarioLogado().gerenteId);
+  }
 
   abrirModal(pedido: PedidoAutocadastro) {
     this.selectedPedido.set(pedido);
@@ -64,13 +40,16 @@ export class DashboardManager {
     this.selectedPedido.set(null);
   }
 
-  aprovarPedido(pedido: PedidoAutocadastro) {
-    pedido.aprovado = true;
+  aprovarPedido(pedido: any) {
+    console.log(pedido.idCliente);
+    alert('pedido aprovado');
+    this.clientService.aprovarSolicitacao(pedido.idCliente);
     this.fecharModal();
   }
 
-  recusarPedido(pedido: PedidoAutocadastro) {
-    pedido.aprovado = false;
+  recusarPedido(pedido: any) {
+    alert('pedido recusado');
+    this.clientService.recusarSolicitacao(pedido.idCliente);
     this.fecharModal();
   }
 }

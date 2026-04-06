@@ -33,13 +33,11 @@
                 <div class="info-group">
                     <label>Status</label>
                     <p class="info-value"
-                        [ngClass]="pedido.aprovado === null ? 'status-pendente' : pedido.aprovado ? 'status-aprovado' : 'status-recusado'">
-                        @if(pedido.aprovado === null) {
+                        [ngClass]="pedido.statusAprovacao === 'pendente' ? 'status-pendente' : 'status-aprovado' ">
+                        @if(pedido.statusAprovacao === 'pendente') {
                         Pendente
-                        } @else if(pedido.aprovado) {
-                        Aprovado
-                        } @else {
-                        Recusado
+                        }@else{
+                        --
                         }
                     </p>
                 </div>
@@ -61,7 +59,7 @@
                 <button class="btn-enviar" (click)="recurarIsActive()">Cancelar</button>
                 <button class="btn-enviar" (click)="onRecusar()">Enviar</button>
             </div>
-            
+
         </div>
         }}
     </div>

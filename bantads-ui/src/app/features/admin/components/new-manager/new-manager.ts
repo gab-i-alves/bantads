@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Output, signal } from '@angular/core';
+import { Component, EventEmitter, inject, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ManagerService } from '../../../../core/services/manager.service';
 
 type Gerente = {
   nome: string;
@@ -17,6 +18,8 @@ type Gerente = {
   styleUrl: './new-manager.css',
 })
 export class NewManager {
+  manageService = inject(ManagerService);
+
   @Output() fecharModal = new EventEmitter<void>();
   @Output() adicionarGerente = new EventEmitter<Gerente>();
 
@@ -45,8 +48,9 @@ export class NewManager {
       senha: this.senha(),
     };
 
-    this.adicionarGerente.emit(novoGerente);
+    this.manageService.createGerente(novoGerente);
     this.limparFormulario();
+    window.location.reload();
     this.fecharModal.emit();
   }
 

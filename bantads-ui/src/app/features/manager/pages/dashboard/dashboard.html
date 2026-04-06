@@ -1,7 +1,7 @@
 <app-header-manager></app-header-manager>
 <section class="max-w-[1200px] m-auto flex justify-between items-center mt-5 mb-5">
     <h1 class="text-[40px] font-[700]">Dashboard</h1>
-    @if(pedidos.filter(p => p.aprovado === null).length > 0) {
+    <!-- @if(clientesPendentes) {
     <div>
 
         <button class="button">
@@ -10,12 +10,12 @@
                     d="M224 0c-17.7 0-32 14.3-32 32V49.9C119.5 61.4 64 124.2 64 200v33.4c0 45.4-15.5 89.5-43.8 124.9L5.3 377c-5.8 7.2-6.9 17.1-2.9 25.4S14.8 416 24 416H424c9.2 0 17.6-5.3 21.6-13.6s2.9-18.2-2.9-25.4l-14.9-18.6C399.5 322.9 384 278.8 384 233.4V200c0-75.8-55.5-138.6-128-150.1V32c0-17.7-14.3-32-32-32zm0 96h8c57.4 0 104 46.6 104 104v33.4c0 47.9 13.9 94.6 39.7 134.6H72.3C98.1 328 112 281.3 112 233.4V200c0-57.4 46.6-104 104-104h8zm64 352H224 160c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7s18.7-28.3 18.7-45.3z">
                 </path>
             </svg>
-            <p>Aprovações pendentes: {{ pedidos.filter(p => p.aprovado === null).length }}</p>
+            <p>Aprovações pendentes: {{ clientesPendentes.length }}</p>
         </button>
 
         <div class="dot"></div>
     </div>
-}
+    } -->
 </section>
 
 <section>
@@ -34,21 +34,21 @@
 
             <tbody>
 
-                @for (pedido of pedidos; track pedido.cpf) {
-                @if(pedido.aprovado === null) {
+                @for (cliente of clientesPendentes; track cliente.idCliente) {
+                @if(cliente.statusAprovacao === 'pendente') {
                 <tr>
                     <td>
                         <div class="user">
-                            <div class="avatar">{{pedido.nome.charAt(0) + pedido.nome.split(' ')[1].charAt(0)}}</div>
-                            <span>{{pedido.nome}}</span>
+                            <div class="avatar">{{cliente.nome.charAt(0) + cliente.nome.split(' ')[1].charAt(0)}}</div>
+                            <span>{{cliente.nome}}</span>
                         </div>
                     </td>
-                    <td class="cpf">{{pedido.cpf}}</td>
-                    <td class="salary">R$ {{pedido.salario.toFixed(2).replace('.', ',') }}</td>
+                    <td class="cpf">{{cliente.cpf}}</td>
+                    <td class="salary">R$ {{cliente.salario.toFixed(2).replace('.', ',') }}</td>
                     <td>
                         <div class="actions">
-                            <button class="btn btn-recusar" (click)="abrirModal(pedido)">Recusar</button>
-                            <button class="btn btn-aprovar" (click)="abrirModal(pedido)">Aprovar</button>
+                            <button class="btn btn-recusar" (click)="abrirModal(cliente)">Recusar</button>
+                            <button class="btn btn-aprovar" (click)="abrirModal(cliente)">Aprovar</button>
                         </div>
                     </td>
                 </tr>

@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-small-card',
@@ -6,4 +7,8 @@ import { Component } from '@angular/core';
   templateUrl: './small-card.html',
   styleUrl: './small-card.css',
 })
-export class SmallCard {}
+export class SmallCard {
+
+  authService = inject(AuthService);
+  meusDados = this.authService.getUsuarioLogado();
+}

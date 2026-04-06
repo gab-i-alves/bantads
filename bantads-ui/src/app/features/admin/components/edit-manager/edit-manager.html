@@ -14,17 +14,17 @@
 
         <div class="flex flex-col gap-4 p-10">
 
-            <input type="text" placeholder="Nome" >
+            <input type="text" [(ngModel)]="gerente.nome" placeholder="Nome">
 
-            <input type="text" placeholder="CPF" >
+            <input type="text" [(ngModel)]="gerente.cpf" placeholder="CPF">
 
-            <input type="email" placeholder="Email" >
+            <input type="email" [(ngModel)]="gerente.email" placeholder="Email">
 
-            <input type="text" placeholder="Telefone" >
+            <input type="text" [(ngModel)]="gerente.telefone" placeholder="Telefone">
 
-            <input type="password" placeholder="Senha" >
+            <input type="password" [(ngModel)]="gerente.senha" placeholder="Senha">
 
-            <button class="save-button">
+            <button class="save-button" (click)="salvarEdicao()">
                 Salvar gerente
             </button>
 

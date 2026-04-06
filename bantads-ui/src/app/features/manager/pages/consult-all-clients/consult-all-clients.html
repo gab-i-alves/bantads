@@ -7,10 +7,7 @@
 
 <section class="max-w-[1200px] m-auto flex justify-around items-center mt-5 mb-5">
     <div class="form-control">
-        <input
-            type="text"
-            placeholder="Clique e digite o nome ou CPF do cliente..."
-            class="input input-alt"
+        <input type="text" placeholder="Clique e digite o nome ou CPF do cliente..." class="input input-alt"
             [(ngModel)]="searchTerm" />
         <span class="input-border input-border-alt"></span>
     </div>
@@ -46,9 +43,9 @@
                     <td class="cpf">{{cliente.cpf}}</td>
                     <td class="salary">R$ {{cliente.salario.toFixed(2).replace('.', ',') }}</td>
                     <td>{{cliente.cidade}}</td>
-                    <td>{{cliente.estado}}</td>
-                    <td>R$ {{cliente.saldoConta.toFixed(2).replace('.', ',') }}</td>
-                    <td>R$ {{cliente.limiteConta.toFixed(2).replace('.', ',') }}</td>
+                    <td>{{cliente.uf}}</td>
+                    <td>R$ {{cliente.saldo.toFixed(2).replace('.', ',') }}</td>
+                    <td>R$ {{cliente.credito.toFixed(2).replace('.', ',') }}</td>
                 </tr>
                 }
 
