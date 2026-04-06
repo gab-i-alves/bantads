@@ -145,6 +145,7 @@ export class ClientService {
     const novoCliente = {
       idCliente: novoId,
       statusAprovacao: 'pendente',
+      gerenteId: 1,
       ...cliente
     };
 
@@ -155,7 +156,6 @@ export class ClientService {
   }
 
   //  operações financeiras
-
   transferirDinheiro(idRemetente: number, idDestinatario: number, valor: number) {
     const clientes = this.getDB();
 
@@ -245,6 +245,30 @@ export class ClientService {
     }
 
     cliente.statusAprovacao = 'recusado';
+
+    this.saveDB(clientes);
+
+    return cliente;
+  }
+
+  // atualizar dados do cliente
+  updateCliente(idCliente: number, dadosAtualizados: any) {
+    const clientes = this.getDB();
+
+    const cliente = clientes.find(c => c.idCliente === idCliente);
+
+    if (!cliente) {
+      throw new Error('Cliente não encontrado');
+    }
+
+    // Atualizar apenas os campos que não alteram a integridade do sistema
+    const camposPermitidos = ['nome', 'email', 'salario', 'funcao', 'telefone', 'cep', 'cidade', 'uf', 'rua', 'numero', 'complemento'];
+
+    camposPermitidos.forEach(campo => {
+      if (dadosAtualizados[campo] !== undefined) {
+        cliente[campo] = dadosAtualizados[campo];
+      }
+    });
 
     this.saveDB(clientes);
 

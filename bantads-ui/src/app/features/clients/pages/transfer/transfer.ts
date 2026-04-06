@@ -66,5 +66,7 @@ export class Transfer implements OnInit {
       console.log('Transferindo', amountNumber, 'para cliente ID:', recipientId);
       this.clientService.transferirDinheiro(currentUser.idCliente, recipientId, amountNumber);
     }
+
+    alert('dinheiro transferido!')
   }
 }

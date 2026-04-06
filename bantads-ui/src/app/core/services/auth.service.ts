@@ -84,4 +84,14 @@ export class AuthService {
 
     return novoCliente;
   }
+
+  atualizarPerfil(idCliente: number, dadosAtualizados: any) {
+    const clienteAtualizado = this.clientes.updateCliente(idCliente, dadosAtualizados);
+
+    // Atualizar localStorage com os novos dados
+    localStorage.setItem(this.key, JSON.stringify(clienteAtualizado));
+    localStorage.setItem(this.keyTipo, 'cliente');
+
+    return clienteAtualizado;
+  }
 }
