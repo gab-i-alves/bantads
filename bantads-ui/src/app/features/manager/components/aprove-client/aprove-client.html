@@ -1,0 +1,66 @@
+<div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header do Modal -->
+        <div class="modal-header">
+            <h2>Solicitação</h2>
+            <button class="close-button" (click)="closeModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Conteúdo do Modal -->
+        @if(pedido) {
+        <div class="modal-body">
+            <div class="pedido-info">
+                <div class="info-group">
+                    <label>Nome do Cliente</label>
+                    <p class="info-value">{{ pedido.nome }}</p>
+                </div>
+
+                <div class="info-group">
+                    <label>CPF</label>
+                    <p class="info-value">{{ pedido.cpf }}</p>
+                </div>
+
+                <div class="info-group">
+                    <label>Salário</label>
+                    <p class="info-value salary">R$ {{ pedido.salario.toFixed(2).replace('.', ',') }}</p>
+                </div>
+
+                <div class="info-group">
+                    <label>Status</label>
+                    <p class="info-value"
+                        [ngClass]="pedido.statusAprovacao === 'pendente' ? 'status-pendente' : 'status-aprovado' ">
+                        @if(pedido.statusAprovacao === 'pendente') {
+                        Pendente
+                        }@else{
+                        --
+                        }
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer do Modal -->
+        <div class="modal-footer">
+            @if(!recusar) {
+            <button class="btn btn-recusar" (click)="recurarIsActive()">Recusar Pedido</button>
+            <button class="btn btn-aprovar" (click)="onAprovar()">Aprovar Pedido</button>
+            }
+        </div>
+
+        @if(recusar) {
+        <div class="recusar-box">
+            <input type="text" placeholder="Adicione um comentário para recusar o pedido..." class="recusar-input">
+            <div class="flex justify-between">
+                <button class="btn-enviar" (click)="recurarIsActive()">Cancelar</button>
+                <button class="btn-enviar" (click)="onRecusar()">Enviar</button>
+            </div>
+
+        </div>
+        }}
+    </div>
+</div>

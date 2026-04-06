@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -24,7 +25,19 @@ public class DataSeeder implements CommandLineRunner {
             log.info("Banco ja possui dados, seed ignorado.");
             return;
         }
+        seed();
+    }
 
+    // /reboot: apaga tudo e re-insere os dados da spec
+    @Transactional
+    public void reboot() {
+        repository.deleteAll();
+        repository.flush();
+        seed();
+        log.info("Reboot: dados resetados pro estado inicial da spec.");
+    }
+
+    private void seed() {
         List<Cliente> clientes = List.of(
             Cliente.builder()
                 .nome("Catharyna").email("cli1@bantads.com.br").cpf("12912861012")
@@ -76,4 +89,5 @@ public class DataSeeder implements CommandLineRunner {
         repository.saveAll(clientes);
         log.info("Seed: {} clientes inseridos.", clientes.size());
     }
+
 }

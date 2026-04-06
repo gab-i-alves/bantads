@@ -22,14 +22,14 @@ services:
         volumes:
             - mongo-data:/data/db
     rabbit:
-        image: rabbitmq:4.2.5-alpine
+        image: rabbitmq:4.2-management-alpine
         restart: unless-stopped
         ports:
             - ${RABBIT_AMQP_PORT}:5672
             - ${RABBIT_UI_PORT}:15672
         environment:
-            RABBIT_DEFAULT_USER: ${RABBIT_DEFAULT_USER}
-            RABBIT_DEFAULT_PASS: ${RABBIT_DEFAULT_PASS}
+            RABBITMQ_DEFAULT_USER: ${RABBIT_DEFAULT_USER}
+            RABBITMQ_DEFAULT_PASS: ${RABBIT_DEFAULT_PASS}
         volumes:
             - rabbitmq-data:/var/lib/rabbitmq/
     ms-cliente:
@@ -44,6 +44,23 @@ services:
             DB_PASS: ${POSTGRES_PASSWORD}
         depends_on:
             - postgres
+    ms-conta:
+        build: ./ms-conta
+        restart: unless-stopped
+        ports:
+            - "8083:8083"
+        environment:
+            DB_HOST: postgres
+            DB_PORT: 5432
+            DB_USER: ${POSTGRES_USER}
+            DB_PASS: ${POSTGRES_PASSWORD}
+            RABBIT_HOST: rabbit
+            RABBIT_PORT: 5672
+            RABBIT_USER: ${RABBIT_DEFAULT_USER}
+            RABBIT_PASS: ${RABBIT_DEFAULT_PASS}
+        depends_on:
+            - postgres
+            - rabbit
     ms-auth:
       build: ./ms-auth
       restart: unless-stopped
@@ -59,6 +76,20 @@ services:
         JWT_SECRET: ${JWT_SECRET}
       depends_on:
         - mongo
+    ms-funcionario:
+      build: ./ms-funcionario
+      restart: unless-stopped
+      ports:
+        - "8083:8080"
+      environment:
+        DB_HOST: postgres
+        DB_PORT: 5432
+        DB_USER: ${POSTGRES_USER}
+        DB_PASS: ${POSTGRES_PASSWORD}
+      depends_on:
+        - postgres
+      volumes:
+        - ./ms-funcionario/src:/app/src
 
 volumes:
     postgres-data:

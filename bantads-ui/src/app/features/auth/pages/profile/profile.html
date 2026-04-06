@@ -4,19 +4,20 @@
     <div class="flex gap-4">
         <div class="border bg-purple-700 p-4 rounded-[50%] w-16 h-16 flex items-center justify-center text-white text-xl
         font-bold">
-            TG
+            {{meuDados.nome[0]}}
         </div>
 
         <div class="flex flex-col items-center justify-center mt-4 gap-2">
-            <h1 class="text-2xl font-bold">Thiago Cordeiro</h1>
-            <p class="text-gray-600">
+            <h1 class="text-2xl font-bold">{{meuDados.nome}}</h1>
+            <p class="text-white">
+                {{meuDados.email}}
             </p>
         </div>
     </div>
     <div>
-        <h1>Saldo: <span>R$ 1.000,00</span></h1>
-        <h1>Limite: <span>R$ 1.000,00</span></h1>
-        <h1>gerente: <span>John Doe</span></h1>
+        <h1>Saldo: <span>{{meuDados.saldo}}</span></h1>
+        <h1>Limite Credito: <span>{{meuDados.credito}}</span></h1>
+        <h1>gerente: <span>{{meuDados.gerenteId}}</span></h1>
     </div>
 </section>
 

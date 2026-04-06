@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Header } from '../../../../shared/components/header/header';
+import { AuthService } from '../../../../core/services/auth.service';
+import { ClientService } from '../../../../core/services/client.service';
 
 @Component({
   selector: 'app-deposit',
@@ -8,6 +10,15 @@ import { Header } from '../../../../shared/components/header/header';
   styleUrl: './deposit.css',
 })
 export class Deposit {
+
+  authService = inject(AuthService);
+  clientService = inject(ClientService);
+  userLogado = this.authService.getUsuarioLogado();
+
+
+
+
+
   amount: string = '0,00';
   isActive: boolean = false;
 
@@ -28,6 +39,11 @@ export class Deposit {
     }
 
     this.isActive = true;
+
+    const valor = parseFloat(this.amount.replace(',', '.'));
+    console.log('Iniciando depósito! valor a ser depositado: R$ ' + valor);
+
+    this.clientService.depositarDinheiro(this.userLogado.idCliente, valor);
 
     setTimeout(() => {
       console.log('Depósito processado! valor depositado: R$ ' + this.amount);

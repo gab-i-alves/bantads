@@ -33,24 +33,20 @@
 
             <div class="form-container">
                 @if (isLogin) {
-                <form class="form">
+                <form class="form" (ngSubmit)="login()">
 
                     <div class="input-group">
                         <label>Email</label>
-                        <input type="email" placeholder="eg. johnfrans@gmail.com">
+                        <input type="email" [(ngModel)]="email" name="email" placeholder="eg. johnfrans@gmail.com">
                     </div>
 
                     <div class="input-group">
                         <label>Password</label>
-                        <input type="password" placeholder="Enter your password">
-                        <small>Must be at least 8 characters.</small>
+                        <input type="password" [(ngModel)]="senha" name="senha" placeholder="Enter your password">
                     </div>
 
-                    <button type="submit" [routerLink]="['/client/dashboard']">Login</button>
+                    <button type="submit">Login</button>
 
-                    <p class="login-text">
-                        Dont have an account? <span (click)="trocarEstado()">Register</span>
-                    </p>
                 </form>
                 }
 

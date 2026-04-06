@@ -1,0 +1,158 @@
+<app-header-manager></app-header-manager>
+<section class="max-w-[1200px] m-auto flex justify-around items-center mt-5 mb-5">
+    <div class="form-control">
+        <input type="text" placeholder="Clique e digite o nome ou CPF do cliente..." class="input input-alt"
+            [(ngModel)]="searchTerm" />
+        <span class="input-border input-border-alt"></span>
+    </div>
+</section>
+
+@if (clienteSelecionado) {
+<section class="max-w-[1200px] m-auto flex justify-between items-center mt-10 mb-5">
+
+    <div class="flex flex-col">
+        <h1 class="text-[44px] font-[700]">{{clienteSelecionado.nome}}</h1>
+        <div class="flex items-center my-5 gap-4">
+
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#3b2a59] bg-[#1d162d]">
+                <span class="w-2 h-2 rounded-full bg-[#a87ffb]"></span>
+                <span class="text-[#a87ffb] text-xs font-bold uppercase tracking-wider">Conta Ativa</span>
+            </div>
+
+            <p class="text-gray-400 text-sm font-medium tracking-wide">CPF: {{clienteSelecionado.cpf}}</p>
+
+        </div>
+    </div>
+
+    <div class=" flex justify-end mb-4" (click)="searchTerm = ''">
+        <button
+            class="flex items-center gap-2 px-4 py-2 bg-[#1e1e21] hover:bg-[#2a2a2d] border border-[#3b3b3f] rounded-lg text-gray-300 text-sm font-medium transition-all active:scale-95">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                </path>
+            </svg>
+            Limpar Busca
+        </button>
+    </div>
+</section>
+
+<hr class=" max-w-[1200px] m-auto border-white/10 my-1">
+
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl  my-10 mx-auto">
+
+    <!-- Card 1: Saldo -->
+    <div
+        class="bg-[#121214] border border-[#1e1e21] rounded-2xl p-6 flex flex-col justify-between hover:border-purple-500/50 transition-all">
+        <div class="flex justify-between items-start mb-8">
+            <span class="text-gray-400 text-sm font-medium">Saldo</span>
+            <div class="p-2 bg-purple-900/20 rounded-lg">
+                <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
+                    </path>
+                </svg>
+            </div>
+        </div>
+        <div>
+            <h2 class="text-white text-3xl font-bold mb-4">R$ {{clienteSelecionado.saldo.toFixed(2).replace('.',
+                ',')}}</h2>
+            <div class="flex items-center gap-1.5 text-emerald-500 text-xs font-semibold">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+                <span>+2.4% este mês</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 2: Limite -->
+    <div
+        class="bg-[#121214] border border-[#1e1e21] rounded-2xl p-6 flex flex-col justify-between hover:border-purple-500/50 transition-all">
+        <div class="flex justify-between items-start mb-8">
+            <span class="text-gray-400 text-sm font-medium">Limite</span>
+            <div class="p-2 bg-purple-900/20 rounded-lg">
+                <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
+                    </path>
+                </svg>
+            </div>
+        </div>
+        <div>
+            <h2 class="text-white text-3xl font-bold mb-4">R$ {{clienteSelecionado.credito.toFixed(2).replace('.',
+                ',')}}</h2>
+            <!-- Barra de Progresso
+            <div class="w-full bg-[#1e1e21] rounded-full h-1.5 mb-2">
+                <div class="bg-purple-600 h-1.5 rounded-full" style="width: 65%"></div>
+            </div> -->
+            <span class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">65% do limite utilizado</span>
+        </div>
+    </div>
+
+    <!-- Card 3: Salário -->
+    <div
+        class="bg-[#121214] border border-[#1e1e21] rounded-2xl p-6 flex flex-col justify-between hover:border-purple-500/50 transition-all">
+        <div class="flex justify-between items-start mb-8">
+            <span class="text-gray-400 text-sm font-medium">Salário</span>
+            <div class="p-2 bg-purple-900/20 rounded-lg">
+                <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z">
+                    </path>
+                </svg>
+            </div>
+        </div>
+        <div>
+            <h2 class="text-white text-3xl font-bold mb-4">R$ {{clienteSelecionado.salario.toFixed(2).replace('.',
+                ',')}}</h2>
+            <span class="text-gray-500 text-xs">Última verificação: 12 Out 2023</span>
+        </div>
+    </div>
+
+</section>
+
+<hr class=" max-w-[1200px] m-auto border-white/10 my-1">
+
+<section class="max-w-6xl mx-auto bg-[#121214] border border-[#1e1e21] rounded-2xl my-10 p-8  text-left">
+    <div class="mb-10">
+        <h3 class="text-white text-xl font-semibold mb-1">Informações Pessoais</h3>
+        <p class="text-gray-500 text-sm">Documentos e dados residenciais</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 ">
+        <!-- CPF -->
+        <div class="space-y-1">
+            <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">CPF</p>
+            <p class="text-white font-medium">{{clienteSelecionado.cpf}}</p>
+        </div>
+
+        <!-- CIDADE -->
+        <div class="space-y-1">
+            <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Cidade</p>
+            <p class="text-white font-medium">{{clienteSelecionado.cidade}}</p>
+        </div>
+
+        <!-- ESTADO -->
+        <div class="space-y-1">
+            <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Estado</p>
+            <p class="text-white font-medium">{{clienteSelecionado.uf}}</p>
+        </div>
+
+        <!-- SALÁRIO -->
+        <div class="space-y-1">
+            <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Salário</p>
+            <p class="text-white font-medium">R$ {{clienteSelecionado.salario.toFixed(2).replace('.', ',')}}</p>
+        </div>
+    </div>
+</section>
+
+
+<hr class=" max-w-[1200px] m-auto border-white/10 my-1">
+}

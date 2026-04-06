@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { AuthService } from '../../../../core/services/auth.service';
+import { ClientService } from '../../../../core/services/client.service';
 
 @Component({
   selector: 'app-cash-balance',
@@ -6,4 +8,16 @@ import { Component } from '@angular/core';
   templateUrl: './cash-balance.html',
   styleUrl: './cash-balance.css',
 })
-export class CashBalance { }
+export class CashBalance {
+
+
+  authService = inject(AuthService);
+  clientService = inject(ClientService);
+  meusDados = this.authService.getUsuarioLogado();
+
+  dadosAtualizados: any;
+
+  ngOnInit() {
+    this.dadosAtualizados = this.clientService.getClienteById(this.meusDados.idCliente);
+  }
+}
