@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.0] - 2026-04-06
+
+### Added
+- **bantads-ui**: telas do gerente (dashboard, consultar clientes, consultar cliente, top 3)
+- **bantads-ui**: telas do admin (dashboard, relatório de clientes, gerenciar gerentes)
+- **bantads-ui**: mock funcional para autocadastro e edição de perfil
+- **bantads-ui**: services com localStorage para clientes, gerentes, admins e autenticação
+- **bantads-ui**: `MovimentacaoService` e `Movimentacao` model com seed de 15 registros da spec
+- **bantads-ui**: filtro por data início/fim e saldo consolidado por dia no extrato (R8)
+- **bantads-ui**: registro automático de movimentações em depósito, saque e transferência
+- **bantads-ui**: arquivos base para auth guard, interceptor, models e money pipe
+
+### Changed
+- **bantads-ui**: navegação funcional no dashboard do gerente (R9, R12, R13)
+- **bantads-ui**: `consult-all-clients` com filtro de pendentes e link para detalhe via CPF
+
+---
+
 ## [0.3.1] - 2026-04-03
 
 ### Added
