@@ -65,7 +65,7 @@
     <h1 class="text-xl font-[200] py-10">Ações Rápidas</h1>
     <div class="card">
         <!-- Item 1 -->
-        <div class="card-item">
+        <div class="card-item" (click)="navegarPara('/manager/consultar-clientes')">
             <div class="icon">
                 <!-- Ícone SVG de Múltiplos Usuários -->
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"
@@ -80,7 +80,7 @@
         </div>
 
         <!-- Item 2 -->
-        <div class="card-item">
+        <div class="card-item" (click)="navegarPara('/manager/consultar-cliente')">
             <div class="icon">
                 <!-- Ícone SVG de Busca de Usuário -->
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"
@@ -95,7 +95,7 @@
         </div>
 
         <!-- Item 3 -->
-        <div class="card-item">
+        <div class="card-item" (click)="navegarPara('/manager/top-clientes')">
             <div class="icon">
                 <!-- Ícone SVG de Troféu -->
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"

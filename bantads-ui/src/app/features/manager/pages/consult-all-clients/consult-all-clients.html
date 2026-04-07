@@ -33,7 +33,7 @@
             <tbody>
 
                 @for (cliente of clientesFiltrados; track cliente.cpf) {
-                <tr>
+                <tr (click)="verCliente(cliente.cpf)" style="cursor: pointer;">
                     <td>
                         <div class="user">
                             <div class="avatar">{{cliente.nome.charAt(0) + cliente.nome.split(' ')[1].charAt(0)}}</div>

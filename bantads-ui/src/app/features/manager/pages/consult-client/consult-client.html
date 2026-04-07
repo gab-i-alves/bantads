@@ -59,14 +59,7 @@
         <div>
             <h2 class="text-white text-3xl font-bold mb-4">R$ {{clienteSelecionado.saldo.toFixed(2).replace('.',
                 ',')}}</h2>
-            <div class="flex items-center gap-1.5 text-emerald-500 text-xs font-semibold">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                </svg>
-                <span>+2.4% este mês</span>
-            </div>
+            <span class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Saldo atual</span>
         </div>
     </div>
 
@@ -91,7 +84,7 @@
             <div class="w-full bg-[#1e1e21] rounded-full h-1.5 mb-2">
                 <div class="bg-purple-600 h-1.5 rounded-full" style="width: 65%"></div>
             </div> -->
-            <span class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">65% do limite utilizado</span>
+            <span class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Limite disponível</span>
         </div>
     </div>
 
@@ -112,7 +105,7 @@
         <div>
             <h2 class="text-white text-3xl font-bold mb-4">R$ {{clienteSelecionado.salario.toFixed(2).replace('.',
                 ',')}}</h2>
-            <span class="text-gray-500 text-xs">Última verificação: 12 Out 2023</span>
+            <span class="text-gray-500 text-xs">Renda declarada</span>
         </div>
     </div>
 

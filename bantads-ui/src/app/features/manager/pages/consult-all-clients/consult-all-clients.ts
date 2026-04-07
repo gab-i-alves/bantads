@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { HeaderManager } from '../../../../shared/components/header-manager/header-manager';
 import { ClientService } from '../../../../core/services/client.service';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -24,6 +25,7 @@ export class ConsultAllClients {
 
   clienteService = inject(ClientService);
   authService = inject(AuthService);
+  private router = inject(Router);
 
   clientes = this.clienteService.getClientesByGerente(this.authService.getUsuarioLogado().gerenteId);
 
@@ -37,6 +39,12 @@ export class ConsultAllClients {
       )
       : this.clientes;
 
-    return resultado.sort((a, b) => a.nome.localeCompare(b.nome));
+    return resultado
+      .filter((c: any) => c.statusAprovacao !== 'pendente')
+      .sort((a, b) => a.nome.localeCompare(b.nome));
+  }
+
+  verCliente(cpf: string) {
+    this.router.navigate(['/manager/consultar-cliente'], { queryParams: { cpf } });
   }
 }

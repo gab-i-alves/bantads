@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { HeaderManager } from '../../../../shared/components/header-manager/header-manager';
 import { AproveClient } from '../../components/aprove-client/aprove-client';
 import { ClientService } from '../../../../core/services/client.service';
@@ -24,6 +25,7 @@ export class DashboardManager {
 
   clientService = inject(ClientService);
   authService = inject(AuthService);
+  private router = inject(Router);
 
   clientesPendentes: any;
   ngOnInit() {
@@ -41,15 +43,18 @@ export class DashboardManager {
   }
 
   aprovarPedido(pedido: any) {
-    console.log(pedido.idCliente);
-    alert('pedido aprovado');
     this.clientService.aprovarSolicitacao(pedido.idCliente);
     this.fecharModal();
+    this.clientesPendentes = this.clientService.getClientesByGerente(this.authService.getUsuarioLogado().gerenteId);
   }
 
   recusarPedido(pedido: any) {
-    alert('pedido recusado');
     this.clientService.recusarSolicitacao(pedido.idCliente);
     this.fecharModal();
+    this.clientesPendentes = this.clientService.getClientesByGerente(this.authService.getUsuarioLogado().gerenteId);
+  }
+
+  navegarPara(rota: string) {
+    this.router.navigate([rota]);
   }
 }
