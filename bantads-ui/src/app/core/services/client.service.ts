@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { MovimentacaoService } from './movimentacao.service';
 
 @Injectable({
   providedIn: 'root',
@@ -6,6 +7,7 @@ import { Injectable } from '@angular/core';
 export class ClientService {
 
   private key = 'clientes';
+  private movService = inject(MovimentacaoService);
 
   constructor() {
     this.initMock();
@@ -104,6 +106,54 @@ export class ClientService {
           saldo: 1800,
           credito: 1700,
           statusAprovacao: 'pendente'
+        },
+        {
+          idCliente: 7,
+          gerenteId: 1,
+          nome: 'Fernanda Costa',
+          cpf: '321.654.987-00',
+          rua: 'Rua Marechal Deodoro, 220',
+          cidade: 'Londrina',
+          uf: 'PR',
+          email: 'fernanda@email.com',
+          senha: '123456',
+          salario: 4800,
+          telefone: '(43) 99876-1234',
+          saldo: 0,
+          credito: 0,
+          statusAprovacao: 'pendente'
+        },
+        {
+          idCliente: 8,
+          gerenteId: 1,
+          nome: 'Rafael Oliveira',
+          cpf: '456.789.123-55',
+          rua: 'Av. Paraná, 1050',
+          cidade: 'Maringá',
+          uf: 'PR',
+          email: 'rafael@email.com',
+          senha: '123456',
+          salario: 1800,
+          telefone: '(44) 98765-4321',
+          saldo: 0,
+          credito: 0,
+          statusAprovacao: 'pendente'
+        },
+        {
+          idCliente: 9,
+          gerenteId: 2,
+          nome: 'Beatriz Santos',
+          cpf: '789.123.456-77',
+          rua: 'Rua Santos Dumont, 88',
+          cidade: 'Ponta Grossa',
+          uf: 'PR',
+          email: 'beatriz@email.com',
+          senha: '123456',
+          salario: 6200,
+          telefone: '(42) 91234-5678',
+          saldo: 0,
+          credito: 0,
+          statusAprovacao: 'pendente'
         }
       ];
 
@@ -175,6 +225,16 @@ export class ClientService {
 
     this.saveDB(clientes);
 
+    this.movService.addMovimentacao({
+      dataHora: this.movService.agora(),
+      tipo: 'TRANSFERENCIA',
+      idClienteOrigem: idRemetente,
+      nomeClienteOrigem: remetente.nome,
+      idClienteDestino: idDestinatario,
+      nomeClienteDestino: destinatario.nome,
+      valor
+    });
+
     return { remetente, destinatario };
   }
 
@@ -188,6 +248,14 @@ export class ClientService {
     cliente.saldo -= valor;
 
     this.saveDB(clientes);
+
+    this.movService.addMovimentacao({
+      dataHora: this.movService.agora(),
+      tipo: 'SAQUE',
+      idClienteOrigem: idCliente,
+      nomeClienteOrigem: cliente.nome,
+      valor
+    });
 
     return cliente;
   }
@@ -205,6 +273,14 @@ export class ClientService {
     cliente.saldo += valor;
 
     this.saveDB(clientes);
+
+    this.movService.addMovimentacao({
+      dataHora: this.movService.agora(),
+      tipo: 'DEPOSITO',
+      idClienteOrigem: idCliente,
+      nomeClienteOrigem: cliente.nome,
+      valor
+    });
 
     return cliente;
   }

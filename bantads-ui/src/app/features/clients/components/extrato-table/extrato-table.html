@@ -3,78 +3,46 @@
 
     <table class="activity-table">
         <tbody>
-            <!-- Item 1 -->
+            @for (item of items; track $index) {
             <tr>
                 <td>
                     <div class="activity-content">
                         <div class="activity-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-                                <path d="M3 6h18" />
-                                <path d="M16 10a4 4 0 0 1-8 0" />
-                            </svg>
-                        </div>
-                        <div class="activity-details">
-                            <h4>Amazon Brasil</h4>
-                            <p>Compra no cartão • 14:20</p>
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    <span class="activity-value negative">- R$ 249,90</span>
-                    <span class="activity-category">Eletrónicos</span>
-                </td>
-            </tr>
-
-            <!-- Item 2 -->
-            <tr>
-                <td>
-                    <div class="activity-content">
-                        <div class="activity-icon">
+                            @if (item.isPositive) {
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 5v14" />
                                 <path d="m19 12-7 7-7-7" />
                             </svg>
-                        </div>
-                        <div class="activity-details">
-                            <h4>Transferência Recebida</h4>
-                            <p>Pix de João Silva • Ontem</p>
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    <span class="activity-value positive">+ R$ 1.200,00</span>
-                    <span class="activity-category">Renda</span>
-                </td>
-            </tr>
-
-            <!-- Item 3 -->
-            <tr>
-                <td>
-                    <div class="activity-content">
-                        <div class="activity-icon">
+                            } @else {
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f43f5e"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
-                                <path d="M7 2v20" />
-                                <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" />
+                                <path d="M12 19V5" />
+                                <path d="m5 12 7-7 7 7" />
                             </svg>
+                            }
                         </div>
                         <div class="activity-details">
-                            <h4>iFood Delivery</h4>
-                            <p>Compra no cartão • Ontem</p>
+                            <h4>{{ item.label }}</h4>
+                            <p>{{ item.sublabel }}</p>
                         </div>
                     </div>
                 </td>
                 <td>
-                    <span class="activity-value negative">- R$ 85,20</span>
-                    <span class="activity-category">Alimentação</span>
+                    <span class="activity-value" [class.positive]="item.isPositive"
+                        [class.negative]="!item.isPositive">{{ item.amount }}</span>
+                    <span class="activity-category">{{ item.category }}</span>
                 </td>
             </tr>
+            } @empty {
+            <tr>
+                <td colspan="2" style="text-align: center; opacity: 0.4; padding: 24px;">
+                    Sem movimentações recentes.
+                </td>
+            </tr>
+            }
         </tbody>
     </table>
 
-    <a href="#" class="view-all">Ver Todo o Histórico</a>
+    <a routerLink="/client/extrato" class="view-all">Ver Todo o Histórico</a>
 </div>
