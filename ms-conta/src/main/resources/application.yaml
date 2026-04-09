@@ -6,7 +6,7 @@ spring:
     name: ms-conta
 
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/bantads?currentSchema=schema_conta
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/bantads
     username: ${DB_USER:bantads}
     password: ${DB_PASS:bantads123}
 
@@ -17,7 +17,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        default_schema: schema_conta
+        default_schema: schema_conta_cud
 
   rabbitmq:
     host: ${RABBIT_HOST:localhost}
