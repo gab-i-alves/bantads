@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.0] - 2026-04-10
+
+### Added
+- **ms-conta**: padrão CQRS com dois schemas PostgreSQL (`schema_conta_cud` e `schema_conta_read`)
+- **ms-conta**: `RabbitConfig` com exchange DIRECT, fila `conta.sync` e JSON converter
+- **ms-conta**: `ContaEvent` record para eventos de sincronização
+- **ms-conta**: `ContaEventPublisher` publica eventos no RabbitMQ após cada operação de escrita
+- **ms-conta**: `ContaEventListener` consome eventos da fila e atualiza o schema de leitura
+- **ms-conta**: entidades de leitura `ContaRead` e `MovimentacaoRead` (schema_conta_read)
+- **ms-conta**: repositórios de leitura `ContaReadRepository` e `MovimentacaoReadRepository`
+
+### Changed
+- **ms-conta**: `ContaService` separado em leitura (schema read) e escrita (schema cud + publish)
+- **ms-conta**: `DataSeeder` popula ambos os schemas (CUD e Read) no seed e no reboot
+- **ms-conta**: entidades `Conta` e `Movimentacao` com `schema = "schema_conta_cud"` explícito
+- **ms-conta**: `application.yaml` com `default_schema: schema_conta_cud`
+- **init-postgres.sql**: `schema_conta` substituído por `schema_conta_cud` + `schema_conta_read`
+
+---
+
 ## [0.4.0] - 2026-04-06
 
 ### Added
