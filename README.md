@@ -57,7 +57,7 @@ O sistema segue uma arquitetura de microsserviços com os seguintes componentes:
 | API Gateway | Thiago | — | Pendente |
 | SAGA Orquestrador | Gabi | — | Pendente |
 | Frontend | Thiago | 4200 | Em desenvolvimento (telas de cliente) |
-| CQRS (ms-conta) | Gabi | — | Pendente (sync RabbitMQ) |
+| CQRS (ms-conta) | Gabi | — | Pronto (2 schemas + sync RabbitMQ) |
 
 ---
 
