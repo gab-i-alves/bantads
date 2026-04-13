@@ -7,3 +7,4 @@ CREATE SCHEMA IF NOT EXISTS schema_cliente;
 CREATE SCHEMA IF NOT EXISTS schema_conta_cud;
 CREATE SCHEMA IF NOT EXISTS schema_conta_read;
 CREATE SCHEMA IF NOT EXISTS schema_gerente;
+CREATE SCHEMA IF NOT EXISTS schema_funcionario;

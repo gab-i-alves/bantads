@@ -3,6 +3,7 @@ package br.dac.bantads.ms_funcionario.service;
 import br.dac.bantads.ms_funcionario.dto.CreateFuncionarioRequestDTO;
 import br.dac.bantads.ms_funcionario.dto.FuncionarioResponseDTO;
 import br.dac.bantads.ms_funcionario.dto.UpdateFuncionarioRequestDTO;
+import br.dac.bantads.ms_funcionario.exceptions.FuncionarioExceptions;
 import br.dac.bantads.ms_funcionario.model.Funcionario;
 import br.dac.bantads.ms_funcionario.model.Role;
 import br.dac.bantads.ms_funcionario.repository.FuncionarioRepository;
@@ -20,6 +21,9 @@ public class FuncionarioService {
 
     @Transactional
     public FuncionarioResponseDTO create(CreateFuncionarioRequestDTO dto) {
+        if (funcionarioRepository.findByCpf(dto.getCpf()).isPresent()) {
+            throw new FuncionarioExceptions.CpfInUseException(dto.getCpf());
+        }
         Funcionario funcionario = new Funcionario(
                 null,
                 dto.getCpf(),
@@ -33,14 +37,18 @@ public class FuncionarioService {
 
     @Transactional
     public FuncionarioResponseDTO delete(String cpf) {
-        Funcionario funcionario = funcionarioRepository.findByCpf(cpf).orElseThrow();
+        Funcionario funcionario = funcionarioRepository.findByCpf(cpf).orElseThrow(
+                FuncionarioExceptions.NotFoundException::new
+        );
         funcionarioRepository.delete(funcionario);
         return new FuncionarioResponseDTO(funcionario);
     }
 
     @Transactional
     public FuncionarioResponseDTO update(String cpf, UpdateFuncionarioRequestDTO dto) {
-        Funcionario funcionario = funcionarioRepository.findByCpf(cpf).orElseThrow();
+        Funcionario funcionario = funcionarioRepository.findByCpf(cpf).orElseThrow(
+                FuncionarioExceptions.NotFoundException::new
+        );
         funcionario.setNome(dto.getNome());
         funcionario.setEmail(dto.getEmail());
         funcionario.setRole(dto.getRole());
@@ -48,13 +56,15 @@ public class FuncionarioService {
         return new FuncionarioResponseDTO(funcionario);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public FuncionarioResponseDTO findByCpf(String cpf) {
-        Funcionario funcionario = funcionarioRepository.findByCpf(cpf).orElseThrow();
+        Funcionario funcionario = funcionarioRepository.findByCpf(cpf).orElseThrow(
+                FuncionarioExceptions.NotFoundException::new
+        );
         return new FuncionarioResponseDTO(funcionario);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<FuncionarioResponseDTO> findAll() {
         List<Funcionario> funcionarios = funcionarioRepository.findAll();
         return funcionarios.stream()
@@ -62,7 +72,7 @@ public class FuncionarioService {
                 .toList();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<FuncionarioResponseDTO> findByRole(Role role) {
         List<Funcionario> funcionarios = funcionarioRepository.findByRole(role);
         return funcionarios.stream()

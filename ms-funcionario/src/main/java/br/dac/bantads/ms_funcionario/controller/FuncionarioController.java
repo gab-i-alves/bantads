@@ -8,6 +8,8 @@ import br.dac.bantads.ms_funcionario.model.Role;
 import br.dac.bantads.ms_funcionario.service.FuncionarioService;
 import br.dac.bantads.ms_funcionario.service.RebootService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,33 +22,33 @@ public class FuncionarioController {
     private FuncionarioService funcionarioService;
 
     @GetMapping
-    public List<FuncionarioResponseDTO> findAll() {
-        return funcionarioService.findAll();
+    public ResponseEntity<List<FuncionarioResponseDTO>> findAll() {
+        return ResponseEntity.ok(funcionarioService.findAll());
     }
 
     @GetMapping("/{cpf}")
-    public FuncionarioResponseDTO findByCpf(@PathVariable String cpf) {
-        return funcionarioService.findByCpf(cpf);
+    public ResponseEntity<FuncionarioResponseDTO> findByCpf(@PathVariable String cpf) {
+        return ResponseEntity.ok(funcionarioService.findByCpf(cpf));
     }
 
     @PostMapping
-    public FuncionarioResponseDTO create(@RequestBody CreateFuncionarioRequestDTO dto) {
-        return funcionarioService.create(dto);
+    public ResponseEntity<FuncionarioResponseDTO> create(@RequestBody CreateFuncionarioRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(funcionarioService.create(dto));
     }
 
     @DeleteMapping("/{cpf}")
-    public FuncionarioResponseDTO delete(@PathVariable String cpf) {
-        return funcionarioService.delete(cpf);
+    public ResponseEntity<FuncionarioResponseDTO> delete(@PathVariable String cpf) {
+        return ResponseEntity.ok(funcionarioService.delete(cpf));
     }
 
     @PutMapping("/{cpf}")
-    public FuncionarioResponseDTO update(@PathVariable String cpf, @RequestBody UpdateFuncionarioRequestDTO dto) {
-        return funcionarioService.update(cpf, dto);
+    public ResponseEntity<FuncionarioResponseDTO> update(@PathVariable String cpf, @RequestBody UpdateFuncionarioRequestDTO dto) {
+        return ResponseEntity.ok(funcionarioService.update(cpf, dto));
     }
 
     @GetMapping("/role/{role}")
-    public List<FuncionarioResponseDTO> findByRole(@PathVariable Role role) {
-        return funcionarioService.findByRole(role);
+    public ResponseEntity<List<FuncionarioResponseDTO>> findByRole(@PathVariable Role role) {
+        return ResponseEntity.ok(funcionarioService.findByRole(role));
     }
 
 
