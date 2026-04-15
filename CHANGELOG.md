@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.1] - 2026-04-14
+
+### Added
+- **ms-funcionario**: classes de exceção (`FuncionarioExceptions`, `ServiceException`, `ServiceExceptionHandler`) com error handling centralizado
+- **bantads-ui**: `transaction.model.ts` com interfaces TypeScript para movimentações
+
+### Changed
+- **ms-funcionario**: `FuncionarioController` e `FuncionarioService` refatorados com tratamento de erros adequado
+- **ms-funcionario**: `application.properties` atualizado
+- **init-postgres.sql**: ajuste nos schemas
+
+---
+
 ## [0.5.0] - 2026-04-10
 
 ### Added
