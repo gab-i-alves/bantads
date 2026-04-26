@@ -7,6 +7,7 @@ module.exports = {
     SERVICES: {
         AUTH: process.env.MS_AUTH_URL,
         CLIENTE: process.env.MS_CLIENTE_URL,
-        CONTA: process.env.MS_CONTA_URL
+        CONTA: process.env.MS_CONTA_URL,
+        FUNCIONARIO: process.env.MS_FUNCIONARIO_URL
     }
 };
