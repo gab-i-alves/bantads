@@ -2,7 +2,6 @@ import { Component, inject, signal } from '@angular/core';
 import { HeaderAdmin } from '../../../../shared/components/header-admin/header-admin';
 import { NewManager } from '../../components/new-manager/new-manager';
 import { EditManager } from '../../components/edit-manager/edit-manager';
-import { ManagerService } from '../../../../core/services/manager.service';
 
 type Gerente = {
   nome: string;
@@ -20,19 +19,12 @@ type Gerente = {
 })
 export class ManageManagers {
 
-  manageService = inject(ManagerService);
+ 
 
 
-  gerentes: any[] = this.manageService.getGerentes();
-
-  ngOnInit() {
-    this.gerentes = this.manageService.getGerentes();
-  }
 
   deletar(idGerente: number) {
     alert('deletado com sucesso');
-    this.manageService.deleteGerente(idGerente);
-    window.location.reload();
   }
 
   adicionarGerenteIsActive = signal(false);
@@ -49,7 +41,7 @@ export class ManageManagers {
   }
 
   adicionarNovoGerente(gerente: Gerente) {
-    this.gerentes.push(gerente);
+
   }
 
 

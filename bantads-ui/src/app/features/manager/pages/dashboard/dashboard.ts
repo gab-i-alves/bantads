@@ -2,7 +2,6 @@ import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { HeaderManager } from '../../../../shared/components/header-manager/header-manager';
 import { AproveClient } from '../../components/aprove-client/aprove-client';
-import { ClientService } from '../../../../core/services/client.service';
 import { AuthService } from '../../../../core/services/auth.service';
 
 type PedidoAutocadastro = {
@@ -23,14 +22,9 @@ export class DashboardManager {
   selectedPedido = signal<PedidoAutocadastro | null>(null);
   isModalOpen = signal(false);
 
-  clientService = inject(ClientService);
   authService = inject(AuthService);
   private router = inject(Router);
 
-  clientesPendentes: any;
-  ngOnInit() {
-    this.clientesPendentes = this.clientService.getClientesByGerente(this.authService.getUsuarioLogado().gerenteId);
-  }
 
   abrirModal(pedido: PedidoAutocadastro) {
     this.selectedPedido.set(pedido);
@@ -43,16 +37,11 @@ export class DashboardManager {
   }
 
   aprovarPedido(pedido: any) {
-    this.clientService.aprovarSolicitacao(pedido.idCliente);
     this.fecharModal();
-    this.clientesPendentes = this.clientService.getClientesByGerente(this.authService.getUsuarioLogado().gerenteId);
   }
 
   recusarPedido(pedido: any) {
-    this.clientService.recusarSolicitacao(pedido.idCliente);
-    this.fecharModal();
-    this.clientesPendentes = this.clientService.getClientesByGerente(this.authService.getUsuarioLogado().gerenteId);
-  }
+    this.fecharModal();}
 
   navegarPara(rota: string) {
     this.router.navigate([rota]);

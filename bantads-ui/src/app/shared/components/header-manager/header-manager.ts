@@ -12,6 +12,6 @@ export class HeaderManager {
   authService = inject(AuthService);
 
 
-  meusDados = this.authService.getUsuarioLogado()
+  //meusDados = this.authService.getUsuarioLogado()
 
 }

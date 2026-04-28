@@ -1,7 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Header } from '../../../../shared/components/header/header';
 import { AuthService } from '../../../../core/services/auth.service';
-import { ClientService } from '../../../../core/services/client.service';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -13,7 +12,6 @@ import { FormsModule } from '@angular/forms';
 export class Profile implements OnInit {
 
   authService = inject(AuthService);
-  clientService = inject(ClientService);
 
   meuDados: any;
 
@@ -37,7 +35,7 @@ export class Profile implements OnInit {
   }
 
   carregarDados() {
-    this.meuDados = this.authService.getUsuarioLogado();
+
 
     if (this.meuDados) {
       // Preencher objeto editável com dados atuais
@@ -76,13 +74,10 @@ export class Profile implements OnInit {
     try {
       // Apenas o cliente pode editar seus próprios dados
       if (this.meuDados && this.meuDados.idCliente) {
-        const clienteAtualizado = this.authService.atualizarPerfil(
-          this.meuDados.idCliente,
-          this.editavelData
-        );
+ 
 
         // Atualizar dados exibidos
-        this.meuDados = clienteAtualizado;
+
 
         alert('Dados atualizados com sucesso!');
         this.step = 1;

@@ -1,97 +1,59 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { ClientService } from './client.service';
-import { ManagerService } from './manager.service';
-import { AdminService } from './admin.service';
+import { LoginModel } from '../models/login.model';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
 
-  clientes = inject(ClientService);
-  gerentes = inject(ManagerService);
-  admins = inject(AdminService);
+  private http = inject(HttpClient);
+  private router = inject(Router);
 
-  private key = 'usuarioLogado';
-  private keyTipo = 'tipoUsuario';
+  private ApiBaseUrl = 'http://localhost:8082';
 
-  constructor() { }
-
-  login(email: string, senha: string) {
-    // Primeiro tenta login como gerente
-    const gerentes = this.gerentes.getGerentes();
-    const gerente = gerentes.find(
-      g => g.email === email && g.senha === senha
+  login(email: string, password: string) {
+    return this.http.post<LoginModel>(
+      `${this.ApiBaseUrl}/api/login`,
+      { email, password }
     );
-
-    if (gerente) {
-      localStorage.setItem(this.key, JSON.stringify(gerente));
-      localStorage.setItem(this.keyTipo, 'gerente');
-      return { usuario: gerente, tipo: 'gerente' };
-    }
-
-    // Se não encontrar gerente, tenta como cliente
-    const clientes = this.clientes.getClientes();
-    const cliente = clientes.find(
-      c => c.email === email && c.senha === senha
-    );
-
-    if (cliente) {
-      localStorage.setItem(this.key, JSON.stringify(cliente));
-      localStorage.setItem(this.keyTipo, 'cliente');
-      return { usuario: cliente, tipo: 'cliente' };
-    }
-
-    // Se não encontrar cliente, tenta como admin
-    const admins = this.admins.getAdmins();
-    const admin = admins.find(
-      c => c.email === email && c.senha === senha
-    );
-
-    if (admin) {
-      localStorage.setItem(this.key, JSON.stringify(admin));
-      localStorage.setItem(this.keyTipo, 'admin');
-      return { usuario: admin, tipo: 'admin' };
-    }
-
-    return null;
   }
 
-  informacaoUserLogado() {
-    const user = localStorage.getItem(this.key);
-    const tipo = localStorage.getItem(this.keyTipo);
-    return user ? { usuario: JSON.parse(user), tipo: tipo || 'cliente' } : null;
+  handleLoginSuccess(response: LoginModel) {
+    localStorage.setItem('token', response.access_token);
+    localStorage.setItem('role', response.role);
+
+    this.redirectByRole(response.role);
   }
 
-  getTipoUsuario(): string | null {
-    return localStorage.getItem(this.keyTipo);
+  redirectByRole(role: string) {
+    switch (role) {
+      case 'ADMIN':
+        this.router.navigate(['/admin/dashboard']);
+        break;
+      case 'USER':
+        this.router.navigate(['/user/dashboard']);
+        break;
+      default:
+        this.router.navigate(['/']);
+    }
   }
 
-  getUsuarioLogado() {
-    const info = this.informacaoUserLogado();
-    return info ? info.usuario : null;
+  getToken() {
+    return localStorage.getItem('token');
+  }
+
+  getRole() {
+    return localStorage.getItem('role');
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getToken();
   }
 
   logout() {
-    localStorage.removeItem(this.key);
-    localStorage.removeItem(this.keyTipo);
-  }
-
-  autoCadastro(cliente: any) {
-    const novoCliente = this.clientes.PostCliente(cliente);
-
-    localStorage.setItem(this.key, JSON.stringify(novoCliente));
-
-    return novoCliente;
-  }
-
-  atualizarPerfil(idCliente: number, dadosAtualizados: any) {
-    const clienteAtualizado = this.clientes.updateCliente(idCliente, dadosAtualizados);
-
-    // Atualizar localStorage com os novos dados
-    localStorage.setItem(this.key, JSON.stringify(clienteAtualizado));
-    localStorage.setItem(this.keyTipo, 'cliente');
-
-    return clienteAtualizado;
+    localStorage.clear();
+    this.router.navigate(['/login']);
   }
 }

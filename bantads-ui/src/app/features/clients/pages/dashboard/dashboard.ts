@@ -4,7 +4,6 @@ import { SmallCard } from '../../components/small-card/small-card';
 import { Header } from '../../../../shared/components/header/header';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
-import { ClientService } from '../../../../core/services/client.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,12 +15,12 @@ export class Dashboard {
 
 
   authService = inject(AuthService);
-  clientService = inject(ClientService);
-  meusDados = this.authService.getUsuarioLogado();
+  //clientService = inject(ClientService);
+  //meusDados = this.authService.getUsuarioLogado();
 
   dadosAtualizados: any;
 
   ngOnInit() {
-    this.dadosAtualizados = this.clientService.getClienteById(this.meusDados.idCliente);
+   // this.dadosAtualizados = this.clientService.getClienteById(this.meusDados.idCliente);
   }
 }

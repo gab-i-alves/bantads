@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, Output, signal, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ManagerService } from '../../../../core/services/manager.service';
 
 
 @Component({
@@ -15,7 +14,6 @@ export class EditManager {
   @Output() fecharModal = new EventEmitter<void>();
 
 
-  managerService = inject(ManagerService);
 
   closeModal() {
     this.fecharModal.emit();
@@ -31,10 +29,10 @@ export class EditManager {
       senha: this.gerente.senha
     };
 
-    this.managerService.updateGerente(
-      this.gerente.gerenteId,
-      gerenteAtualizado
-    );
+    // this.managerService.updateGerente(
+    //   this.gerente.gerenteId,
+    //   gerenteAtualizado
+    // );
 
     this.closeModal();
     window.location.reload();

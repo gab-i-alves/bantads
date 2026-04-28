@@ -10,5 +10,4 @@ import { AuthService } from '../../../../core/services/auth.service';
 export class SmallCard {
 
   authService = inject(AuthService);
-  meusDados = this.authService.getUsuarioLogado();
 }

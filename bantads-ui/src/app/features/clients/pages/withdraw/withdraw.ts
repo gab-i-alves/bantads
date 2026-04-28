@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Header } from '../../../../shared/components/header/header';
 import { AuthService } from '../../../../core/services/auth.service';
-import { ClientService } from '../../../../core/services/client.service';
 
 @Component({
   selector: 'app-withdraw',
@@ -12,7 +11,6 @@ import { ClientService } from '../../../../core/services/client.service';
 export class Withdraw {
 
 
-  clientService = inject(ClientService);
   authService = inject(AuthService);
 
   amount: string = '0,00';
@@ -35,8 +33,6 @@ export class Withdraw {
     }
 
     this.isActive = true;
-
-    this.clientService.sacarDinheiro(this.authService.getUsuarioLogado().idCliente, parseFloat(this.amount.replace(',', '.')));
 
     setTimeout(() => {
       console.log('Saque processado! valor sacado: R$ ' + this.amount);

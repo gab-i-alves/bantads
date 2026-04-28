@@ -7,11 +7,10 @@
     </div>
 </section>
 
-@if (clienteSelecionado) {
 <section class="max-w-[1200px] m-auto flex justify-between items-center mt-10 mb-5">
 
     <div class="flex flex-col">
-        <h1 class="text-[44px] font-[700]">{{clienteSelecionado.nome}}</h1>
+        <h1 class="text-[44px] font-[700]">thiago</h1>
         <div class="flex items-center my-5 gap-4">
 
             <div class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#3b2a59] bg-[#1d162d]">
@@ -19,7 +18,7 @@
                 <span class="text-[#a87ffb] text-xs font-bold uppercase tracking-wider">Conta Ativa</span>
             </div>
 
-            <p class="text-gray-400 text-sm font-medium tracking-wide">CPF: {{clienteSelecionado.cpf}}</p>
+            <p class="text-gray-400 text-sm font-medium tracking-wide">CPF: 12840266876</p>
 
         </div>
     </div>
@@ -57,8 +56,7 @@
             </div>
         </div>
         <div>
-            <h2 class="text-white text-3xl font-bold mb-4">R$ {{clienteSelecionado.saldo.toFixed(2).replace('.',
-                ',')}}</h2>
+            <h2 class="text-white text-3xl font-bold mb-4">R$ 1000,00</h2>
             <span class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Saldo atual</span>
         </div>
     </div>
@@ -78,8 +76,7 @@
             </div>
         </div>
         <div>
-            <h2 class="text-white text-3xl font-bold mb-4">R$ {{clienteSelecionado.credito.toFixed(2).replace('.',
-                ',')}}</h2>
+            <h2 class="text-white text-3xl font-bold mb-4">R$ 5000,00</h2>
             <!-- Barra de Progresso
             <div class="w-full bg-[#1e1e21] rounded-full h-1.5 mb-2">
                 <div class="bg-purple-600 h-1.5 rounded-full" style="width: 65%"></div>
@@ -103,8 +100,7 @@
             </div>
         </div>
         <div>
-            <h2 class="text-white text-3xl font-bold mb-4">R$ {{clienteSelecionado.salario.toFixed(2).replace('.',
-                ',')}}</h2>
+            <h2 class="text-white text-3xl font-bold mb-4">R$ 8888,00</h2>
             <span class="text-gray-500 text-xs">Renda declarada</span>
         </div>
     </div>
@@ -123,29 +119,28 @@
         <!-- CPF -->
         <div class="space-y-1">
             <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">CPF</p>
-            <p class="text-white font-medium">{{clienteSelecionado.cpf}}</p>
+            <p class="text-white font-medium">12840266876</p>
         </div>
 
         <!-- CIDADE -->
         <div class="space-y-1">
             <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Cidade</p>
-            <p class="text-white font-medium">{{clienteSelecionado.cidade}}</p>
+            <p class="text-white font-medium">Curitiba</p>
         </div>
 
         <!-- ESTADO -->
         <div class="space-y-1">
             <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Estado</p>
-            <p class="text-white font-medium">{{clienteSelecionado.uf}}</p>
+            <p class="text-white font-medium">pr</p>
         </div>
 
         <!-- SALÁRIO -->
         <div class="space-y-1">
             <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Salário</p>
-            <p class="text-white font-medium">R$ {{clienteSelecionado.salario.toFixed(2).replace('.', ',')}}</p>
+            <p class="text-white font-medium">R$ 8888,00</p>
         </div>
     </div>
 </section>
 
 
 <hr class=" max-w-[1200px] m-auto border-white/10 my-1">
-}

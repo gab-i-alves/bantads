@@ -2,7 +2,6 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderManager } from '../../../../shared/components/header-manager/header-manager';
-import { ClientService } from '../../../../core/services/client.service';
 import { AuthService } from '../../../../core/services/auth.service';
 
 type Cliente = {
@@ -23,25 +22,16 @@ type Cliente = {
 })
 export class ConsultAllClients {
 
-  clienteService = inject(ClientService);
   authService = inject(AuthService);
   private router = inject(Router);
 
-  clientes = this.clienteService.getClientesByGerente(this.authService.getUsuarioLogado().gerenteId);
 
   searchTerm: string = '';
 
-  get clientesFiltrados(): Cliente[] {
-    const resultado = this.searchTerm.trim()
-      ? this.clientes.filter(cliente =>
-        cliente.nome.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        cliente.cpf.includes(this.searchTerm)
-      )
-      : this.clientes;
+  get clientesFiltrados(): any[] {
+    const resultado = 0 as any;
 
     return resultado
-      .filter((c: any) => c.statusAprovacao !== 'pendente')
-      .sort((a, b) => a.nome.localeCompare(b.nome));
   }
 
   verCliente(cpf: string) {

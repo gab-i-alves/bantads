@@ -1,7 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Header } from '../../../../shared/components/header/header';
-import { ClientService } from '../../../../core/services/client.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { signal } from '@angular/core';
 
@@ -19,7 +18,6 @@ interface Cliente {
   styleUrl: './transfer.css',
 })
 export class Transfer implements OnInit {
-  private clientService = inject(ClientService);
   private authService = inject(AuthService);
 
   amount: string = '0,00';
@@ -29,22 +27,22 @@ export class Transfer implements OnInit {
   selectedRecipient = signal<Cliente | null>(null);
 
   ngOnInit() {
-    this.loadRecipients();
+    //this.loadRecipients();
   }
 
-  loadRecipients() {
-    const currentUser = this.authService.getUsuarioLogado();
-    const allClients = this.clientService.getClientes();
+  // loadRecipients() {
+  //   const currentUser = this.authService.getUsuarioLogado();
+  //   const allClients = this.clientService.getClientes();
 
-    if (currentUser) {
-      const filtered = allClients.filter(
-        client => client.idCliente !== currentUser.idCliente
-      );
-      this.recipients.set(filtered);
-    } else {
-      this.recipients.set(allClients);
-    }
-  }
+  //   if (currentUser) {
+  //     const filtered = allClients.filter(
+  //       client => client.idCliente !== currentUser.idCliente
+  //     );
+  //     this.recipients.set(filtered);
+  //   } else {
+  //     this.recipients.set(allClients);
+  //   }
+  // }
 
   formatCurrency(value: string) {
     let numeric = value.replace(/\D/g, '');
@@ -60,12 +58,10 @@ export class Transfer implements OnInit {
   transferir() {
 
     if (this.selectedRecipient() && this.amount) {
-      const currentUser = this.authService.getUsuarioLogado();
       const recipientId = this.selectedRecipient()!.idCliente;
       const amountNumber = parseFloat(this.amount.replace(',', '.'));
       console.log('Transferindo', amountNumber, 'para cliente ID:', recipientId);
-      this.clientService.transferirDinheiro(currentUser.idCliente, recipientId, amountNumber);
-    }
+ }
 
     alert('dinheiro transferido!')
   }
