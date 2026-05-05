@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.ufpr.dac.bantads.ms_conta.dto.ContaResumoDTO;
 import br.ufpr.dac.bantads.ms_conta.dto.ExtratoResponseDTO;
 import br.ufpr.dac.bantads.ms_conta.dto.ExtratoResponseDTO.ItemExtrato;
 import br.ufpr.dac.bantads.ms_conta.dto.OperacaoResponseDTO;
@@ -52,6 +53,20 @@ public class ContaService {
     }
 
     // ==================== LEITURA (usa schema_conta_read) ====================
+
+    // listagem de todas as contas - usado pelo gateway pra montar a tela
+    // do admin (R12: lista de gerentes com seus clientes)
+    public List<ContaResumoDTO> listarTodas() {
+        return contaReadRepo.findAll().stream()
+                .map(c -> new ContaResumoDTO(
+                        c.getNumero(),
+                        c.getClienteCpf(),
+                        c.getGerenteCpf(),
+                        c.getSaldo(),
+                        c.getLimite(),
+                        c.getDataCriacao()))
+                .toList();
+    }
 
     // R3: consultar saldo pra tela inicial do cliente
     public SaldoResponseDTO consultarSaldo(String numeroConta) {

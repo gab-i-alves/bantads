@@ -9,22 +9,25 @@ const router = express.Router();
 router.get("/", auth, async (request, response, next) => {
     try {
         const headers = { Authorization: request.headers.authorization }
-        const funcionariosRequest = await axios.get(
-            `${services.funcionario}/gerentes/`,
-            { headers, timout: 3000 }
-        )
 
-        // todo: findall das contas pra fazer um map com os gerentes
-        //axios.get(
-        //    `${services.conta}/contas/`,
-        //    { headers, timout: 3000 }
-        //)
+        const [funcionariosRequest, contasRequest] = await Promise.all([
+            axios.get(`${services.funcionario}/gerentes/`, { headers, timeout: 3000 }),
+            axios.get(`${services.conta}/contas/`, { headers, timeout: 3000 }),
+        ])
 
-        // placeholder enquanto o endpoint de conta não existe
+        // agrupa contas por gerenteCpf pra anexar a cada gerente a lista
+        // de clientes que ele atende
+        const contasPorGerente = contasRequest.data.reduce((acc, conta) => {
+            const cpf = conta.gerenteCpf
+            if (!acc[cpf]) acc[cpf] = []
+            acc[cpf].push(conta)
+            return acc
+        }, {})
+
         const funcionarios = funcionariosRequest.data.map(
             funcionario => ({
                 ...funcionario,
-                clientes: []
+                clientes: contasPorGerente[funcionario.cpf] || []
             })
         )
 

@@ -1,6 +1,7 @@
 package br.ufpr.dac.bantads.ms_conta.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.ufpr.dac.bantads.ms_conta.dto.ContaResumoDTO;
 import br.ufpr.dac.bantads.ms_conta.dto.ExtratoResponseDTO;
 import br.ufpr.dac.bantads.ms_conta.dto.OperacaoRequestDTO;
 import br.ufpr.dac.bantads.ms_conta.dto.OperacaoResponseDTO;
@@ -29,6 +31,13 @@ public class ContaController {
 
     public ContaController(ContaService contaService) {
         this.contaService = contaService;
+    }
+
+    // listagem de todas as contas - consumida pelo gateway pra montar
+    // a tela do admin (gerentes -> clientes)
+    @GetMapping
+    public ResponseEntity<List<ContaResumoDTO>> listar() {
+        return ResponseEntity.ok(contaService.listarTodas());
     }
 
     // R3: saldo pra tela inicial do cliente
