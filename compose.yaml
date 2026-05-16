@@ -79,8 +79,13 @@ services:
         SPRING_MONGODB_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
         SPRING_MONGODB_AUTHENTICATION_DATABASE: admin
         JWT_SECRET: ${JWT_SECRET}
+        RABBIT_HOST: rabbit
+        RABBIT_PORT: 5672
+        RABBIT_USER: ${RABBIT_DEFAULT_USER}
+        RABBIT_PASS: ${RABBIT_DEFAULT_PASS}
       depends_on:
         - mongo
+        - rabbit
     ms-funcionario:
       build: ./ms-funcionario
       restart: unless-stopped

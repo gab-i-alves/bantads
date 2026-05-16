@@ -30,7 +30,7 @@ public class RebootService {
             createAccount("ger1@bantads.com.br", "tads", Role.GERENTE),
             createAccount("ger2@bantads.com.br", "tads", Role.GERENTE),
             createAccount("ger3@bantads.com.br", "tads", Role.GERENTE),
-            createAccount("ger4@bantads.com.br", "tads", Role.ADMINISTRADOR)
+            createAccount("adm1@bantads.com.br", "tads", Role.ADMINISTRADOR)
         );
         accountRepository.insert(accounts);
         return accounts;

@@ -21,7 +21,7 @@ public class RebootService {
             new Funcionario(null, "98574307084", "Geniéve", "ger1@bantads.com.br", Role.GERENTE),
             new Funcionario(null, "64065268052", "Godophredo", "ger2@bantads.com.br", Role.GERENTE),
             new Funcionario(null, "23862179060", "Gyândula", "ger3@bantads.com.br", Role.GERENTE),
-            new Funcionario(null, "40501740066", "Adamântio",  "ger4@bantads.com.br", Role.ADMINISTRADOR)
+            new Funcionario(null, "40501740066", "Adamântio",  "adm1@bantads.com.br", Role.ADMINISTRADOR)
         );
 
         funcionarioRepository.saveAll(funcionarios);

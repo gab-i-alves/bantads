@@ -6,6 +6,7 @@
 #       ./start.sh build    (só builda as imagens)
 #       ./start.sh stop     (para tudo)
 #       ./start.sh clean    (para tudo e apaga volumes — reset total do banco)
+#       ./start.sh reboot   (recarrega dados pre-cadastrados via /reboot dos MSs)
 # =============================================================================
 
 set -e
@@ -154,6 +155,32 @@ case "${1:-up}" in
         echo ""
         ;;
 
+    reboot)
+        echo ""
+        echo -e "  ${ARROW} Recarregando dados pre-cadastrados da spec..."
+        echo ""
+        FAILED=0
+        for svc in "ms-auth:8082" "ms-cliente:8081" "ms-conta:8083" "ms-funcionario:8084"; do
+            name="${svc%%:*}"
+            port="${svc##*:}"
+            echo -ne "  ${ARROW} ${name}..."
+            if curl -fsS --max-time 10 "http://localhost:${port}/reboot" -o /dev/null; then
+                echo -e "\r  ${CHECK} ${name} reseedado em :${port}   "
+            else
+                echo -e "\r  ${CROSS} ${name} falhou em :${port}   "
+                FAILED=$((FAILED+1))
+            fi
+        done
+        echo ""
+        if [ "$FAILED" -eq 0 ]; then
+            echo -e "  ${CHECK} ${GREEN}${BOLD}Dados recarregados.${NC}"
+        else
+            echo -e "  ${CROSS} ${RED}${BOLD}${FAILED} servico(s) falharam — confira ./start.sh up${NC}"
+            exit 1
+        fi
+        echo ""
+        ;;
+
     up|"")
         banner
 
@@ -176,7 +203,7 @@ case "${1:-up}" in
         ;;
 
     *)
-        echo "Uso: ./start.sh [build|stop|clean|up]"
+        echo "Uso: ./start.sh [build|stop|clean|up|reboot]"
         exit 1
         ;;
 esac
