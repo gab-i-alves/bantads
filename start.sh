@@ -93,10 +93,12 @@ show_result() {
         echo ""
         echo -e "  ${CHECK} ${GREEN}${BOLD}Tudo no ar!${NC}"
         echo ""
-        echo -e "  ${ARROW} MS Cliente   ${YELLOW}http://localhost:8081${NC}"
-        echo -e "  ${ARROW} MS Auth      ${YELLOW}http://localhost:8082${NC}"
-        echo -e "  ${ARROW} MS Conta     ${YELLOW}http://localhost:8083${NC}"
-        echo -e "  ${ARROW} RabbitMQ UI  ${YELLOW}http://localhost:15672${NC}"
+        echo -e "  ${ARROW} API Gateway     ${YELLOW}http://localhost:3000${NC}"
+        echo -e "  ${ARROW} MS Cliente      ${YELLOW}http://localhost:8081${NC}"
+        echo -e "  ${ARROW} MS Auth         ${YELLOW}http://localhost:8082${NC}"
+        echo -e "  ${ARROW} MS Conta        ${YELLOW}http://localhost:8083${NC}"
+        echo -e "  ${ARROW} MS Funcionario  ${YELLOW}http://localhost:8084${NC}"
+        echo -e "  ${ARROW} RabbitMQ UI     ${YELLOW}http://localhost:15672${NC}"
         echo ""
         echo -e "  ${DIM}────────────────────────────────────────────────────────────────${NC}"
         echo -e "${DIM}"
@@ -164,7 +166,8 @@ case "${1:-up}" in
         sleep 5
         echo -e "\r  ${CHECK} Bancos prontos        "
 
-        run_step "Microsserviços (auth, cliente, conta)" $DC up -d ms-auth ms-cliente ms-conta
+        run_step "Microsserviços (auth, cliente, conta, funcionario)" $DC up -d ms-auth ms-cliente ms-conta ms-funcionario
+        run_step "API Gateway" $DC up -d api-gateway
 
         echo ""
         echo -e "  ${DIM}[████████████████████████████████████████] 100%%${NC}"
