@@ -11,11 +11,11 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
 
-  private ApiBaseUrl = 'http://localhost:8082';
+  private ApiBaseUrl = 'http://localhost:3000';
 
   login(email: string, password: string) {
     return this.http.post<LoginModel>(
-      `${this.ApiBaseUrl}/api/login`,
+      `${this.ApiBaseUrl}/auth/login`,
       { email, password }
     );
   }
@@ -29,11 +29,14 @@ export class AuthService {
 
   redirectByRole(role: string) {
     switch (role) {
-      case 'ADMIN':
-        this.router.navigate(['/admin/dashboard']);
+      case 'GERENTE':
+        this.router.navigate(['/manager/dashboard']);
         break;
-      case 'USER':
-        this.router.navigate(['/user/dashboard']);
+      case 'CLIENTE':
+        this.router.navigate(['client/dashboard']);
+        break;
+      case 'ADMINISTRADOR':
+        this.router.navigate(['/admin/dashboard']);
         break;
       default:
         this.router.navigate(['/']);
@@ -54,6 +57,6 @@ export class AuthService {
 
   logout() {
     localStorage.clear();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 }

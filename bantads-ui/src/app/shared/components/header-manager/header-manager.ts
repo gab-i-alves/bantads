@@ -10,8 +10,9 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class HeaderManager {
   authService = inject(AuthService);
+  //meusDados = this.authService.getUsuarioLogado();
 
-
-  //meusDados = this.authService.getUsuarioLogado()
-
+  logout(){
+    this.authService.logout();
+  }
 }

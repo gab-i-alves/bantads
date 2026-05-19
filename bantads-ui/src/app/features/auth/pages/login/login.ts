@@ -41,6 +41,7 @@ export class Login {
     this.authService.login(this.email, this.senha).subscribe({
       next: (response) => {
         console.log('Login bem-sucedido:', response);
+        this.authService.handleLoginSuccess(response);
       },
       error: (error) => {
         console.error('Erro no login:', error);

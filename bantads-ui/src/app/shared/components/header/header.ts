@@ -14,4 +14,8 @@ export class Header {
   authService = inject(AuthService);
   //meusDados = this.authService.getUsuarioLogado();
 
+  logout(){
+    this.authService.logout();
+  }
+
 }

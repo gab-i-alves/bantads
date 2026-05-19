@@ -24,3 +24,12 @@ export interface ClienteUpdate {
   salario?: number;
   aprovado?: boolean | null;
 }
+
+
+export interface ClienteUpdate {
+  nome?: string;
+  cidade?: string;
+  uf?: string;
+  salario?: number;
+  aprovado?: boolean | null;
+}
