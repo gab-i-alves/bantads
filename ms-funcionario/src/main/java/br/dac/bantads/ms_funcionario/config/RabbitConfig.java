@@ -20,6 +20,9 @@ public class RabbitConfig {
     public static final String CMD_QUEUE = "saga.cmd.funcionario";
     public static final String CMD_ROUTING_KEY = "saga.cmd.funcionario";
 
+    // routing key usada pelo POST /gerentes pra disparar a saga R17 no ms-saga
+    public static final String START_INSERCAO_GERENTE_ROUTING_KEY = "saga.start.insercao_gerente";
+
     @Bean
     public DirectExchange sagaExchange() {
         return new DirectExchange(SAGA_EXCHANGE);

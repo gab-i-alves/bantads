@@ -18,6 +18,11 @@ public class RabbitConfig {
     public static final String QUEUE = "conta.sync";
     public static final String ROUTING_KEY = "conta.sync";
 
+    // infra das SAGAs orquestradas pelo ms-saga (R1, R10, R17, R18 etc.)
+    public static final String SAGA_EXCHANGE = "saga.exchange";
+    public static final String SAGA_CMD_QUEUE = "saga.cmd.conta";
+    public static final String SAGA_CMD_ROUTING_KEY = "saga.cmd.conta";
+
     // exchange tipo DIRECT: manda mensagem pra fila que bater a routing key
     @Bean
     public DirectExchange contaExchange() {
@@ -41,5 +46,20 @@ public class RabbitConfig {
     @Bean
     public MessageConverter jsonMessageConverter() {
         return new JacksonJsonMessageConverter();
+    }
+
+    @Bean
+    public DirectExchange sagaExchange() {
+        return new DirectExchange(SAGA_EXCHANGE);
+    }
+
+    @Bean
+    public Queue sagaCmdQueue() {
+        return new Queue(SAGA_CMD_QUEUE, true);
+    }
+
+    @Bean
+    public Binding sagaCmdBinding(Queue sagaCmdQueue, DirectExchange sagaExchange) {
+        return BindingBuilder.bind(sagaCmdQueue).to(sagaExchange).with(SAGA_CMD_ROUTING_KEY);
     }
 }

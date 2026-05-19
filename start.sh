@@ -99,6 +99,7 @@ show_result() {
         echo -e "  ${ARROW} MS Auth         ${YELLOW}http://localhost:8082${NC}"
         echo -e "  ${ARROW} MS Conta        ${YELLOW}http://localhost:8083${NC}"
         echo -e "  ${ARROW} MS Funcionario  ${YELLOW}http://localhost:8084${NC}"
+        echo -e "  ${ARROW} MS Saga         ${YELLOW}http://localhost:8085${NC}"
         echo -e "  ${ARROW} RabbitMQ UI     ${YELLOW}http://localhost:15672${NC}"
         echo ""
         echo -e "  ${DIM}────────────────────────────────────────────────────────────────${NC}"
@@ -193,7 +194,7 @@ case "${1:-up}" in
         sleep 5
         echo -e "\r  ${CHECK} Bancos prontos        "
 
-        run_step "Microsserviços (auth, cliente, conta, funcionario)" $DC up -d ms-auth ms-cliente ms-conta ms-funcionario
+        run_step "Microsserviços (auth, cliente, conta, funcionario, saga)" $DC up -d ms-auth ms-cliente ms-conta ms-funcionario ms-saga
         run_step "API Gateway" $DC up -d api-gateway
 
         echo ""

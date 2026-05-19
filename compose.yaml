@@ -103,6 +103,18 @@ services:
       depends_on:
         - postgres
         - rabbit
+    ms-saga:
+      build: ./ms-saga
+      restart: unless-stopped
+      ports:
+        - "8085:8085"
+      environment:
+        RABBIT_HOST: rabbit
+        RABBIT_PORT: 5672
+        RABBIT_USER: ${RABBIT_DEFAULT_USER}
+        RABBIT_PASS: ${RABBIT_DEFAULT_PASS}
+      depends_on:
+        - rabbit
     api-gateway:
       build: ./api-gateway
       restart: unless-stopped
