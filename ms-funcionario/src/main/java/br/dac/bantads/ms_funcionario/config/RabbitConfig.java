@@ -23,6 +23,9 @@ public class RabbitConfig {
     // routing key usada pelo POST /gerentes pra disparar a saga R17 no ms-saga
     public static final String START_INSERCAO_GERENTE_ROUTING_KEY = "saga.start.insercao_gerente";
 
+    // routing key usada pelo DELETE /gerentes/{cpf} pra disparar a saga R18 no ms-saga
+    public static final String START_REMOCAO_GERENTE_ROUTING_KEY = "saga.start.remocao_gerente";
+
     @Bean
     public DirectExchange sagaExchange() {
         return new DirectExchange(SAGA_EXCHANGE);

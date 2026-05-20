@@ -28,6 +28,12 @@ public class RabbitConfig {
     public static final String START_INSERCAO_GERENTE_QUEUE = "saga.start.insercao_gerente";
     public static final String START_INSERCAO_GERENTE_ROUTING_KEY = "saga.start.insercao_gerente";
 
+    public static final String START_ALTERACAO_PERFIL_QUEUE = "saga.start.alteracao_perfil";
+    public static final String START_ALTERACAO_PERFIL_ROUTING_KEY = "saga.start.alteracao_perfil";
+
+    public static final String START_REMOCAO_GERENTE_QUEUE = "saga.start.remocao_gerente";
+    public static final String START_REMOCAO_GERENTE_ROUTING_KEY = "saga.start.remocao_gerente";
+
     public static final String CMD_CLIENTE_ROUTING_KEY = "saga.cmd.cliente";
     public static final String CMD_AUTH_ROUTING_KEY = "saga.cmd.auth";
     public static final String CMD_CONTA_ROUTING_KEY = "saga.cmd.conta";
@@ -76,6 +82,26 @@ public class RabbitConfig {
     @Bean
     public Binding startInsercaoGerenteBinding(Queue startInsercaoGerenteQueue, DirectExchange sagaExchange) {
         return BindingBuilder.bind(startInsercaoGerenteQueue).to(sagaExchange).with(START_INSERCAO_GERENTE_ROUTING_KEY);
+    }
+
+    @Bean
+    public Queue startAlteracaoPerfilQueue() {
+        return new Queue(START_ALTERACAO_PERFIL_QUEUE, true);
+    }
+
+    @Bean
+    public Binding startAlteracaoPerfilBinding(Queue startAlteracaoPerfilQueue, DirectExchange sagaExchange) {
+        return BindingBuilder.bind(startAlteracaoPerfilQueue).to(sagaExchange).with(START_ALTERACAO_PERFIL_ROUTING_KEY);
+    }
+
+    @Bean
+    public Queue startRemocaoGerenteQueue() {
+        return new Queue(START_REMOCAO_GERENTE_QUEUE, true);
+    }
+
+    @Bean
+    public Binding startRemocaoGerenteBinding(Queue startRemocaoGerenteQueue, DirectExchange sagaExchange) {
+        return BindingBuilder.bind(startRemocaoGerenteQueue).to(sagaExchange).with(START_REMOCAO_GERENTE_ROUTING_KEY);
     }
 
     @Bean
