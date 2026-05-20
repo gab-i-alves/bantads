@@ -13,6 +13,7 @@ import { TopClients } from './features/manager/pages/top-clients/top-clients';
 import { DashboardAdmin } from './features/admin/pages/dashboard/dashboard';
 import { CustomerReport } from './features/admin/pages/customer-report/customer-report';
 import { ManageManagers } from './features/admin/pages/manage-managers/manage-managers';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
     {
@@ -21,57 +22,71 @@ export const routes: Routes = [
     },
     {
         path: 'perfil',
-        component: Profile
+        component: Profile,
+        canActivate: [authGuard]
     },
     // Rotas para o cliente
     {
         path: 'client/dashboard',
-        component: Dashboard
+        component: Dashboard,
+        canActivate: [authGuard]
     },
     {
         path: 'client/transferir',
-        component: Transfer
+        component: Transfer,
+        canActivate: [authGuard]
     },
     {
         path: 'client/sacar',
-        component: Withdraw
+        component: Withdraw,
+        canActivate: [authGuard]
     },
     {
         path: 'client/depositar',
-        component: Deposit
+        component: Deposit,
+        canActivate: [authGuard]
     },
     {
         path: 'client/extrato',
-        component: TransactionHistory
+        component: TransactionHistory,
+        canActivate: [authGuard]
     },
     // Rotas para o gerente
     {
         path: 'manager/dashboard',
-        component: DashboardManager
+        component: DashboardManager, 
+        canActivate: [authGuard]
     },
     {
         path: 'manager/consultar-clientes',
-        component: ConsultAllClients
+        component: ConsultAllClients, 
+        canActivate: [authGuard]
     },
     {
         path: 'manager/consultar-cliente',
-        component: ConsultClient
+        component: ConsultClient, 
+        canActivate: [authGuard]
     },
     {
         path: 'manager/top-clientes',
-        component: TopClients
+        component: TopClients, 
+        canActivate: [authGuard]
     },
     // Rotas para o admin
     {
         path: 'admin/dashboard',
-        component: DashboardAdmin
+        component: DashboardAdmin, 
+        canActivate: [authGuard]
+
     },
     {
         path: 'admin/relatorio-clientes',
-        component: CustomerReport
+        component: CustomerReport, 
+        canActivate: [authGuard]
     },
     {
         path: 'admin/gerenciar-gerentes',
-        component: ManageManagers
+        component: ManageManagers, 
+        canActivate: [authGuard]
     }
 ];
