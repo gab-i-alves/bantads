@@ -95,8 +95,8 @@ public class ClienteService {
         return toResponse(salvo);
     }
 
-    // R10: gerente aprova cliente
-    // TODO pendente: saga deve criar conta no ms-conta e enviar senha por email
+    // R10: gerente aprova cliente. A criação de conta e auth roda na SAGA
+    // disparada pelo ClienteController (saga.start.autocadastro).
     @Transactional
     public ClienteResponseDTO aprovar(String cpf) {
         Cliente cliente = repository.findByCpf(cpf)
@@ -104,6 +104,16 @@ public class ClienteService {
         cliente.setStatus(StatusCliente.APROVADO);
         Cliente salvo = repository.save(cliente);
         return toResponse(salvo);
+    }
+
+    // compensação: usado pela SAGA de autocadastro quando a criação de
+    // conta/auth falha — volta o cliente pro estado PENDENTE
+    @Transactional
+    public void reverterParaPendente(String cpf) {
+        Cliente cliente = repository.findByCpf(cpf)
+                .orElseThrow(() -> new ClienteNaoEncontradoException(cpf));
+        cliente.setStatus(StatusCliente.PENDENTE);
+        repository.save(cliente);
     }
 
     // R11: gerente rejeita cliente com motivo
