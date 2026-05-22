@@ -1,13 +1,13 @@
 package br.ufpr.dac.bantads.ms_cliente.controller;
 
 import br.ufpr.dac.bantads.ms_cliente.dto.*;
+import br.ufpr.dac.bantads.ms_cliente.saga.SagaPublisher;
 import br.ufpr.dac.bantads.ms_cliente.service.ClienteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -16,6 +16,7 @@ import java.util.Map;
 public class ClienteController {
 
     private final ClienteService service;
+    private final SagaPublisher sagaPublisher;
 
     // R1: autocadastro - cliente se cadastra sem login, status começa como PENDENTE
     @PostMapping
@@ -44,18 +45,25 @@ public class ClienteController {
         return ResponseEntity.ok(service.buscarPorCpf(cpf));
     }
 
-    // TODO R4: alterar perfil - tudo menos cpf. pendente: recalcular limite no ms-conta
+    // R4: alterar perfil. Atualiza dados síncrono e dispara saga pra recalcular
+    // limite no ms-conta (regra: limite >= |saldo negativo| se for o caso).
     @PutMapping("/{cpf}")
     public ResponseEntity<ClienteResponseDTO> atualizar(
             @PathVariable String cpf,
             @Valid @RequestBody ClienteRequestDTO dto) {
-        return ResponseEntity.ok(service.atualizar(cpf, dto));
+        ClienteResponseDTO response = service.atualizar(cpf, dto);
+        sagaPublisher.dispararAlteracaoPerfil(cpf, dto);
+        return ResponseEntity.ok(response);
     }
 
-    // TODO R10: gerente aprova cliente - pendente: saga cria conta no ms-conta via rabbitmq
+    // R10: gerente aprova cliente. Status muda síncrono (UX imediata) e a saga
+    // cuida do resto: cria auth, cria conta vinculada ao gerente menos cheio,
+    // envia senha por e-mail (mock). Em caso de falha, compensa via REVERTER_APROVACAO.
     @PostMapping("/{cpf}/aprovar")
     public ResponseEntity<ClienteResponseDTO> aprovar(@PathVariable String cpf) {
-        return ResponseEntity.ok(service.aprovar(cpf));
+        ClienteResponseDTO response = service.aprovar(cpf);
+        sagaPublisher.dispararAutocadastro(cpf);
+        return ResponseEntity.ok(response);
     }
 
     // R11: gerente rejeita cliente - motivo recebido mas nao persistido aqui
