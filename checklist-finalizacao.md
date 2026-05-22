@@ -2,38 +2,36 @@
 
 ## 1 — Desbloqueio integração front ↔ back
 
-- [ ] Gateway: condicionar `app.use(express.json())` em `api-gateway/src/server.js:13` (hoje quebra o proxy com HTTP 408 em todo POST)
-- [ ] Frontend: registrar `provideHttpClient(withInterceptors([reqInterceptor]))` em `bantads-ui/src/app/app.config.ts` (sem isso o `inject(HttpClient)` quebra em runtime)
-- [ ] Frontend: preencher `core/interceptors/req.interceptor.ts` (arquivo vazio) injetando `Authorization: Bearer <token>` quando houver token
-- [ ] Frontend: preencher `core/guards/auth.guard.ts` (arquivo vazio) com `CanActivate` baseado em `AuthService.isAuthenticated()`
-- [ ] Frontend: trocar URLs hardcoded (`localhost:8082` em `auth.service.ts`, `localhost:8081` em `cliente.service.ts`) por `http://localhost:3000` (gateway)
-- [ ] Frontend: corrigir mapping de roles em `auth.service.ts:32-35` (`USER`/`ADMIN` → `CLIENTE`/`GERENTE`/`ADMINISTRADOR`)
-- [ ] Frontend: criar `ContaService`, `FuncionarioService` e `MovimentacaoService` espelhando o padrão de `cliente.service.ts`
+- [x] Gateway: condicionar `app.use(express.json())` em `api-gateway/src/server.js:13` — já comentado em commit anterior, POST agora passa pelo proxy
+- [x] Frontend: registrar `provideHttpClient` em `bantads-ui/src/app/app.config.ts` — feito (usa `HTTP_INTERCEPTORS` clássico + `withInterceptorsFromDi()`)
+- [x] Frontend: preencher `core/interceptors/req.interceptor.ts` — injeta `Authorization: Bearer <token>` quando há token em `localStorage`
+- [x] Frontend: preencher `core/guards/auth.guard.ts` — `CanActivateFn` com mapping de rota → role (`/client`→CLIENTE, `/admin`→ADMINISTRADOR, `/manager`→GERENTE)
+- [x] Frontend: trocar URLs hardcoded em `auth.service.ts` por `http://localhost:3000` (gateway) — feito; `cliente.service.ts` ainda em `localhost:8081` (pendente)
+- [x] Frontend: corrigir mapping de roles em `auth.service.ts` — `CLIENTE`/`GERENTE`/`ADMINISTRADOR` agora coerentes com `auth.guard.ts`
+- [ ] Frontend: criar `ContaService`, `FuncionarioService` e `MovimentacaoService` espelhando o padrão de `cliente.service.ts` — pendente; só existem `auth.service.ts` e `cliente.service.ts`
 
 ---
 
 ## 2 — Orquestrador SAGA (`ms-saga`)
 
-- [ ] `ms-saga`: criar `RabbitConfig` (exchange `saga.exchange` + fila `saga.reply.orchestrator`) e listener da fila de replies
-- [ ] `ms-saga`: state machine simples — pode ser tabela Postgres `saga_log(sagaId, type, currentStep, status, payload)` ou cache in-memory (basta funcionar)
-- [ ] **SAGA Autocadastro (R1 + R10) E2E**:
-  - publish `CRIAR_CLIENTE` em `saga.cmd.cliente`
-  - on reply ok → `CONSULTAR_GERENTE_MENOS_CLIENTES` em `saga.cmd.funcionario`
-  - on reply ok → `CRIAR_AUTH_CLIENTE` em `saga.cmd.auth`
-  - on reply ok → `CRIAR_CONTA` em `saga.cmd.conta` (precisa fila nova, item abaixo)
-  - on qualquer falha → compensação (delete cliente, delete auth, etc.)
-- [ ] Adicionar listener `saga.cmd.conta` no ms-conta (hoje só tem RabbitConfig do CQRS interno)
-- [ ] Plugar step real `CRIAR_AUTH_CLIENTE` no `SagaCommandListener` do ms-auth (gerar senha aleatória, persistir hash, retornar email + senha pra orquestrador disparar e-mail)
-- [ ] Plugar step real `CONSULTAR_GERENTE_MENOS_CLIENTES` no `SagaCommandListener` do ms-funcionario (count via consulta no banco do conta — provavelmente via composição HTTP)
-- [ ] Remover `// TODO pendente: saga deve criar conta...` do `ClienteService.aprovar()` (depois que R10 estiver fluindo via SAGA)
+- [x] `ms-saga`: criar `RabbitConfig` (exchange `saga.exchange` + fila `saga.reply.orchestrator`) e listener da fila de replies
+- [x] `ms-saga`: state machine simples — `SagaState` in-memory via `ConcurrentHashMap` (suficiente pro escopo; produção pediria tabela Postgres)
+- [x] **SAGA Autocadastro (R1 + R10) E2E**:
+  - R1 fica síncrono (POST `/clientes` cria PENDENTE)
+  - R10 publica `saga.start.autocadastro` → `APROVAR_CLIENTE` → `CONSULTAR_GERENTE_MENOS_CONTAS` → `BUSCAR_DADOS_GERENTE` → `CRIAR_AUTH_CLIENTE` (senha aleatória) → `CRIAR_CONTA` → log mock e-mail
+  - Compensação: `REMOVER_CONTA` → `REMOVER_AUTH_CLIENTE` → `REVERTER_APROVACAO` (ordem reversa dos steps já completados)
+- [x] Adicionar listener `saga.cmd.conta` no ms-conta — `CRIAR_CONTA`, `REMOVER_CONTA`, `RECALCULAR_LIMITE`, `REATRIBUIR_TODAS_CONTAS` adicionados ao `SagaCommandListener`
+- [x] Plugar step real `CRIAR_AUTH_CLIENTE` no `SagaCommandListener` do ms-auth — gera senha aleatória (8 chars), BCrypt, retorna `senhaTemporaria` no reply pra orquestrador montar mock de e-mail
+- [x] Plugar step real `BUSCAR_DADOS_GERENTE` no ms-funcionario — retorna nome+email do gerente escolhido pelo ms-conta
+- [x] Remover `// TODO pendente: saga deve criar conta...` do `ClienteService.aprovar()` (R10 agora dispara saga via `SagaPublisher` no controller)
 
 ---
 
 ## 3 — Demais SAGAs
 
-- [ ] **SAGA Alteração de Perfil (R4)**: Cliente atualiza → Conta recalcula limite. Regra dura: se novo limite < saldo negativo, limite = saldo negativo
-- [ ] **SAGA Inserção de Gerente (R17)**: consulta gerente com **mais** contas → insere novo gerente → reatribui 1 conta
-- [ ] **SAGA Remoção de Gerente (R18)**: bloquear se for o último gerente → consulta gerente com **menos** contas → reatribui todas as contas → remove
+- [x] **SAGA Alteração de Perfil (R4)**: `saga.start.alteracao_perfil` → `ATUALIZAR_CLIENTE` (ms-cliente) → `RECALCULAR_LIMITE` (ms-conta, regra `limite >= |saldo|` se saldo < 0)
+- [x] **SAGA Inserção de Gerente (R17)**: já existente — `CONSULTAR_GERENTE_MAIS_CONTAS` → `CRIAR_AUTH_GERENTE` → `REATRIBUIR_CONTA`
+- [x] **SAGA Remoção de Gerente (R18)**: `saga.start.remocao_gerente` → `VERIFICAR_ULTIMO_GERENTE` (bloqueia se ≤1) → `CONSULTAR_GERENTE_MENOS_CONTAS` (com `excluirCpf` do alvo) → `REATRIBUIR_TODAS_CONTAS` → `REMOVER_GERENTE` → `REMOVER_AUTH_GERENTE`
 
 ---
 

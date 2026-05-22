@@ -34,9 +34,12 @@ public class FuncionarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(funcionarioService.create(dto));
     }
 
+    // R18: dispara SAGA. Retorna 202 ACCEPTED com os dados do gerente que está sendo
+    // removido — o delete físico, reatribuição de contas e remoção de auth acontecem
+    // assincronamente. Front-end deve fazer refresh da listagem após a chamada.
     @DeleteMapping("/{cpf}")
     public ResponseEntity<FuncionarioResponseDTO> delete(@PathVariable String cpf) {
-        return ResponseEntity.ok(funcionarioService.delete(cpf));
+        return ResponseEntity.accepted().body(funcionarioService.iniciarRemocao(cpf));
     }
 
     @PutMapping("/{cpf}")

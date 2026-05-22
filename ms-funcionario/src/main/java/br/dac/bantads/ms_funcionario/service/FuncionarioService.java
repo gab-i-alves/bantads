@@ -77,6 +77,28 @@ public class FuncionarioService {
         return new FuncionarioResponseDTO(funcionario);
     }
 
+    // R18: dispara SAGA de remoção. O delete físico acontece DENTRO da saga,
+    // depois de VERIFICAR_ULTIMO_GERENTE e REATRIBUIR_TODAS_CONTAS.
+    public FuncionarioResponseDTO iniciarRemocao(String cpf) {
+        Funcionario funcionario = funcionarioRepository.findByCpf(cpf).orElseThrow(
+                FuncionarioExceptions.NotFoundException::new
+        );
+        Map<String, String> payload = new LinkedHashMap<>();
+        payload.put("cpf", cpf);
+        payload.put("email", funcionario.getEmail());
+        try {
+            String json = objectMapper.writeValueAsString(payload);
+            rabbitTemplate.convertAndSend(
+                    RabbitConfig.SAGA_EXCHANGE,
+                    RabbitConfig.START_REMOCAO_GERENTE_ROUTING_KEY,
+                    json
+            );
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("falha ao serializar payload da saga R18", e);
+        }
+        return new FuncionarioResponseDTO(funcionario);
+    }
+
     @Transactional
     public FuncionarioResponseDTO update(String cpf, UpdateFuncionarioRequestDTO dto) {
         Funcionario funcionario = funcionarioRepository.findByCpf(cpf).orElseThrow(
