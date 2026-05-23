@@ -56,6 +56,7 @@ public class AccountService {
         LoginResponseDTO response = new LoginResponseDTO();
         response.setAccessToken(token);
         response.setTipo(account.getRole());
+        response.setRole(account.getRole());
         response.setUsuario(buscarDadosUsuario(account));
         return response;
     }

@@ -19,5 +19,7 @@ public class LoginResponseDTO {
 
     private Role tipo;
 
+    private Role role;
+
     private Map<String, Object> usuario;
 }
