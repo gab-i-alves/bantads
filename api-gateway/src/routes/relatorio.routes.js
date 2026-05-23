@@ -1,17 +1,13 @@
 const express = require("express");
 const services = require("../config/services");
 const auth = require("../middlewares/auth");
+const requireRole = require("../middlewares/requireRole");
 const axios = require("axios");
 
 const router = express.Router();
 
 
-router.get("/", auth, async (request, response, next) => {
-    // R16: relatório admin com todas as contas + dados de cliente e gerente
-    if (request.user?.role !== "ADMINISTRADOR") {
-        return response.status(403).json({ message: "acesso restrito ao administrador" })
-    }
-
+router.get("/", auth, requireRole("ADMINISTRADOR"), async (request, response, next) => {
     try {
         const headers = { Authorization: request.headers.authorization }
 

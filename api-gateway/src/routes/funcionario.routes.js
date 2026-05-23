@@ -1,12 +1,13 @@
 const express = require("express");
 const services = require("../config/services");
 const auth = require("../middlewares/auth");
+const requireRole = require("../middlewares/requireRole");
 const axios = require("axios");
 
 const router = express.Router();
 
 
-router.get("/", auth, async (request, response, next) => {
+router.get("/", auth, requireRole("ADMINISTRADOR"), async (request, response, next) => {
     try {
         const headers = { Authorization: request.headers.authorization }
 

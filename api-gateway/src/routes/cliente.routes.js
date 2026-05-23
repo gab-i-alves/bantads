@@ -8,9 +8,12 @@ const router = express.Router();
 router.use("/", auth, createProxyMiddleware({
     target: services.cliente,
     changeOrigin: true,
-    pathRewrite: {
-        "^/": "/clientes/"
-    }
+    pathRewrite: (path) => {
+        if (path === "/" || path.startsWith("/?")) {
+            return "/clientes" + path.slice(1);
+        }
+        return "/clientes" + path;
+    },
 }));
 
 module.exports = router;
