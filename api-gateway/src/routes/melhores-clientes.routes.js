@@ -22,7 +22,7 @@ router.get("/", auth, async (request, response, next) => {
             }
 
             const gerentesRequest = await axios.get(
-                `${services.funcionario}/gerentes/`,
+                `${services.funcionario}/gerentes`,
                 { headers, timeout: 3000 }
             )
             const gerente = gerentesRequest.data.find(g => g.email === email)
@@ -37,8 +37,8 @@ router.get("/", auth, async (request, response, next) => {
 
         // 2. Buscar contas e clientes em paralelo (uma chamada só pra clientes, filtra em memória)
         const [contasRequest, clientesRequest] = await Promise.all([
-            axios.get(`${services.conta}/contas/`, { headers, timeout: 3000 }),
-            axios.get(`${services.cliente}/clientes/`, { headers, timeout: 3000 }),
+            axios.get(`${services.conta}/contas`, { headers, timeout: 3000 }),
+            axios.get(`${services.cliente}/clientes`, { headers, timeout: 3000 }),
         ])
 
         // 3. Filtrar contas do gerente, ordenar por saldo desc e pegar top 3

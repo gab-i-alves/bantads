@@ -17,8 +17,8 @@ router.get("/", auth, async (request, response, next) => {
 
         // busca gerentes e contas em paralelo pra montar o agregado
         const [gerentesRequest, contasRequest] = await Promise.all([
-            axios.get(`${services.funcionario}/gerentes/`, { headers, timeout: 3000 }),
-            axios.get(`${services.conta}/contas/`, { headers, timeout: 3000 }),
+            axios.get(`${services.funcionario}/gerentes`, { headers, timeout: 3000 }),
+            axios.get(`${services.conta}/contas`, { headers, timeout: 3000 }),
         ])
 
         // o endpoint /gerentes/ devolve ADMINISTRADOR junto — filtra só GERENTE

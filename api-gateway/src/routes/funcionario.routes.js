@@ -11,8 +11,8 @@ router.get("/", auth, async (request, response, next) => {
         const headers = { Authorization: request.headers.authorization }
 
         const [funcionariosRequest, contasRequest] = await Promise.all([
-            axios.get(`${services.funcionario}/gerentes/`, { headers, timeout: 3000 }),
-            axios.get(`${services.conta}/contas/`, { headers, timeout: 3000 }),
+            axios.get(`${services.funcionario}/gerentes`, { headers, timeout: 3000 }),
+            axios.get(`${services.conta}/contas`, { headers, timeout: 3000 }),
         ])
 
         // agrupa contas por gerenteCpf pra anexar a cada gerente a lista

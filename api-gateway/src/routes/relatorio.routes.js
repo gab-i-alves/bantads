@@ -17,9 +17,9 @@ router.get("/", auth, async (request, response, next) => {
 
         // busca em paralelo as 3 fontes de dados
         const [contasRequest, clientesRequest, gerentesRequest] = await Promise.all([
-            axios.get(`${services.conta}/contas/`, { headers, timeout: 3000 }),
-            axios.get(`${services.cliente}/clientes/`, { headers, timeout: 3000 }),
-            axios.get(`${services.funcionario}/gerentes/`, { headers, timeout: 3000 }),
+            axios.get(`${services.conta}/contas`, { headers, timeout: 3000 }),
+            axios.get(`${services.cliente}/clientes`, { headers, timeout: 3000 }),
+            axios.get(`${services.funcionario}/gerentes`, { headers, timeout: 3000 }),
         ])
 
         // indexa por cpf pra lookup O(1) ao montar cada linha
