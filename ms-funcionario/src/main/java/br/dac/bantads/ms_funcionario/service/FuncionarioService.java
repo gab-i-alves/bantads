@@ -121,16 +121,16 @@ public class FuncionarioService {
 
     @Transactional(readOnly = true)
     public List<FuncionarioResponseDTO> findAll() {
-        List<Funcionario> funcionarios = funcionarioRepository.findAll();
-        return funcionarios.stream()
+        return funcionarioRepository.findAll().stream()
+                .sorted(java.util.Comparator.comparing(Funcionario::getNome, String.CASE_INSENSITIVE_ORDER))
                 .map(FuncionarioResponseDTO::new)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<FuncionarioResponseDTO> findByRole(Role role) {
-        List<Funcionario> funcionarios = funcionarioRepository.findByRole(role);
-        return funcionarios.stream()
+        return funcionarioRepository.findByRole(role).stream()
+                .sorted(java.util.Comparator.comparing(Funcionario::getNome, String.CASE_INSENSITIVE_ORDER))
                 .map(FuncionarioResponseDTO::new)
                 .toList();
     }
