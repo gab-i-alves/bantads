@@ -126,6 +126,6 @@ class SagaCommandListenerTest {
 
     private ClienteResponseDTO stubResponse(String cpf) {
         return new ClienteResponseDTO(1L, "Teste", "t@t.com", cpf, "41900000000",
-                java.math.BigDecimal.ZERO, "PENDENTE", null);
+                java.math.BigDecimal.ZERO, "PENDENTE", null, null, null);
     }
 }

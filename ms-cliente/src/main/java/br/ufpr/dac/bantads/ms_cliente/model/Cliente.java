@@ -3,6 +3,7 @@ package br.ufpr.dac.bantads.ms_cliente.model;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "cliente", schema = "schema_cliente")
@@ -36,6 +37,12 @@ public class Cliente {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private StatusCliente status;
+
+    @Column(name = "data_decisao")
+    private LocalDateTime dataDecisao;
+
+    @Column(name = "motivo_rejeicao", length = 500)
+    private String motivoRejeicao;
 
     // relacao 1:1 - cada cliente tem seu proprio endereco (aqui foi uma suposicao, poderia ser diferente. mas o enunciado nao especifica nada sobre endereco, entao deixei assim, poderia ser 1:n mas ai teria que criar uma tabela intermediaria cliente_endereco) TODO: decidir sobre isso na próxima aula
     // cascade: salvar/deletar cliente salva/deleta endereco junto

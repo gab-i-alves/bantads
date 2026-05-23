@@ -25,18 +25,14 @@ public class ClienteController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // R12: listar todos os clientes (aprovados)
-    // R9: filtro=para_aprovar - lista pendentes pro gerente aprovar
-    // TODO R14: filtro=melhores_clientes - pendente integracao com ms-conta
     @GetMapping
-    public ResponseEntity<?> listar(@RequestParam(required = false) String filtro) {
+    public ResponseEntity<?> listar(
+            @RequestParam(required = false) String filtro,
+            @RequestParam(required = false) String busca) {
         if ("para_aprovar".equals(filtro)) {
             return ResponseEntity.ok(service.listarPendentes());
         }
-        if ("melhores_clientes".equals(filtro)) {
-            return ResponseEntity.ok(Map.of("message", "necessario integrar com ms-conta ainda"));
-        }
-        return ResponseEntity.ok(service.listarTodos());
+        return ResponseEntity.ok(service.listarTodos(busca));
     }
 
     // R13: consultar cliente por cpf

@@ -4,12 +4,15 @@ import br.ufpr.dac.bantads.ms_cliente.dto.*;
 import br.ufpr.dac.bantads.ms_cliente.model.*;
 import br.ufpr.dac.bantads.ms_cliente.repository.ClienteRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ClienteService {
 
     private final ClienteRepository repository;
@@ -45,22 +48,29 @@ public class ClienteService {
         return toResponse(salvo);
     }
 
-    // R12: lista clientes aprovados (os que ja tem conta)
     @Transactional(readOnly = true)
-    public List<ClienteResponseDTO> listarTodos() {
+    public List<ClienteResponseDTO> listarTodos(String busca) {
         return repository.findByStatus(StatusCliente.APROVADO)
                 .stream()
+                .filter(c -> matchBusca(c, busca))
+                .sorted(Comparator.comparing(Cliente::getNome, String.CASE_INSENSITIVE_ORDER))
                 .map(this::toResponse)
                 .toList();
     }
 
-    // R9: lista clientes aguardando aprovacao do gerente
     @Transactional(readOnly = true)
     public List<ClienteResponseDTO> listarPendentes() {
         return repository.findByStatus(StatusCliente.PENDENTE)
                 .stream()
+                .sorted(Comparator.comparing(Cliente::getNome, String.CASE_INSENSITIVE_ORDER))
                 .map(this::toResponse)
                 .toList();
+    }
+
+    private boolean matchBusca(Cliente c, String busca) {
+        if (busca == null || busca.isBlank()) return true;
+        String q = busca.toLowerCase();
+        return c.getCpf().contains(q) || c.getNome().toLowerCase().contains(q);
     }
 
     // R13: busca cliente por cpf
@@ -95,35 +105,35 @@ public class ClienteService {
         return toResponse(salvo);
     }
 
-    // R10: gerente aprova cliente. A criação de conta e auth roda na SAGA
-    // disparada pelo ClienteController (saga.start.autocadastro).
     @Transactional
     public ClienteResponseDTO aprovar(String cpf) {
         Cliente cliente = repository.findByCpf(cpf)
                 .orElseThrow(() -> new ClienteNaoEncontradoException(cpf));
         cliente.setStatus(StatusCliente.APROVADO);
+        cliente.setDataDecisao(java.time.LocalDateTime.now());
+        cliente.setMotivoRejeicao(null);
         Cliente salvo = repository.save(cliente);
         return toResponse(salvo);
     }
 
-    // compensação: usado pela SAGA de autocadastro quando a criação de
-    // conta/auth falha — volta o cliente pro estado PENDENTE
     @Transactional
     public void reverterParaPendente(String cpf) {
         Cliente cliente = repository.findByCpf(cpf)
                 .orElseThrow(() -> new ClienteNaoEncontradoException(cpf));
         cliente.setStatus(StatusCliente.PENDENTE);
+        cliente.setDataDecisao(null);
         repository.save(cliente);
     }
 
-    // R11: gerente rejeita cliente com motivo
-    // motivo nao persiste aqui - vai ser enviado por email via rabbitmq
     @Transactional
     public ClienteResponseDTO rejeitar(String cpf, RejeitarRequestDTO dto) {
         Cliente cliente = repository.findByCpf(cpf)
                 .orElseThrow(() -> new ClienteNaoEncontradoException(cpf));
         cliente.setStatus(StatusCliente.REJEITADO);
+        cliente.setDataDecisao(java.time.LocalDateTime.now());
+        cliente.setMotivoRejeicao(dto != null ? dto.motivo() : null);
         Cliente salvo = repository.save(cliente);
+        log.info("[MOCK EMAIL] R11 rejeicao -> para={} | motivo={}", cliente.getEmail(), cliente.getMotivoRejeicao());
         return toResponse(salvo);
     }
 
@@ -144,7 +154,9 @@ public class ClienteService {
                 c.getTelefone(),
                 c.getSalario(),
                 c.getStatus().name(),
-                endDto
+                endDto,
+                c.getDataDecisao(),
+                c.getMotivoRejeicao()
         );
     }
 
