@@ -37,9 +37,11 @@
 
 ## 4 — API Composition (R14, R15, R16)
 
-- [ ] **R14 — 3 melhores clientes**: junta `top-3 saldos` (ms-conta) + dados (ms-cliente). Hoje existe stub em `ClienteController.java:34` sem corpo real
-- [ ] **R15 — Dashboard admin**: para cada gerente devolver `nº de clientes, soma saldos positivos, soma saldos negativos`, ordenado por positivos desc
-- [ ] **R16 — Relatório completo**: lista de `cpf, nome, email, salário, nº conta, saldo, limite, cpf gerente, nome gerente`, ordenado por nome do cliente
+Implementadas no api-gateway (padrão Promise.all + agregação, igual ao `funcionario.routes.js`).
+
+- [x] **R14 — 3 melhores clientes**: `GET /melhores-clientes?gerenteCpf=...` (ou via email do token). Top 3 saldos das contas do gerente + dados de cliente
+- [x] **R15 — Dashboard admin**: `GET /admin/dashboard`. Pra cada gerente: nº clientes, soma saldos positivos, soma negativos. Ordenado por positivos desc. Admin-only (403 senão)
+- [x] **R16 — Relatório completo**: `GET /admin/relatorio`. Lista cpf/nome/email/salário/nº conta/saldo/limite/cpf gerente/nome gerente. Ordenado por nome ASC pt-BR. Admin-only
 
 ---
 
