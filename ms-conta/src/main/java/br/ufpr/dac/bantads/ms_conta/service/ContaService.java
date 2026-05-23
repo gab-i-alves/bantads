@@ -3,7 +3,10 @@ package br.ufpr.dac.bantads.ms_conta.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,7 +78,6 @@ public class ContaService {
         return new SaldoResponseDTO(conta.getClienteCpf(), conta.getNumero(), conta.getSaldo());
     }
 
-    // R8: consultar extrato - com filtro opcional de data inicio/fim
     public ExtratoResponseDTO consultarExtrato(String numeroConta, LocalDate inicio, LocalDate fim) {
         ContaRead conta = contaReadRepo.findByNumero(numeroConta)
                 .orElseThrow(() -> new RuntimeException("Conta não encontrada: " + numeroConta));
@@ -97,7 +99,57 @@ public class ContaService {
                         m.getValor()))
                 .toList();
 
-        return new ExtratoResponseDTO(conta.getNumero(), conta.getSaldo(), itens);
+        List<ExtratoResponseDTO.SaldoDiario> saldosDiarios = inicio != null && fim != null
+                ? calcularSaldosDiarios(numeroConta, conta.getSaldo(), inicio, fim)
+                : List.of();
+
+        return new ExtratoResponseDTO(conta.getNumero(), conta.getSaldo(), itens, saldosDiarios);
+    }
+
+    private List<ExtratoResponseDTO.SaldoDiario> calcularSaldosDiarios(
+            String numeroConta, BigDecimal saldoAtual, LocalDate inicio, LocalDate fim) {
+
+        List<MovimentacaoRead> todasMovs = movReadRepo.findByContaNumero(numeroConta);
+
+        BigDecimal saldoAposFim = saldoAtual;
+        for (MovimentacaoRead m : todasMovs) {
+            if (m.getDataHora().toLocalDate().isAfter(fim)) {
+                saldoAposFim = saldoAposFim.subtract(delta(m, numeroConta));
+            }
+        }
+
+        Map<LocalDate, BigDecimal> deltasPorDia = new HashMap<>();
+        for (MovimentacaoRead m : todasMovs) {
+            LocalDate d = m.getDataHora().toLocalDate();
+            if (!d.isBefore(inicio) && !d.isAfter(fim)) {
+                deltasPorDia.merge(d, delta(m, numeroConta), BigDecimal::add);
+            }
+        }
+
+        BigDecimal saldoInicial = saldoAposFim;
+        for (BigDecimal delta : deltasPorDia.values()) {
+            saldoInicial = saldoInicial.subtract(delta);
+        }
+
+        List<ExtratoResponseDTO.SaldoDiario> resultado = new ArrayList<>();
+        BigDecimal saldoCorrente = saldoInicial;
+        LocalDate dia = inicio;
+        while (!dia.isAfter(fim)) {
+            saldoCorrente = saldoCorrente.add(deltasPorDia.getOrDefault(dia, BigDecimal.ZERO));
+            resultado.add(new ExtratoResponseDTO.SaldoDiario(dia, saldoCorrente));
+            dia = dia.plusDays(1);
+        }
+        return resultado;
+    }
+
+    private BigDecimal delta(MovimentacaoRead m, String numeroConta) {
+        return switch (m.getTipo()) {
+            case DEPOSITO -> m.getValor();
+            case SAQUE -> m.getValor().negate();
+            case TRANSFERENCIA -> numeroConta.equals(m.getContaOrigem())
+                    ? m.getValor().negate()
+                    : m.getValor();
+        };
     }
 
     // ==================== ESCRITA (usa schema_conta_cud + publica evento) ====================

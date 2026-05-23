@@ -81,16 +81,38 @@ public class SagaCommandListener {
     }
 
     private String gerenteCpfPorContagem(boolean mais, String excluirCpf) {
-        Map<String, Long> contagem = contaRepository.findAll().stream()
+        List<Conta> contasFiltradas = contaRepository.findAll().stream()
                 .filter(c -> excluirCpf == null || !excluirCpf.equals(c.getGerenteCpf()))
+                .toList();
+        if (contasFiltradas.isEmpty()) return null;
+
+        Map<String, Long> contagem = contasFiltradas.stream()
                 .collect(Collectors.groupingBy(Conta::getGerenteCpf, Collectors.counting()));
-        if (contagem.isEmpty()) return null;
-        Comparator<Map.Entry<String, Long>> cmp = Comparator.comparing(Map.Entry::getValue);
-        return contagem.entrySet().stream()
-                .sorted(mais ? cmp.reversed() : cmp)
-                .findFirst()
+
+        if (!mais) {
+            return contagem.entrySet().stream()
+                    .min(Comparator.comparing(Map.Entry::getValue))
+                    .map(Map.Entry::getKey)
+                    .orElse(null);
+        }
+
+        long maxContas = contagem.values().stream().max(Long::compare).orElse(0L);
+        List<String> candidatos = contagem.entrySet().stream()
+                .filter(e -> e.getValue() == maxContas)
                 .map(Map.Entry::getKey)
-                .orElse(null);
+                .toList();
+        if (candidatos.size() == 1) return candidatos.get(0);
+
+        Map<String, BigDecimal> saldoPositivoPorGerente = contasFiltradas.stream()
+                .filter(c -> candidatos.contains(c.getGerenteCpf()))
+                .filter(c -> c.getSaldo().signum() >= 0)
+                .collect(Collectors.groupingBy(
+                        Conta::getGerenteCpf,
+                        Collectors.reducing(BigDecimal.ZERO, Conta::getSaldo, BigDecimal::add)));
+
+        return candidatos.stream()
+                .min(Comparator.comparing(cpf -> saldoPositivoPorGerente.getOrDefault(cpf, BigDecimal.ZERO)))
+                .orElse(candidatos.get(0));
     }
 
     // ---------- Reatribuição ----------
