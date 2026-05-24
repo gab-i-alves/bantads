@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
@@ -83,5 +85,18 @@ public class ClienteController {
     public ResponseEntity<Map<String, String>> handleConflict(ClienteService.ClienteJaCadastradoException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
+        Map<String, String> fields = new LinkedHashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                fields.put(error.getField(), error.getDefaultMessage()));
+
+        return ResponseEntity.badRequest()
+                .body(Map.of(
+                        "error", "dados invalidos",
+                        "fields", fields
+                ));
     }
 }

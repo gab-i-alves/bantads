@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { LoginModel } from '../models/login.model';
 import { Router } from '@angular/router';
+import { ClienteCreate } from '../models/cliente.model';
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +19,10 @@ export class AuthService {
       `${this.ApiBaseUrl}/auth/login`,
       { email, password }
     );
+  }
+
+  autocadastro(cliente: ClienteCreate) {
+    return this.http.post(`${this.ApiBaseUrl}/cliente`, cliente);
   }
 
   handleLoginSuccess(response: LoginModel) {

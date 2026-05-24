@@ -31,22 +31,36 @@
             </thead>
 
             <tbody>
+                @if(isLoadingClientes()) {
+                <tr>
+                    <td colspan="7">Carregando clientes...</td>
+                </tr>
+                } @else if(errorMessage()) {
+                <tr>
+                    <td colspan="7">{{ errorMessage() }}</td>
+                </tr>
+                } @else if(clientesFiltrados().length === 0) {
+                <tr>
+                    <td colspan="7">Nenhum cliente encontrado.</td>
+                </tr>
+                } @else {
 
-                @for (cliente of clientesFiltrados; track cliente.cpf) {
+                @for (cliente of clientesFiltrados(); track cliente.cpf) {
                 <tr (click)="verCliente(cliente.cpf)" style="cursor: pointer;">
                     <td>
                         <div class="user">
-                            <div class="avatar">{{cliente.nome.charAt(0) + cliente.nome.split(' ')[1].charAt(0)}}</div>
+                            <div class="avatar">{{iniciais(cliente.nome)}}</div>
                             <span>{{cliente.nome}}</span>
                         </div>
                     </td>
                     <td class="cpf">{{cliente.cpf}}</td>
                     <td class="salary">R$ {{cliente.salario.toFixed(2).replace('.', ',') }}</td>
-                    <td>{{cliente.cidade}}</td>
-                    <td>{{cliente.uf}}</td>
-                    <td>R$ {{cliente.saldo.toFixed(2).replace('.', ',') }}</td>
-                    <td>R$ {{cliente.credito.toFixed(2).replace('.', ',') }}</td>
+                    <td>{{cliente.endereco?.cidade || cliente.cidade || '--'}}</td>
+                    <td>{{cliente.endereco?.estado || cliente.uf || '--'}}</td>
+                    <td>R$ {{(cliente.saldo || 0).toFixed(2).replace('.', ',') }}</td>
+                    <td>R$ {{(cliente.credito || 0).toFixed(2).replace('.', ',') }}</td>
                 </tr>
+                }
                 }
 
             </tbody>

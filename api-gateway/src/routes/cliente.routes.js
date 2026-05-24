@@ -5,6 +5,12 @@ const auth = require("../middlewares/auth");
 
 const router = express.Router();
 
+router.post("/", createProxyMiddleware({
+    target: services.cliente,
+    changeOrigin: true,
+    pathRewrite: () => "/clientes"
+}));
+
 router.use("/", auth, createProxyMiddleware({
     target: services.cliente,
     changeOrigin: true,
