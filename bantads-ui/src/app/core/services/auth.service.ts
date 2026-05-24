@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { LoginModel } from '../models/login.model';
 import { Router } from '@angular/router';
-import { ClienteCreate } from '../models/cliente.model';
+import { Cliente, ClienteCreate } from '../models/cliente.model';
 
 @Injectable({
   providedIn: 'root',
@@ -28,6 +28,11 @@ export class AuthService {
   handleLoginSuccess(response: LoginModel) {
     localStorage.setItem('token', response.access_token);
     localStorage.setItem('role', response.role);
+    localStorage.setItem('tipo', response.tipo || response.role);
+
+    if (response.usuario) {
+      localStorage.setItem('usuario', JSON.stringify(response.usuario));
+    }
 
     this.redirectByRole(response.role);
   }
@@ -54,6 +59,20 @@ export class AuthService {
 
   getRole() {
     return localStorage.getItem('role');
+  }
+
+  getUsuarioLogado(): Cliente | null {
+    const usuario = localStorage.getItem('usuario');
+    if (!usuario) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(usuario) as Cliente;
+    } catch {
+      localStorage.removeItem('usuario');
+      return null;
+    }
   }
 
   isAuthenticated(): boolean {

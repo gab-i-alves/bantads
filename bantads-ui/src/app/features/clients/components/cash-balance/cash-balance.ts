@@ -1,5 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { AuthService } from '../../../../core/services/auth.service';
+import { ContaService } from '../../../../core/services/conta.service';
+import { ContaResumo } from '../../../../core/models/conta.model';
 
 @Component({
   selector: 'app-cash-balance',
@@ -7,16 +9,40 @@ import { AuthService } from '../../../../core/services/auth.service';
   templateUrl: './cash-balance.html',
   styleUrl: './cash-balance.css',
 })
-export class CashBalance {
+export class CashBalance implements OnInit {
+  private authService = inject(AuthService);
+  private contaService = inject(ContaService);
 
+  usuario = signal(this.authService.getUsuarioLogado());
+  conta = signal<ContaResumo | null>(null);
+  isLoadingConta = signal(false);
 
-  // authService = inject(AuthService);
-  // clientService = inject(ClientService);
-  // meusDados = this.authService.getUsuarioLogado();
+  saldoFormatado = computed(() => this.formatarMoeda(this.conta()?.saldo ?? 0));
+  limiteFormatado = computed(() => this.formatarMoeda(this.conta()?.limite ?? 0));
 
-  // dadosAtualizados: any;
+  ngOnInit() {
+    const cpf = this.usuario()?.cpf;
+    if (!cpf) {
+      return;
+    }
 
-  // ngOnInit() {
-  //   this.dadosAtualizados = this.clientService.getClienteById(this.meusDados.idCliente);
-  // }
+    this.isLoadingConta.set(true);
+    this.contaService.buscarContaPorClienteCpf(cpf).subscribe({
+      next: (conta) => {
+        this.conta.set(conta);
+        this.isLoadingConta.set(false);
+      },
+      error: (error) => {
+        console.error('Erro ao buscar conta do cliente:', error);
+        this.isLoadingConta.set(false);
+      }
+    });
+  }
+
+  private formatarMoeda(valor: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(valor);
+  }
 }
