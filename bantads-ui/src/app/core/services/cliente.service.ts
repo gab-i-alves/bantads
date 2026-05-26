@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Cliente, ClienteCreate, ClienteUpdate } from '../models/cliente.model';
+import { Cliente, ClienteCreate, ClienteUpdate, MelhorCliente } from '../models/cliente.model';
 
 @Injectable({
   providedIn: 'root',
@@ -37,5 +37,9 @@ export class ClienteService {
 
   rejeitarCliente(cpf: string, motivo: string): Observable<Cliente> {
     return this.http.post<Cliente>(`${this.ApiBaseUrl}/cliente/${cpf}/rejeitar`, { motivo });
+  }
+
+  listarMelhoresClientes(): Observable<MelhorCliente[]> {
+    return this.http.get<MelhorCliente[]>(`${this.ApiBaseUrl}/melhores-clientes`);
   }
 }

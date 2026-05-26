@@ -22,11 +22,12 @@ export class ConsultAllClients implements OnInit {
   isLoadingClientes = signal(false);
   errorMessage = signal('');
 
-  searchTerm: string = '';
+  searchTerm = signal('');
 
   clientesFiltrados = computed(() => {
-    const termo = this.searchTerm.trim().toLowerCase();
-    const cpfBusca = this.searchTerm.replace(/\D/g, '');
+    const busca = this.searchTerm();
+    const termo = this.normalizarTexto(busca);
+    const cpfBusca = this.normalizarCpf(busca);
     const clientes = this.clientes();
 
     if (!termo) {
@@ -34,8 +35,10 @@ export class ConsultAllClients implements OnInit {
     }
 
     return clientes.filter(cliente => {
-      const cpfCliente = cliente.cpf.replace(/\D/g, '');
-      return cliente.nome.toLowerCase().includes(termo) || cpfCliente.includes(cpfBusca);
+      const nomeCliente = this.normalizarTexto(cliente.nome);
+      const cpfCliente = this.normalizarCpf(cliente.cpf);
+
+      return nomeCliente.includes(termo) || (cpfBusca !== '' && cpfCliente.includes(cpfBusca));
     });
   });
 
@@ -68,6 +71,18 @@ export class ConsultAllClients implements OnInit {
       .map(parte => parte.charAt(0))
       .join('')
       .toUpperCase();
+  }
+
+  private normalizarTexto(valor: string): string {
+    return valor
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  }
+
+  private normalizarCpf(valor: string): string {
+    return valor.replace(/\D/g, '');
   }
 
   verCliente(cpf: string) {

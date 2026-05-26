@@ -1,19 +1,10 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HeaderManager } from '../../../../shared/components/header-manager/header-manager';
 import { AuthService } from '../../../../core/services/auth.service';
-
-type Cliente = {
-  cpf: string;
-  nome: string;
-  cidade: string;
-  uf: string;
-  salario: number;
-  saldo: number;
-  credito: number;
-  aprovado: boolean | null;
-};
+import { ClienteService } from '../../../../core/services/cliente.service';
+import { Cliente } from '../../../../core/models/cliente.model';
 
 @Component({
   selector: 'app-consult-client',
@@ -25,32 +16,82 @@ export class ConsultClient implements OnInit {
 
   authService = inject(AuthService);
   private route = inject(ActivatedRoute);
+  private clienteService = inject(ClienteService);
 
+  searchTerm = signal('');
+  clientes = signal<Cliente[]>([]);
+  isLoadingClientes = signal(false);
+  errorMessage = signal('');
 
-  searchTerm: string = '';
+  clienteSelecionado = computed(() => {
+    const busca = this.searchTerm();
+    const termo = this.normalizarTexto(busca);
+    const cpfBusca = this.normalizarCpf(busca);
+
+    if (!termo) {
+      return null;
+    }
+
+    return this.clientes().find(cliente => {
+      const nomeCliente = this.normalizarTexto(cliente.nome);
+      const cpfCliente = this.normalizarCpf(cliente.cpf);
+
+      return nomeCliente.includes(termo) || (cpfBusca !== '' && cpfCliente.includes(cpfBusca));
+    }) || null;
+  });
 
   ngOnInit() {
+    this.carregarClientes();
+
     this.route.queryParams.subscribe(params => {
       if (params['cpf']) {
-        this.searchTerm = params['cpf'];
+        this.searchTerm.set(params['cpf']);
       }
     });
   }
 
-  // get clienteSelecionado(): Cliente | null {
-  //   if (!this.searchTerm.trim()) {
-  //     return null;
-  //   }
+  carregarClientes() {
+    this.isLoadingClientes.set(true);
+    this.errorMessage.set('');
 
-  //   const termo = this.searchTerm.trim().toLowerCase();
-  //   const cpfSemPontuacao = this.searchTerm.replace(/\D/g, '');
+    this.clienteService.listarClientes().subscribe({
+      next: (clientes) => {
+        this.clientes.set(clientes);
+        this.isLoadingClientes.set(false);
+      },
+      error: (error) => {
+        console.error('Erro ao buscar clientes:', error);
+        this.errorMessage.set('Nao foi possivel carregar os clientes.');
+        this.isLoadingClientes.set(false);
+      }
+    });
+  }
 
-  //   return this.clientes.find(cliente => {
-  //     const cpfClienteSemPontuacao = cliente.cpf.replace(/\D/g, '');
-  //     return (
-  //       cliente.nome.toLowerCase() === termo ||
-  //       cpfClienteSemPontuacao === cpfSemPontuacao
-  //     );
-  //   }) || null;
-  // }
+  cidadeCliente(cliente: Cliente): string {
+    return cliente.endereco?.cidade || cliente.cidade || '--';
+  }
+
+  estadoCliente(cliente: Cliente): string {
+    return cliente.endereco?.estado || cliente.uf || '--';
+  }
+
+  formatarMoeda(valor?: number): string {
+    return `R$ ${(valor || 0).toFixed(2).replace('.', ',')}`;
+  }
+
+  limparBusca() {
+    this.searchTerm.set('');
+  }
+
+  private normalizarTexto(valor: string): string {
+    return valor
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  }
+
+  private normalizarCpf(valor: string): string {
+    return valor.replace(/\D/g, '');
+  }
 }

@@ -44,3 +44,14 @@ export interface ClienteUpdate {
   salario?: number;
   aprovado?: boolean | null;
 }
+
+export interface MelhorCliente {
+  cpf: string;
+  nome: string | null;
+  salario: number;
+  cidade: string | null;
+  estado: string | null;
+  gerenteCpf: string;
+  saldo: number;
+  limite: number;
+}

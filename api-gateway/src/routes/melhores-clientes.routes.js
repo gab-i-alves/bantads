@@ -15,8 +15,9 @@ router.get("/", auth, requireRole("GERENTE", "ADMINISTRADOR"), async (request, r
             axios.get(`${services.cliente}/clientes`, { headers, timeout: 3000 }),
         ])
 
+        // R14: os melhores clientes são globais, independente do gerente da conta.
         const top3Contas = [...contasRequest.data]
-            .sort((a, b) => b.saldo - a.saldo)
+            .sort((a, b) => Number(b.saldo) - Number(a.saldo))
             .slice(0, 3)
 
         const clientesPorCpf = clientesRequest.data.reduce((acc, cliente) => {
@@ -30,9 +31,12 @@ router.get("/", auth, requireRole("GERENTE", "ADMINISTRADOR"), async (request, r
             return {
                 cpf: cliente.cpf || conta.clienteCpf,
                 nome: cliente.nome || null,
+                salario: cliente.salario || 0,
                 cidade: endereco.cidade || null,
                 estado: endereco.estado || null,
+                gerenteCpf: conta.gerenteCpf,
                 saldo: conta.saldo,
+                limite: conta.limite,
             }
         })
 

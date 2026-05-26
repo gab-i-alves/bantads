@@ -2,15 +2,33 @@
 <section class="max-w-[1200px] m-auto flex justify-around items-center mt-5 mb-5">
     <div class="form-control">
         <input type="text" placeholder="Clique e digite o nome ou CPF do cliente..." class="input input-alt"
-            [(ngModel)]="searchTerm" />
+            [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
         <span class="input-border input-border-alt"></span>
     </div>
 </section>
 
+@if(isLoadingClientes()) {
+<section class="max-w-[1200px] m-auto mt-10 mb-5">
+    <p class="text-gray-400">Carregando clientes...</p>
+</section>
+} @else if(errorMessage()) {
+<section class="max-w-[1200px] m-auto mt-10 mb-5">
+    <p class="text-gray-400">{{ errorMessage() }}</p>
+</section>
+} @else if(!searchTerm().trim()) {
+<section class="max-w-[1200px] m-auto mt-10 mb-5">
+    <p class="text-gray-400">Digite o nome ou CPF de um cliente para consultar.</p>
+</section>
+} @else if(!clienteSelecionado()) {
+<section class="max-w-[1200px] m-auto mt-10 mb-5">
+    <p class="text-gray-400">Nenhum cliente encontrado.</p>
+</section>
+} @else {
+@if(clienteSelecionado(); as cliente) {
 <section class="max-w-[1200px] m-auto flex justify-between items-center mt-10 mb-5">
 
     <div class="flex flex-col">
-        <h1 class="text-[44px] font-[700]">thiago</h1>
+        <h1 class="text-[44px] font-[700]">{{ cliente.nome }}</h1>
         <div class="flex items-center my-5 gap-4">
 
             <div class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#3b2a59] bg-[#1d162d]">
@@ -18,12 +36,12 @@
                 <span class="text-[#a87ffb] text-xs font-bold uppercase tracking-wider">Conta Ativa</span>
             </div>
 
-            <p class="text-gray-400 text-sm font-medium tracking-wide">CPF: 12840266876</p>
+            <p class="text-gray-400 text-sm font-medium tracking-wide">CPF: {{ cliente.cpf }}</p>
 
         </div>
     </div>
 
-    <div class=" flex justify-end mb-4" (click)="searchTerm = ''">
+    <div class=" flex justify-end mb-4" (click)="limparBusca()">
         <button
             class="flex items-center gap-2 px-4 py-2 bg-[#1e1e21] hover:bg-[#2a2a2d] border border-[#3b3b3f] rounded-lg text-gray-300 text-sm font-medium transition-all active:scale-95">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -56,7 +74,7 @@
             </div>
         </div>
         <div>
-            <h2 class="text-white text-3xl font-bold mb-4">R$ 1000,00</h2>
+            <h2 class="text-white text-3xl font-bold mb-4">{{ formatarMoeda(cliente.saldo) }}</h2>
             <span class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Saldo atual</span>
         </div>
     </div>
@@ -76,7 +94,7 @@
             </div>
         </div>
         <div>
-            <h2 class="text-white text-3xl font-bold mb-4">R$ 5000,00</h2>
+            <h2 class="text-white text-3xl font-bold mb-4">{{ formatarMoeda(cliente.credito) }}</h2>
             <!-- Barra de Progresso
             <div class="w-full bg-[#1e1e21] rounded-full h-1.5 mb-2">
                 <div class="bg-purple-600 h-1.5 rounded-full" style="width: 65%"></div>
@@ -100,7 +118,7 @@
             </div>
         </div>
         <div>
-            <h2 class="text-white text-3xl font-bold mb-4">R$ 8888,00</h2>
+            <h2 class="text-white text-3xl font-bold mb-4">{{ formatarMoeda(cliente.salario) }}</h2>
             <span class="text-gray-500 text-xs">Renda declarada</span>
         </div>
     </div>
@@ -119,28 +137,30 @@
         <!-- CPF -->
         <div class="space-y-1">
             <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">CPF</p>
-            <p class="text-white font-medium">12840266876</p>
+            <p class="text-white font-medium">{{ cliente.cpf }}</p>
         </div>
 
         <!-- CIDADE -->
         <div class="space-y-1">
             <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Cidade</p>
-            <p class="text-white font-medium">Curitiba</p>
+            <p class="text-white font-medium">{{ cidadeCliente(cliente) }}</p>
         </div>
 
         <!-- ESTADO -->
         <div class="space-y-1">
             <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Estado</p>
-            <p class="text-white font-medium">pr</p>
+            <p class="text-white font-medium">{{ estadoCliente(cliente) }}</p>
         </div>
 
         <!-- SALÁRIO -->
         <div class="space-y-1">
             <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Salário</p>
-            <p class="text-white font-medium">R$ 8888,00</p>
+            <p class="text-white font-medium">{{ formatarMoeda(cliente.salario) }}</p>
         </div>
     </div>
 </section>
 
 
 <hr class=" max-w-[1200px] m-auto border-white/10 my-1">
+}
+}
