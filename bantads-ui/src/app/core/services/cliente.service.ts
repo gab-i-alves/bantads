@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Cliente, ClienteCreate, ClienteUpdate } from '../models/cliente.model';
+import { Cliente, ClienteCreate, ClienteUpdate, MelhorCliente } from '../models/cliente.model';
 
 @Injectable({
   providedIn: 'root',
@@ -9,29 +9,37 @@ import { Cliente, ClienteCreate, ClienteUpdate } from '../models/cliente.model';
 export class ClienteService {
 
   private http = inject(HttpClient);
-  private ApiBaseUrl = 'http://localhost:8081';
+  private ApiBaseUrl = 'http://localhost:3000';
 
   listarClientes(): Observable<Cliente[]> {
-    return this.http.get<Cliente[]>(`${this.ApiBaseUrl}/clientes`);
+    return this.http.get<Cliente[]>(`${this.ApiBaseUrl}/cliente`);
+  }
+
+  listarClientesPendentes(): Observable<Cliente[]> {
+    return this.http.get<Cliente[]>(`${this.ApiBaseUrl}/cliente?filtro=para_aprovar`);
   }
 
   buscarCliente(cpf: string): Observable<Cliente> {
-    return this.http.get<Cliente>(`${this.ApiBaseUrl}/clientes/${cpf}`);
+    return this.http.get<Cliente>(`${this.ApiBaseUrl}/cliente/${cpf}`);
   }
 
   criarCliente(cliente: ClienteCreate): Observable<Cliente> {
-    return this.http.post<Cliente>(`${this.ApiBaseUrl}/clientes`, cliente);
+    return this.http.post<Cliente>(`${this.ApiBaseUrl}/cliente`, cliente);
   }
 
   atualizarCliente(cpf: string, dados: ClienteUpdate): Observable<Cliente> {
-    return this.http.put<Cliente>(`${this.ApiBaseUrl}/clientes/${cpf}`, dados);
+    return this.http.put<Cliente>(`${this.ApiBaseUrl}/cliente/${cpf}`, dados);
   }
 
-  aprovarCliente(cpf: string): Observable<void> {
-    return this.http.post<void>(`${this.ApiBaseUrl}/clientes/${cpf}/aprovar`, {});
+  aprovarCliente(cpf: string): Observable<Cliente> {
+    return this.http.post<Cliente>(`${this.ApiBaseUrl}/cliente/${cpf}/aprovar`, {});
   }
 
-  rejeitarCliente(cpf: string): Observable<void> {
-    return this.http.post<void>(`${this.ApiBaseUrl}/clientes/${cpf}/rejeitar`, {});
+  rejeitarCliente(cpf: string, motivo: string): Observable<Cliente> {
+    return this.http.post<Cliente>(`${this.ApiBaseUrl}/cliente/${cpf}/rejeitar`, { motivo });
+  }
+
+  listarMelhoresClientes(): Observable<MelhorCliente[]> {
+    return this.http.get<MelhorCliente[]>(`${this.ApiBaseUrl}/melhores-clientes`);
   }
 }

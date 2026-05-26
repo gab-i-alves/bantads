@@ -24,7 +24,21 @@
 
             <tbody>
 
-                @for (cli of topClientes; track cli.idCliente; let i = $index) {
+                @if (isLoadingClientes()) {
+                <tr>
+                    <td colspan="8">Carregando melhores clientes...</td>
+                </tr>
+                } @else if (errorMessage()) {
+                <tr>
+                    <td colspan="8">{{ errorMessage() }}</td>
+                </tr>
+                } @else if (topClientes().length === 0) {
+                <tr>
+                    <td colspan="8">Nenhum cliente encontrado.</td>
+                </tr>
+                }
+
+                @for (cli of topClientes(); track cli.cpf; let i = $index) {
                 <tr>
                     <td>
                         <div class="rank">
@@ -39,17 +53,17 @@
                     <td>
                         <div class="user">
                             <div class="avatar">
-                                {{cli.nome.charAt(0) + cli.nome.split(' ')[1].charAt(0)}}
+                                {{ iniciais(cli.nome) }}
                             </div>
-                            <span>{{cli.nome}}</span>
+                            <span>{{cli.nome || 'Cliente sem nome'}}</span>
                         </div>
                     </td>
                     <td class="cpf">{{cli.cpf}}</td>
-                    <td class="salary">R$ {{cli.salario.toFixed(2).replace('.', ',')}}</td>
-                    <td>{{cli.cidade}}</td>
-                    <td>{{cli.uf}}</td>
-                    <td>R$ {{cli.saldo.toFixed(2).replace('.', ',')}}</td>
-                    <td>R$ {{cli.credito.toFixed(2).replace('.', ',')}}</td>
+                    <td class="salary">R$ {{ formatarMoeda(cli.salario) }}</td>
+                    <td>{{cli.cidade || '-'}}</td>
+                    <td>{{cli.estado || '-'}}</td>
+                    <td>R$ {{ formatarMoeda(cli.saldo) }}</td>
+                    <td>R$ {{ formatarMoeda(cli.limite) }}</td>
                 </tr>
                 }
             </tbody>

@@ -33,11 +33,11 @@
                 <div class="info-group">
                     <label>Status</label>
                     <p class="info-value"
-                        [ngClass]="pedido.statusAprovacao === 'pendente' ? 'status-pendente' : 'status-aprovado' ">
-                        @if(pedido.statusAprovacao === 'pendente') {
+                        [ngClass]="pedido.status === 'PENDENTE' ? 'status-pendente' : 'status-aprovado' ">
+                        @if(pedido.status === 'PENDENTE') {
                         Pendente
                         }@else{
-                        --
+                        {{ pedido.status || '--' }}
                         }
                     </p>
                 </div>

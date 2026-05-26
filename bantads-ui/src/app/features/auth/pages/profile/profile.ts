@@ -35,7 +35,7 @@ export class Profile implements OnInit {
   }
 
   carregarDados() {
-
+    this.meuDados = this.authService.getUsuarioLogado();
 
     if (this.meuDados) {
       // Preencher objeto editável com dados atuais
@@ -45,12 +45,12 @@ export class Profile implements OnInit {
         salario: this.meuDados.salario || 0,
         funcao: this.meuDados.funcao || '',
         telefone: this.meuDados.telefone || '',
-        cep: this.meuDados.cep || '',
-        cidade: this.meuDados.cidade || '',
-        uf: this.meuDados.uf || '',
-        rua: this.meuDados.rua || '',
-        numero: this.meuDados.numero || '',
-        complemento: this.meuDados.complemento || ''
+        cep: this.meuDados.endereco?.cep || '',
+        cidade: this.meuDados.endereco?.cidade || '',
+        uf: this.meuDados.endereco?.estado || '',
+        rua: this.meuDados.endereco?.logradouro || '',
+        numero: this.meuDados.endereco?.numero || '',
+        complemento: this.meuDados.endereco?.complemento || ''
       };
     }
   }
