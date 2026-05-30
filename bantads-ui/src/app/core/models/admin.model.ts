@@ -20,3 +20,25 @@ export interface RelatorioCliente {
   cpfGerente: string;
   nomeGerente: string;
 }
+
+export interface Gerente {
+  cpf: string;
+  nome: string;
+  email: string;
+  role: string;
+  clientes?: unknown[];
+}
+
+export interface GerenteCreate {
+  cpf: string;
+  nome: string;
+  email: string;
+  senha: string;
+  role?: string;
+}
+
+export interface GerenteUpdate {
+  nome: string;
+  email: string;
+  role: string;
+}

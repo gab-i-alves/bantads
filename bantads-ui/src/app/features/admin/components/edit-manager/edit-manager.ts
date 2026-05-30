@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, Output, signal, effect, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Gerente, GerenteUpdate } from '../../../../core/models/admin.model';
 
 
 @Component({
@@ -10,31 +11,29 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './edit-manager.css',
 })
 export class EditManager {
-  @Input() gerente: any;
+  @Input() gerente: Gerente | null = null;
   @Output() fecharModal = new EventEmitter<void>();
-
-
+  @Output() salvarGerente = new EventEmitter<{ cpf: string; gerente: GerenteUpdate }>();
 
   closeModal() {
     this.fecharModal.emit();
   }
 
-
   salvarEdicao() {
+    if (!this.gerente?.nome || !this.gerente.email) {
+      alert('Por favor, preencha todos os campos!');
+      return;
+    }
+
     const gerenteAtualizado = {
       nome: this.gerente.nome,
-      cpf: this.gerente.cpf,
       email: this.gerente.email,
-      telefone: this.gerente.telefone,
-      senha: this.gerente.senha
+      role: this.gerente.role || 'GERENTE',
     };
 
-    // this.managerService.updateGerente(
-    //   this.gerente.gerenteId,
-    //   gerenteAtualizado
-    // );
-
-    this.closeModal();
-    window.location.reload();
+    this.salvarGerente.emit({
+      cpf: this.gerente.cpf,
+      gerente: gerenteAtualizado,
+    });
   }
 }

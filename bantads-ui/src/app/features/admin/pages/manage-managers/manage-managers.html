@@ -23,25 +23,37 @@
                     <th>NOME</th>
                     <th>CPF</th>
                     <th>Email</th>
-                    <th>Telefone</th>
+                    <th>Clientes</th>
                     <th>Ações</th>
                 </tr>
             </thead>
 
             <tbody>
+                @if (isLoadingGerentes()) {
+                <tr>
+                    <td colspan="5" class="feedback">Carregando gerentes...</td>
+                </tr>
+                } @else if (errorMessage()) {
+                <tr>
+                    <td colspan="5" class="feedback error">{{ errorMessage() }}</td>
+                </tr>
+                } @else if (!gerentes().length) {
+                <tr>
+                    <td colspan="5" class="feedback">Nenhum gerente encontrado.</td>
+                </tr>
+                } @else {
 
-                <!-- @for (gerente of gerentes; track gerente.cpf) {
-                @if(gerente) {
+                @for (gerente of gerentes(); track gerente.cpf) {
                 <tr>
                     <td>
                         <div class="user">
-                            <div class="avatar">{{gerente.nome[0]}}</div>
+                            <div class="avatar">{{ iniciais(gerente.nome) }}</div>
                             <span>{{gerente.nome}}</span>
                         </div>
                     </td>
                     <td class="cpf">{{gerente.cpf}}</td>
-                    <td class="salary">{{gerente.email}}</td>
-                    <td>{{gerente.telefone}}</td>
+                    <td>{{gerente.email}}</td>
+                    <td class="salary">{{gerente.clientes?.length || 0}}</td>
                     <td>
                         <div class="actions">
                             <button class="btn btn-editar" (click)="toggleeditarGerente(gerente)">
@@ -53,7 +65,7 @@
                                         d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
                                 </svg>
                             </button>
-                            <button class="btn btn-excluir" (click)="deletar(gerente.gerenteId)">
+                            <button class="btn btn-excluir" (click)="deletar(gerente)">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" class="lucide lucide-trash-2-icon lucide-trash-2">
@@ -66,7 +78,7 @@
                     </td>
                 </tr>
                 }
-                } -->
+                }
 
             </tbody>
         </table>
@@ -80,5 +92,6 @@
 }
 
 @if(editarGerenteIsActive()) {
-<app-edit-manager [gerente]="gerenteSelecionado" (fecharModal)="fecharModalEditar()"></app-edit-manager>
+<app-edit-manager [gerente]="gerenteSelecionado()" (fecharModal)="fecharModalEditar()"
+    (salvarGerente)="editarGerente($event)"></app-edit-manager>
 }

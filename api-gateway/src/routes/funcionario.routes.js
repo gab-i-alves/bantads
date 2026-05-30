@@ -47,4 +47,78 @@ router.get("/", auth, requireRole("ADMINISTRADOR"), async (request, response, ne
 
 })
 
+router.post("/", auth, requireRole("ADMINISTRADOR"), express.json(), async (request, response, next) => {
+    try {
+        const headers = {
+            Authorization: request.headers.authorization,
+            "Content-Type": "application/json",
+        }
+
+        const funcionarioRequest = await axios.post(
+            `${services.funcionario}/gerentes`,
+            request.body,
+            { headers, timeout: 3000 }
+        )
+
+        response.status(funcionarioRequest.status).json(funcionarioRequest.data)
+    } catch (error) {
+        if (error.response) {
+            let statusCode = error.response.status
+            return response.status(statusCode).json({
+                "message": "erro ao criar gerente",
+                "data": error.response.data
+            })
+        }
+        next(error);
+    }
+})
+
+router.put("/:cpf", auth, requireRole("ADMINISTRADOR"), express.json(), async (request, response, next) => {
+    try {
+        const headers = {
+            Authorization: request.headers.authorization,
+            "Content-Type": "application/json",
+        }
+
+        const funcionarioRequest = await axios.put(
+            `${services.funcionario}/gerentes/${request.params.cpf}`,
+            request.body,
+            { headers, timeout: 3000 }
+        )
+
+        response.status(funcionarioRequest.status).json(funcionarioRequest.data)
+    } catch (error) {
+        if (error.response) {
+            let statusCode = error.response.status
+            return response.status(statusCode).json({
+                "message": "erro ao atualizar gerente",
+                "data": error.response.data
+            })
+        }
+        next(error);
+    }
+})
+
+router.delete("/:cpf", auth, requireRole("ADMINISTRADOR"), async (request, response, next) => {
+    try {
+        const headers = { Authorization: request.headers.authorization }
+
+        const funcionarioRequest = await axios.delete(
+            `${services.funcionario}/gerentes/${request.params.cpf}`,
+            { headers, timeout: 3000 }
+        )
+
+        response.status(funcionarioRequest.status).json(funcionarioRequest.data)
+    } catch (error) {
+        if (error.response) {
+            let statusCode = error.response.status
+            return response.status(statusCode).json({
+                "message": "erro ao remover gerente",
+                "data": error.response.data
+            })
+        }
+        next(error);
+    }
+})
+
 module.exports = router;

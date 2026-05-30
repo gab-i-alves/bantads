@@ -87,6 +87,20 @@ tr td:last-child {
   display: flex;
   gap: 10px;
 }
+
+.feedback {
+  color: #9ca3af;
+  text-align: center;
+}
+
+.feedback.error {
+  color: #ef4444;
+}
+
+.btn {
+  color: #f9fafb;
+}
+
 .btn{
     cursor: pointer;
 }

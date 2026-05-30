@@ -1,14 +1,7 @@
-import { Component, EventEmitter, inject, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-type Gerente = {
-  nome: string;
-  cpf: string;
-  email: string;
-  telefone: string;
-  senha: string;
-};
+import { GerenteCreate } from '../../../../core/models/admin.model';
 
 @Component({
   selector: 'app-new-manager',
@@ -19,12 +12,11 @@ type Gerente = {
 export class NewManager {
 
   @Output() fecharModal = new EventEmitter<void>();
-  @Output() adicionarGerente = new EventEmitter<Gerente>();
+  @Output() adicionarGerente = new EventEmitter<GerenteCreate>();
 
   nome = signal('');
   cpf = signal('');
   email = signal('');
-  telefone = signal('');
   senha = signal('');
 
   closeModal() {
@@ -38,18 +30,15 @@ export class NewManager {
       return;
     }
 
-    const novoGerente: Gerente = {
+    const novoGerente: GerenteCreate = {
       nome: this.nome(),
       cpf: this.cpf(),
       email: this.email(),
-      telefone: this.telefone(),
       senha: this.senha(),
+      role: 'GERENTE',
     };
 
-    //this.manageService.createGerente(novoGerente);
-    this.limparFormulario();
-    window.location.reload();
-    this.fecharModal.emit();
+    this.adicionarGerente.emit(novoGerente);
   }
 
   private validarCampos(): boolean {
@@ -57,7 +46,6 @@ export class NewManager {
       this.nome() !== '' &&
       this.cpf() !== '' &&
       this.email() !== '' &&
-      this.telefone() !== '' &&
       this.senha() !== ''
     );
   }
@@ -66,7 +54,6 @@ export class NewManager {
     this.nome.set('');
     this.cpf.set('');
     this.email.set('');
-    this.telefone.set('');
     this.senha.set('');
   }
 }

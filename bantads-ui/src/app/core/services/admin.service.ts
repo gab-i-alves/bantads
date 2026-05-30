@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { DashboardGerente, RelatorioCliente } from '../models/admin.model';
+import { DashboardGerente, Gerente, GerenteCreate, GerenteUpdate, RelatorioCliente } from '../models/admin.model';
 
 @Injectable({
   providedIn: 'root',
@@ -16,5 +16,21 @@ export class AdminService {
 
   listarRelatorioClientes(): Observable<RelatorioCliente[]> {
     return this.http.get<RelatorioCliente[]>(`${this.ApiBaseUrl}/admin/relatorio`);
+  }
+
+  listarGerentes(): Observable<Gerente[]> {
+    return this.http.get<Gerente[]>(`${this.ApiBaseUrl}/gerentes`);
+  }
+
+  criarGerente(gerente: GerenteCreate): Observable<Gerente> {
+    return this.http.post<Gerente>(`${this.ApiBaseUrl}/gerentes`, gerente);
+  }
+
+  atualizarGerente(cpf: string, gerente: GerenteUpdate): Observable<Gerente> {
+    return this.http.put<Gerente>(`${this.ApiBaseUrl}/gerentes/${cpf}`, gerente);
+  }
+
+  removerGerente(cpf: string): Observable<Gerente> {
+    return this.http.delete<Gerente>(`${this.ApiBaseUrl}/gerentes/${cpf}`);
   }
 }
