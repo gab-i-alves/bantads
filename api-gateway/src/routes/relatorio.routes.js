@@ -35,6 +35,8 @@ router.get("/", auth, requireRole("ADMINISTRADOR"), async (request, response, ne
                 nome: cliente.nome || "",
                 email: cliente.email || "",
                 salario: cliente.salario ?? "",
+                cidade: cliente.endereco?.cidade || "",
+                estado: cliente.endereco?.estado || "",
                 numeroConta: conta.numero,
                 saldo: conta.saldo,
                 limite: conta.limite,

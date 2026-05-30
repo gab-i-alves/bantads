@@ -56,6 +56,40 @@
 
 
 /* table */
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.scroll-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.scroll-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(156, 163, 175, 0.35);
+  border-radius: 50%;
+  background: #080808;
+  color: #f9fafb;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.scroll-button:hover {
+  background: #111111;
+  border-color: rgba(168, 85, 247, 0.8);
+  transform: translateY(-1px);
+}
+
 .table-container {
   max-width: 1200px;
   margin: auto;
@@ -170,4 +204,13 @@ tr td:last-child {
 .actions {
   display: flex;
   gap: 10px;
+}
+
+.feedback {
+  color: #9ca3af;
+  text-align: center;
+}
+
+.feedback.error {
+  color: #ef4444;
 }

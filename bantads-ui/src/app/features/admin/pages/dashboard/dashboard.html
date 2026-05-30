@@ -6,7 +6,14 @@
 </section>
 
 <section class="dashboard-container">
-    @for(gerente of topGerentes; track gerente.id; let i = $index) {
+    @if (isLoadingGerentes()) {
+    <p class="feedback">Carregando dados dos gerentes...</p>
+    } @else if (errorMessage()) {
+    <p class="feedback error">{{ errorMessage() }}</p>
+    } @else if (!topGerentes().length) {
+    <p class="feedback">Nenhum gerente encontrado.</p>
+    } @else {
+    @for(gerente of topGerentes(); track gerente.cpf; let i = $index) {
     <div class="card">
 
         <div class="card-header">
@@ -49,15 +56,16 @@
             </p>
             <p class="positivo">
                 Saldo positivo
-                <span>R$ {{ gerente.saldoPositivo }}</span>
+                <span>R$ {{ formatarMoeda(gerente.saldosPositivos) }}</span>
             </p>
 
             <p class="negativo">
                 Saldo negativo
-                <span>R$ {{ gerente.saldoNegativo }}</span>
+                <span>R$ {{ formatarMoeda(gerente.saldosNegativos) }}</span>
             </p>
         </div>
 
     </div>
+    }
     }
 </section>

@@ -9,11 +9,19 @@
 </section>
 
 <section class="pb-[50px]">
-    <div class="max-w-[1200px] m-auto">
+    <div class="table-toolbar max-w-[1200px] m-auto">
         <p class="text-[#9ca3af]">arraste para visualizar todas as colunas</p>
+        <div class="scroll-actions">
+            <button type="button" class="scroll-button" (click)="rolarTabela('esquerda')" title="Voltar tabela">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left-icon lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+            </button>
+            <button type="button" class="scroll-button" (click)="rolarTabela('direita')" title="Ir tabela">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-icon lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+        </div>
     </div>
 
-    <div class="table-container">
+    <div class="table-container" #tableContainer>
 
         <table>
 
@@ -34,13 +42,26 @@
             </thead>
 
             <tbody>
+                @if (isLoadingClientes()) {
+                <tr>
+                    <td colspan="11" class="feedback">Carregando relatorio de clientes...</td>
+                </tr>
+                } @else if (errorMessage()) {
+                <tr>
+                    <td colspan="11" class="feedback error">{{ errorMessage() }}</td>
+                </tr>
+                } @else if (!clientesFiltrados.length) {
+                <tr>
+                    <td colspan="11" class="feedback">Nenhum cliente encontrado.</td>
+                </tr>
+                } @else {
 
                 @for (cliente of clientesFiltrados; track cliente.cpf) {
                 <tr>
                     <td>
                         <div class="user">
                             <div class="avatar">
-                                {{cliente.nome.charAt(0) + cliente.nome.split(' ')[1].charAt(0)}}
+                                {{ iniciais(cliente.nome) }}
                             </div>
                             <span>{{cliente.nome}}</span>
                         </div>
@@ -53,19 +74,19 @@
                     <td>{{cliente.numeroConta}}</td>
 
                     <td class="salary">
-                        R$ {{cliente.salario.toFixed(2).replace('.', ',') }}
+                        R$ {{ formatarMoeda(cliente.salario) }}
                     </td>
 
-                    <td>{{cliente.cidade}}</td>
+                    <td>{{cliente.cidade || '-'}}</td>
 
-                    <td>{{cliente.estado}}</td>
+                    <td>{{cliente.estado || '-'}}</td>
 
                     <td>
-                        R$ {{cliente.saldoConta.toFixed(2).replace('.', ',') }}
+                        R$ {{ formatarMoeda(cliente.saldo) }}
                     </td>
 
                     <td>
-                        R$ {{cliente.limiteConta.toFixed(2).replace('.', ',') }}
+                        R$ {{ formatarMoeda(cliente.limite) }}
                     </td>
 
                     <td>{{cliente.nomeGerente}}</td>
@@ -73,6 +94,7 @@
                     <td class="cpf">{{cliente.cpfGerente}}</td>
 
                 </tr>
+                }
                 }
 
             </tbody>
