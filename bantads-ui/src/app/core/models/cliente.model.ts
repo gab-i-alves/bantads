@@ -38,11 +38,19 @@ export interface ClienteCreate {
 }
 
 export interface ClienteUpdate {
-  nome?: string;
-  cidade?: string;
-  uf?: string;
-  salario?: number;
-  aprovado?: boolean | null;
+  cpf: string;
+  nome: string;
+  email: string;
+  telefone: string;
+  salario: number;
+  endereco: {
+    logradouro: string;
+    numero: string;
+    complemento?: string | null;
+    cep: string;
+    cidade: string;
+    estado: string;
+  };
 }
 
 export interface MelhorCliente {

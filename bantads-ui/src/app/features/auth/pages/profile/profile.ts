@@ -1,7 +1,10 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { Header } from '../../../../shared/components/header/header';
 import { AuthService } from '../../../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
+import { ClienteService } from '../../../../core/services/cliente.service';
+import { Cliente, ClienteUpdate } from '../../../../core/models/cliente.model';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -12,8 +15,13 @@ import { FormsModule } from '@angular/forms';
 export class Profile implements OnInit {
 
   authService = inject(AuthService);
+  private clienteService = inject(ClienteService);
 
-  meuDados: any;
+  meuDados = signal<Cliente | null>(null);
+  errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
+  isSaving = signal(false);
+  step = signal(1);
 
   // Dados editáveis
   editavelData = {
@@ -35,67 +43,122 @@ export class Profile implements OnInit {
   }
 
   carregarDados() {
-    this.meuDados = this.authService.getUsuarioLogado();
+    const usuarioLogado = this.authService.getUsuarioLogado();
+    this.meuDados.set(usuarioLogado);
 
-    if (this.meuDados) {
-      // Preencher objeto editável com dados atuais
-      this.editavelData = {
-        nome: this.meuDados.nome,
-        email: this.meuDados.email,
-        salario: this.meuDados.salario || 0,
-        funcao: this.meuDados.funcao || '',
-        telefone: this.meuDados.telefone || '',
-        cep: this.meuDados.endereco?.cep || '',
-        cidade: this.meuDados.endereco?.cidade || '',
-        uf: this.meuDados.endereco?.estado || '',
-        rua: this.meuDados.endereco?.logradouro || '',
-        numero: this.meuDados.endereco?.numero || '',
-        complemento: this.meuDados.endereco?.complemento || ''
-      };
+    if (!usuarioLogado?.cpf) {
+      this.errorMessage.set('Usuario nao identificado.');
+      return;
     }
+
+    this.preencherFormulario(usuarioLogado);
+
+    this.clienteService.buscarCliente(usuarioLogado.cpf).subscribe({
+      next: (cliente) => {
+        this.meuDados.set(cliente);
+        localStorage.setItem('usuario', JSON.stringify(cliente));
+        this.preencherFormulario(cliente);
+      },
+      error: (error) => {
+        console.error('Erro ao carregar perfil do cliente:', error);
+        this.errorMessage.set('Nao foi possivel carregar os dados atualizados.');
+      }
+    });
+  }
+
+  preencherFormulario(cliente: Cliente) {
+    this.editavelData = {
+      nome: cliente.nome || '',
+      email: cliente.email || '',
+      salario: cliente.salario || 0,
+      funcao: '',
+      telefone: cliente.telefone || '',
+      cep: cliente.endereco?.cep || '',
+      cidade: cliente.endereco?.cidade || '',
+      uf: cliente.endereco?.estado || '',
+      rua: cliente.endereco?.logradouro || '',
+      numero: cliente.endereco?.numero || '',
+      complemento: cliente.endereco?.complemento || ''
+    };
   }
 
   salvarDados() {
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
     // Validação básica
     if (!this.editavelData.nome || !this.editavelData.email ||
         !this.editavelData.telefone || !this.editavelData.cidade || 
         !this.editavelData.uf || !this.editavelData.rua || !this.editavelData.numero) {
-      alert('Por favor, preencha todos os campos obrigatórios!');
+      this.errorMessage.set('Por favor, preencha todos os campos obrigatorios.');
       return;
     }
 
     // Validar email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(this.editavelData.email)) {
-      alert('Email inválido!');
+      this.errorMessage.set('Email invalido.');
       return;
     }
 
-    try {
-      // Apenas o cliente pode editar seus próprios dados
-      if (this.meuDados && this.meuDados.idCliente) {
- 
+    const clienteAtual = this.meuDados();
 
-        // Atualizar dados exibidos
-
-
-        alert('Dados atualizados com sucesso!');
-        this.step = 1;
-      } else {
-        alert('Erro: Usuário não identificado');
-      }
-    } catch (error: any) {
-      alert('Erro ao atualizar dados: ' + error.message);
+    if (!clienteAtual?.cpf) {
+      this.errorMessage.set('Usuario nao identificado.');
+      return;
     }
+
+    const dadosAtualizados: ClienteUpdate = {
+      cpf: clienteAtual.cpf,
+      nome: this.editavelData.nome,
+      email: this.editavelData.email,
+      telefone: this.editavelData.telefone,
+      salario: Number(this.editavelData.salario),
+      endereco: {
+        logradouro: this.editavelData.rua,
+        numero: this.editavelData.numero,
+        complemento: this.editavelData.complemento || null,
+        cep: this.editavelData.cep.replace(/\D/g, ''),
+        cidade: this.editavelData.cidade,
+        estado: this.editavelData.uf.toUpperCase()
+      }
+    };
+
+    if (!dadosAtualizados.endereco.cep || dadosAtualizados.endereco.cep.length !== 8) {
+      this.errorMessage.set('CEP deve conter 8 digitos.');
+      return;
+    }
+
+    if (!dadosAtualizados.salario || dadosAtualizados.salario <= 0) {
+      this.errorMessage.set('Salario deve ser maior que zero.');
+      return;
+    }
+
+    this.isSaving.set(true);
+    this.clienteService.atualizarCliente(clienteAtual.cpf, dadosAtualizados)
+      .pipe(finalize(() => {
+        this.isSaving.set(false);
+        this.step.set(1);
+      }))
+      .subscribe({
+        next: (cliente) => {
+          this.meuDados.set(cliente);
+          localStorage.setItem('usuario', JSON.stringify(cliente));
+          this.preencherFormulario(cliente);
+          this.successMessage.set('Dados atualizados com sucesso.');
+        },
+        error: (error) => {
+          console.error('Erro ao atualizar perfil do cliente:', error);
+          this.errorMessage.set('Nao foi possivel atualizar os dados.');
+        }
+      });
   }
 
-  step: number = 1;
-
   nextStep() {
-    if (this.step < 4) this.step++;
+    if (this.step() < 4) this.step.update(step => step + 1);
   }
 
   prevStep() {
-    if (this.step > 1) this.step--;
+    if (this.step() > 1) this.step.update(step => step - 1);
   }
 }

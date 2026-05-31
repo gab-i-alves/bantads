@@ -4,27 +4,35 @@
     <div class="flex gap-4">
         <div class="border bg-purple-700 p-4 rounded-[50%] w-16 h-16 flex items-center justify-center text-white text-xl
         font-bold">
-            {{meuDados.nome[0]}}
+            {{meuDados()?.nome?.[0] || '?'}}
         </div>
 
         <div class="flex flex-col items-center justify-center mt-4 gap-2">
-            <h1 class="text-2xl font-bold">{{meuDados.nome}}</h1>
+            <h1 class="text-2xl font-bold">{{meuDados()?.nome || 'Cliente'}}</h1>
             <p class="text-white">
-                {{meuDados.email}}
+                {{meuDados()?.email || ''}}
             </p>
         </div>
     </div>
     <div>
-        <h1>Saldo: <span>{{meuDados.saldo}}</span></h1>
-        <h1>Limite Credito: <span>{{meuDados.credito}}</span></h1>
-        <h1>gerente: <span>{{meuDados.gerenteId}}</span></h1>
+        <h1>CPF: <span>{{meuDados()?.cpf || '--'}}</span></h1>
+        <h1>Status: <span>{{meuDados()?.status || '--'}}</span></h1>
+        <h1>Telefone: <span>{{meuDados()?.telefone || '--'}}</span></h1>
     </div>
 </section>
 
 <section class="max-w-[800px] m-auto ">
-    <form class="form-register mt-10" (ngSubmit)="step === 4 && salvarDados()">
+    @if (errorMessage()) {
+    <p class="text-center text-sm text-red-400 mt-4">{{ errorMessage() }}</p>
+    }
 
-        @switch (step) {
+    @if (successMessage()) {
+    <p class="text-center text-sm text-green-400 mt-4">{{ successMessage() }}</p>
+    }
+
+    <form class="form-register mt-10" (ngSubmit)="step() === 4 && salvarDados()">
+
+        @switch (step()) {
 
         <!-- STEP 1: Dados pessoais -->
         @case (1) {
@@ -100,7 +108,7 @@
         <!-- BOTÕES -->
         <div style="display: flex; gap: 10px; margin-top: 10px;">
 
-            @if (step > 1) {
+            @if (step() > 1) {
             <button type="button" (click)="prevStep()" class="flex gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -111,11 +119,11 @@
             </button>
             }
 
-            @if (step < 4) { <button type="button" (click)="nextStep()">Avançar</button>
+            @if (step() < 4) { <button type="button" (click)="nextStep()">Avançar</button>
                 }
 
-                @if (step === 4) {
-                <button type="submit">Salvar</button>
+                @if (step() === 4) {
+                <button type="submit" [disabled]="isSaving()">{{ isSaving() ? 'Salvando...' : 'Salvar' }}</button>
                 }
 
         </div>
