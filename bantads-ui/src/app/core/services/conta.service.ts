@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { ContaResumo, SaldoConta, TransferenciaResponse } from '../models/conta.model';
+import { ContaResumo, OperacaoContaResponse, SaldoConta, TransferenciaResponse } from '../models/conta.model';
 
 @Injectable({
   providedIn: 'root',
@@ -22,6 +22,13 @@ export class ContaService {
 
   consultarSaldo(numero: string): Observable<SaldoConta> {
     return this.http.get<SaldoConta>(`${this.ApiBaseUrl}/conta/${numero}/saldo`);
+  }
+
+  sacar(numero: string, valor: number): Observable<OperacaoContaResponse> {
+    return this.http.post<OperacaoContaResponse>(
+      `${this.ApiBaseUrl}/conta/${numero}/sacar`,
+      { valor }
+    );
   }
 
   transferir(numeroOrigem: string, numeroDestino: string, valor: number): Observable<TransferenciaResponse> {

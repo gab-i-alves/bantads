@@ -13,6 +13,12 @@ export interface SaldoConta {
   saldo: number;
 }
 
+export interface OperacaoContaResponse {
+  conta: string;
+  data: string;
+  saldo: number;
+}
+
 export interface TransferenciaResponse {
   conta: string;
   data: string;
