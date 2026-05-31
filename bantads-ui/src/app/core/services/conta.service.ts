@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { ContaResumo, OperacaoContaResponse, SaldoConta, TransferenciaResponse } from '../models/conta.model';
+import { ContaResumo, Extrato, OperacaoContaResponse, SaldoConta, TransferenciaResponse } from '../models/conta.model';
 
 @Injectable({
   providedIn: 'root',
@@ -43,5 +43,16 @@ export class ContaService {
       `${this.ApiBaseUrl}/conta/${numeroOrigem}/transferir`,
       { destino: numeroDestino, valor }
     );
+  }
+
+  consultarExtrato(numero: string, inicio?: string, fim?: string): Observable<Extrato> {
+    let params = new HttpParams();
+    if (inicio) {
+      params = params.set('inicio', inicio);
+    }
+    if (fim) {
+      params = params.set('fim', fim);
+    }
+    return this.http.get<Extrato>(`${this.ApiBaseUrl}/conta/${numero}/extrato`, { params });
   }
 }

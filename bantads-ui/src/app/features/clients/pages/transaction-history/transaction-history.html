@@ -18,17 +18,25 @@
             class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition-colors">
             Filtrar
         </button>
-        <!-- @if (dataInicio || dataFim) {
+        @if (dataInicio || dataFim) {
         <button (click)="limparFiltro()"
             class="bg-transparent hover:bg-gray-800 text-gray-400 text-sm px-4 py-2 rounded-lg border border-gray-700 transition-colors">
             Limpar
         </button>
-        } -->
+        }
     </div>
+
+    @if (errorMessage()) {
+    <p class="text-center text-sm text-red-400 mb-6">{{ errorMessage() }}</p>
+    }
+
+    @if (isLoading()) {
+    <p class="text-center text-sm text-gray-500 mb-6">Carregando extrato...</p>
+    }
 
     <div class="space-y-6">
 
-        <!-- @for (group of groupedTransactions; track group.label) {
+        @for (group of groupedTransactions(); track group.date) {
 
         <section class="max-w-[1200px] m-auto pt-2 border-b border-gray-800 pt-10 pb-4">
             <div class="flex justify-between items-end mb-4 ml-1">
@@ -37,7 +45,7 @@
                 </h3>
                 <div class="text-right">
                     <p class="text-[10px] text-gray-500 uppercase">Saldo do dia</p>
-                    <p class="text-sm font-mono text-white">R$ {{ group.dailyBalance }}</p>
+                    <p class="text-sm font-mono text-white">{{ group.dailyBalance }}</p>
                 </div>
             </div>
 
@@ -49,7 +57,7 @@
             </div>
 
             <div class="space-y-2">
-                @for (item of group.items; track item.id) {
+                @for (item of group.items; track $index) {
 
                 <div class="transaction-item p-4 rounded-xl grid grid-cols-4 items-center border border-transparent"
                     [class.text-blue-500]="item.tipo === 'entrada'" [class.text-red-500]="item.tipo === 'saida'">
@@ -78,20 +86,22 @@
                     </div>
 
                     <div class="text-sm font-bold text-right">
-                        {{ item.tipo === 'entrada' ? '(+)' : '(-)' }} R$ {{ item.amount }}
+                        {{ item.tipo === 'entrada' ? '(+)' : '(-)' }} {{ item.amount }}
                     </div>
 
                 </div>
 
-                } @empty {
-                <div class="p-8 text-center text-gray-600 italic text-sm">
-                    Sem movimentações neste dia.
-                </div>
                 }
             </div>
         </section>
 
-        } -->
+        } @empty {
+        @if (!isLoading()) {
+        <div class="p-8 text-center text-gray-600 italic text-sm">
+            Sem movimentações no período.
+        </div>
+        }
+        }
 
     </div>
 </section>

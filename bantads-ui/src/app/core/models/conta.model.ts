@@ -26,3 +26,23 @@ export interface TransferenciaResponse {
   saldo: number;
   valor: number;
 }
+
+export interface MovimentacaoExtrato {
+  data: string;
+  tipo: string;
+  origem: string | null;
+  destino: string | null;
+  valor: number;
+}
+
+export interface SaldoDiario {
+  data: string;
+  saldo: number;
+}
+
+export interface Extrato {
+  conta: string;
+  saldo: number;
+  movimentacoes: MovimentacaoExtrato[];
+  saldosDiarios: SaldoDiario[];
+}
