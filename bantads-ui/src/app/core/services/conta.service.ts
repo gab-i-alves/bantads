@@ -24,6 +24,13 @@ export class ContaService {
     return this.http.get<SaldoConta>(`${this.ApiBaseUrl}/conta/${numero}/saldo`);
   }
 
+  depositar(numero: string, valor: number): Observable<OperacaoContaResponse> {
+    return this.http.post<OperacaoContaResponse>(
+      `${this.ApiBaseUrl}/conta/${numero}/depositar`,
+      { valor }
+    );
+  }
+
   sacar(numero: string, valor: number): Observable<OperacaoContaResponse> {
     return this.http.post<OperacaoContaResponse>(
       `${this.ApiBaseUrl}/conta/${numero}/sacar`,
