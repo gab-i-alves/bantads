@@ -23,33 +23,24 @@
     overflow: hidden;
 }
 
+:host {
+    display: block;
+    width: 100%;
+    max-width: 760px;
+}
+
 .ai-card-minus {
     display: flex;
-
     align-items: center;
     gap: 20px;
     width: 100%;
-    padding: 20px 32px 20px 32px;
+    padding: 20px 32px;
     box-sizing: border-box;
 
-    /* Fundo escuro base com os gradientes coloridos na parte inferior (azul, roxo, rosa) */
-    background-color: #14141c;
-    background-image:
-        radial-gradient(ellipse at 15% 110%, rgba(70, 90, 255, 0.8) 0%, transparent 60%),
-        radial-gradient(ellipse at 85% 110%, rgba(200, 100, 255, 0.8) 0%, transparent 60%),
-        radial-gradient(ellipse at 50% 100%, rgba(255, 140, 255, 0.6) 0%, transparent 70%);
-
-    border-radius: 28px;
+    background-color: #1a1a1a;
+    border-radius: 20px;
     color: #ffffff;
-
-    /* Borda sutil e brilho no topo para dar o efeito "vidro/3D" */
     border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow:
-        inset 0 1px 1px rgba(255, 255, 255, 0.15),
-        0 20px 40px rgba(0, 0, 0, 0.6);
-
-    position: relative;
-    overflow: hidden;
 }
 
 

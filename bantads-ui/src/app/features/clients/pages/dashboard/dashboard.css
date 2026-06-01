@@ -6,36 +6,21 @@ section {
     box-sizing: border-box;
 }
 
-/* layout dos 3 blocos: quebra e empilha quando nao cabe na largura */
 .dashboard-layout {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     align-items: stretch;
     gap: 24px;
 }
 
-.dashboard-layout > app-cash-balance {
-    flex: 1 1 360px;
-}
-
 .content {
     flex: 1 1 280px;
+    max-width: 360px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 10px;
-}
-
-.content-small-cards {
-    flex: 1 1 260px;
-    padding: 20px;
-    border-radius: 20px;
-    background: url('../../../../assets/images/background02.jpg');
-    background-size: cover;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 2rem;
+    gap: 12px;
 }
 
 /* Estilo base dos links */

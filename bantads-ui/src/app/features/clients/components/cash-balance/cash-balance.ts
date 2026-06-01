@@ -19,6 +19,7 @@ export class CashBalance implements OnInit {
 
   saldoFormatado = computed(() => this.formatarMoeda(this.conta()?.saldo ?? 0));
   limiteFormatado = computed(() => this.formatarMoeda(this.conta()?.limite ?? 0));
+  saldoNegativo = computed(() => (this.conta()?.saldo ?? 0) < 0);
 
   ngOnInit() {
     const cpf = this.usuario()?.cpf;
