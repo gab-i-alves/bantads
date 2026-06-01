@@ -1,18 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Header } from '../../../../shared/components/header/header';
 import { AuthService } from '../../../../core/services/auth.service';
-import { signal } from '@angular/core';
-import { forkJoin } from 'rxjs';
-import { ClienteService } from '../../../../core/services/cliente.service';
 import { ContaService } from '../../../../core/services/conta.service';
-import { Cliente } from '../../../../core/models/cliente.model';
 import { ContaResumo } from '../../../../core/models/conta.model';
-
-interface TransferRecipient {
-  cliente: Cliente;
-  conta: ContaResumo;
-}
 
 @Component({
   selector: 'app-transfer',
@@ -22,64 +13,35 @@ interface TransferRecipient {
 })
 export class Transfer implements OnInit {
   private authService = inject(AuthService);
-  private clienteService = inject(ClienteService);
   private contaService = inject(ContaService);
 
   amount: string = '0,00';
+  destino: string = '';
   isActive: boolean = false;
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
-  isLoading = signal(false);
 
   contaOrigem = signal<ContaResumo | null>(null);
-  recipients = signal<TransferRecipient[]>([]);
-  selectedRecipient = signal<TransferRecipient | null>(null);
 
   ngOnInit() {
-    this.loadTransferData();
-  }
+    const usuario = this.authService.getUsuarioLogado();
 
-  loadTransferData() {
-    const currentUser = this.authService.getUsuarioLogado();
-
-    if (!currentUser?.cpf) {
+    if (!usuario?.cpf) {
       this.errorMessage.set('Nao foi possivel identificar o usuario logado.');
       return;
     }
 
-    this.isLoading.set(true);
-    this.errorMessage.set(null);
-
-    forkJoin({
-      clientes: this.clienteService.listarClientes(),
-      contas: this.contaService.listarContas()
-    }).subscribe({
-      next: ({ clientes, contas }) => {
-        const contaOrigem = contas.find(conta => conta.clienteCpf === currentUser.cpf) || null;
-        this.contaOrigem.set(contaOrigem);
-
-        if (!contaOrigem) {
+    this.contaService.buscarContaPorClienteCpf(usuario.cpf).subscribe({
+      next: (conta) => {
+        this.contaOrigem.set(conta);
+        if (!conta) {
           this.errorMessage.set('Conta de origem nao encontrada.');
-          this.recipients.set([]);
-          return;
         }
-
-        const destinatarios = clientes
-          .filter(cliente => cliente.cpf !== currentUser.cpf)
-          .map(cliente => ({
-            cliente,
-            conta: contas.find(conta => conta.clienteCpf === cliente.cpf)
-          }))
-          .filter((item): item is TransferRecipient => !!item.conta);
-
-        this.recipients.set(destinatarios);
       },
       error: (error) => {
-        console.error('Erro ao carregar dados para transferencia:', error);
-        this.errorMessage.set('Nao foi possivel carregar os destinatarios.');
-        this.isLoading.set(false);
-      },
-      complete: () => this.isLoading.set(false)
+        console.error('Erro ao buscar conta de origem:', error);
+        this.errorMessage.set('Nao foi possivel carregar a conta.');
+      }
     });
   }
 
@@ -95,10 +57,9 @@ export class Transfer implements OnInit {
     this.successMessage.set(null);
   }
 
-
   transferir() {
     const origem = this.contaOrigem();
-    const destino = this.selectedRecipient();
+    const destino = this.destino.trim();
     const amountNumber = parseFloat(this.amount.replace(',', '.'));
 
     this.errorMessage.set(null);
@@ -110,7 +71,12 @@ export class Transfer implements OnInit {
     }
 
     if (!destino) {
-      this.errorMessage.set('Selecione um destinatario.');
+      this.errorMessage.set('Informe o numero da conta destino.');
+      return;
+    }
+
+    if (destino === origem.numero) {
+      this.errorMessage.set('Nao e possivel transferir para a propria conta.');
       return;
     }
 
@@ -125,16 +91,16 @@ export class Transfer implements OnInit {
     }
 
     this.isActive = true;
-    this.contaService.transferir(origem.numero, destino.conta.numero, amountNumber).subscribe({
+    this.contaService.transferir(origem.numero, destino, amountNumber).subscribe({
       next: (response) => {
         this.contaOrigem.set({ ...origem, saldo: response.saldo });
         this.amount = '0,00';
-        this.selectedRecipient.set(null);
+        this.destino = '';
         this.successMessage.set('Transferencia realizada com sucesso.');
       },
       error: (error) => {
         console.error('Erro ao realizar transferencia:', error);
-        this.errorMessage.set('Nao foi possivel realizar a transferencia.');
+        this.errorMessage.set('Nao foi possivel realizar a transferencia. Verifique o numero da conta destino.');
         this.isActive = false;
       },
       complete: () => {

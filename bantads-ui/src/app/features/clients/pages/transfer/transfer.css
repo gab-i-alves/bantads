@@ -8,9 +8,11 @@ input::-webkit-inner-spin-button {
     background-color: #1a1a1c;
     display: flex;
     width: 100%;
-    height: 80px;
+    max-width: 340px;
+    margin: 0 auto;
+    height: 60px;
     position: relative;
-    border-radius: 16px;
+    border-radius: 14px;
     transition: 0.3s ease-in-out;
     overflow: hidden;
     cursor: pointer;
@@ -24,7 +26,7 @@ input::-webkit-inner-spin-button {
 .left-side {
     background-color: #7c3aed;
     /* Roxo principal */
-    width: 80px;
+    width: 60px;
     height: 100%;
     border-radius: 4px;
     position: relative;
@@ -38,14 +40,14 @@ input::-webkit-inner-spin-button {
 }
 
 .right-side {
-    width: calc(100% - 80px);
+    width: calc(100% - 60px);
     display: flex;
     align-items: center;
     overflow: hidden;
     justify-content: space-between;
     white-space: nowrap;
     transition: 0.3s;
-    padding: 0 20px;
+    padding: 0 16px;
 }
 
 .arrow {
@@ -55,14 +57,14 @@ input::-webkit-inner-spin-button {
 }
 
 .new {
-    font-size: 18px;
+    font-size: 15px;
     font-family: "Lexend Deca", sans-serif;
     font-weight: 600;
 }
 
 .card {
-    width: 45px;
-    height: 30px;
+    width: 34px;
+    height: 22px;
     background-color: #a78bfa;
     border-radius: 4px;
     position: absolute;
@@ -74,11 +76,11 @@ input::-webkit-inner-spin-button {
 }
 
 .card-line {
-    width: 35px;
-    height: 6px;
+    width: 26px;
+    height: 5px;
     background-color: #7c3aed;
     border-radius: 1px;
-    margin-top: 5px;
+    margin-top: 3px;
 }
 
 .buttons {
@@ -89,7 +91,7 @@ input::-webkit-inner-spin-button {
     border-radius: 50%;
     margin-top: 4px;
     transform: rotate(90deg);
-    margin-left: -20px;
+    margin-left: -15px;
 }
 
 .anim-container.active .card {
@@ -106,11 +108,11 @@ input::-webkit-inner-spin-button {
     }
 
     50% {
-        transform: translateY(-50px) rotate(90deg);
+        transform: translateY(-40px) rotate(90deg);
     }
 
     60% {
-        transform: translateY(-50px) rotate(90deg);
+        transform: translateY(-40px) rotate(90deg);
     }
 
     100% {
@@ -119,49 +121,49 @@ input::-webkit-inner-spin-button {
 }
 
 .post {
-    width: 40px;
-    height: 50px;
+    width: 30px;
+    height: 38px;
     background-color: #e5e7eb;
     position: absolute;
     z-index: 11;
-    top: 80px;
+    top: 60px;
     /* Escondido abaixo */
     border-radius: 4px;
     overflow: hidden;
 }
 
 .post-line {
-    width: 30px;
-    height: 6px;
+    width: 22px;
+    height: 5px;
     background-color: #374151;
     position: absolute;
     border-radius: 0px 0px 2px 2px;
-    right: 5px;
-    top: 6px;
+    right: 4px;
+    top: 5px;
 }
 
 .post-line:before {
     content: "";
     position: absolute;
-    width: 30px;
-    height: 6px;
+    width: 22px;
+    height: 5px;
     background-color: #4b5563;
-    top: -5px;
+    top: -4px;
 }
 
 .screen {
-    width: 30px;
-    height: 15px;
+    width: 22px;
+    height: 11px;
     background-color: #ffffff;
     position: absolute;
-    top: 15px;
-    right: 5px;
+    top: 11px;
+    right: 4px;
     border-radius: 2px;
 }
 
 .dollar {
     position: absolute;
-    font-size: 11px;
+    font-size: 9px;
     font-family: "Lexend Deca", sans-serif;
     width: 100%;
     left: 0;
@@ -177,7 +179,7 @@ input::-webkit-inner-spin-button {
     }
 
     100% {
-        transform: translateY(-55px);
+        transform: translateY(-42px);
     }
 }
 
