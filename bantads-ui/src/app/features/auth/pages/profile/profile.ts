@@ -1,14 +1,16 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Header } from '../../../../shared/components/header/header';
 import { AuthService } from '../../../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { ClienteService } from '../../../../core/services/cliente.service';
+import { ContaService } from '../../../../core/services/conta.service';
 import { Cliente, ClienteUpdate } from '../../../../core/models/cliente.model';
+import { CpfPipe } from '../../../../shared/pipes/cpf.pipe';
 import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
-  imports: [Header, FormsModule],
+  imports: [Header, FormsModule, CpfPipe],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -16,19 +18,24 @@ export class Profile implements OnInit {
 
   authService = inject(AuthService);
   private clienteService = inject(ClienteService);
+  private contaService = inject(ContaService);
 
   meuDados = signal<Cliente | null>(null);
+  saldo = signal<number | null>(null);
+  gerenteNome = signal<string | null>(null);
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
   isSaving = signal(false);
   step = signal(1);
+
+  saldoNegativo = computed(() => (this.saldo() ?? 0) < 0);
+  saldoFormatado = computed(() => this.formatarMoeda(this.saldo() ?? 0));
 
   // Dados editáveis
   editavelData = {
     nome: '',
     email: '',
     salario: 0,
-    funcao: '',
     telefone: '',
     cep: '',
     cidade: '',
@@ -52,6 +59,7 @@ export class Profile implements OnInit {
     }
 
     this.preencherFormulario(usuarioLogado);
+    this.carregarSaldoEGerente(usuarioLogado.cpf);
 
     this.clienteService.buscarCliente(usuarioLogado.cpf).subscribe({
       next: (cliente) => {
@@ -66,12 +74,30 @@ export class Profile implements OnInit {
     });
   }
 
+  carregarSaldoEGerente(cpf: string) {
+    this.contaService.buscarContaPorClienteCpf(cpf).subscribe({
+      next: (conta) => this.saldo.set(conta?.saldo ?? null),
+      error: (error) => console.error('Erro ao buscar saldo do cliente:', error)
+    });
+
+    this.clienteService.buscarGerentePorCliente(cpf).subscribe({
+      next: (gerente) => this.gerenteNome.set(gerente?.nome ?? null),
+      error: (error) => console.error('Erro ao buscar gerente do cliente:', error)
+    });
+  }
+
+  private formatarMoeda(valor: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(valor);
+  }
+
   preencherFormulario(cliente: Cliente) {
     this.editavelData = {
       nome: cliente.nome || '',
       email: cliente.email || '',
       salario: cliente.salario || 0,
-      funcao: '',
       telefone: cliente.telefone || '',
       cep: cliente.endereco?.cep || '',
       cidade: cliente.endereco?.cidade || '',
@@ -155,7 +181,7 @@ export class Profile implements OnInit {
   }
 
   nextStep() {
-    if (this.step() < 4) this.step.update(step => step + 1);
+    if (this.step() < 2) this.step.update(step => step + 1);
   }
 
   prevStep() {

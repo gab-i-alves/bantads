@@ -1,23 +1,34 @@
 <app-header></app-header>
 <section
-    class=" header-profile border rounded-[10px] p-4 max-w-[820px] m-auto flex justify-between items-center pt-10 pb-10">
-    <div class="flex gap-4">
-        <div class="border bg-purple-700 p-4 rounded-[50%] w-16 h-16 flex items-center justify-center text-white text-xl
-        font-bold">
+    class="header-profile p-6 max-w-[820px] m-auto flex justify-between items-center pt-10 pb-10">
+    <div class="flex gap-4 items-center">
+        <div class="bg-purple-700 p-4 rounded-[50%] w-16 h-16 flex items-center justify-center text-white text-xl font-bold">
             {{meuDados()?.nome?.[0] || '?'}}
         </div>
 
-        <div class="flex flex-col items-center justify-center mt-4 gap-2">
+        <div class="flex flex-col justify-center gap-1">
             <h1 class="text-2xl font-bold">{{meuDados()?.nome || 'Cliente'}}</h1>
-            <p class="text-white">
-                {{meuDados()?.email || ''}}
-            </p>
+            <p class="text-white/60">{{meuDados()?.email || ''}}</p>
         </div>
     </div>
-    <div>
-        <h1>CPF: <span>{{meuDados()?.cpf || '--'}}</span></h1>
-        <h1>Status: <span>{{meuDados()?.status || '--'}}</span></h1>
-        <h1>Telefone: <span>{{meuDados()?.telefone || '--'}}</span></h1>
+
+    <div class="info-grid">
+        <div class="info-item">
+            <span class="info-label">CPF</span>
+            <span class="info-value">{{ meuDados()?.cpf | cpf }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Telefone</span>
+            <span class="info-value">{{meuDados()?.telefone || '--'}}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Saldo</span>
+            <span class="info-value" [class.negative]="saldoNegativo()">{{ saldoFormatado() }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Gerente</span>
+            <span class="info-value">{{ gerenteNome() || '--' }}</span>
+        </div>
     </div>
 </section>
 
@@ -30,7 +41,7 @@
     <p class="text-center text-sm text-green-400 mt-4">{{ successMessage() }}</p>
     }
 
-    <form class="form-register mt-10" (ngSubmit)="step() === 4 && salvarDados()">
+    <form class="form-register mt-10" (ngSubmit)="salvarDados()">
 
         @switch (step()) {
 
@@ -46,61 +57,54 @@
             <input type="email" [(ngModel)]="editavelData.email" name="email" placeholder="seuemail@email.com">
         </div>
 
-
-        }
-
-        <!-- STEP 2: Dados Profissionais -->
-        @case (2) {
-        <div class="input-group">
-            <label>Salário</label>
-            <input type="number" [(ngModel)]="editavelData.salario" name="salario" placeholder="R$ 0,00">
-        </div>
-
-        <div class="input-group">
-            <label>Função</label>
-            <input type="text" [(ngModel)]="editavelData.funcao" name="funcao" placeholder="Função, ex: desenvolvedor...">
-        </div>
-
         <div class="input-group">
             <label>Telefone</label>
             <input type="text" [(ngModel)]="editavelData.telefone" name="telefone" placeholder="(00) 00000-0000">
         </div>
 
-        }
-        <!-- STEP 3: Endereço -->
-        @case (3) {
         <div class="input-group">
-            <label>CEP</label>
-            <input type="text" [(ngModel)]="editavelData.cep" name="cep" placeholder="00000-000">
-        </div>
-
-        <div class="input-group">
-            <label>Cidade</label>
-            <input type="text" [(ngModel)]="editavelData.cidade" name="cidade" placeholder="Sua cidade">
-        </div>
-
-        <div class="input-group">
-            <label>Estado</label>
-            <input type="text" [(ngModel)]="editavelData.uf" name="uf" placeholder="UF">
+            <label>Salário</label>
+            <input type="number" [(ngModel)]="editavelData.salario" name="salario" placeholder="R$ 0,00">
         </div>
         }
 
-        @case (4) {
-        <div class="input-group">
-            <label>Logradouro</label>
-            <input type="text" [(ngModel)]="editavelData.rua" name="rua" placeholder="Rua, Avenida...">
+        <!-- STEP 2: Endereço -->
+        @case (2) {
+        <div class="row">
+            <div class="input-group">
+                <label>CEP</label>
+                <input type="text" [(ngModel)]="editavelData.cep" name="cep" placeholder="00000-000">
+            </div>
+
+            <div class="input-group">
+                <label>Número</label>
+                <input type="text" [(ngModel)]="editavelData.numero" name="numero" placeholder="123">
+            </div>
         </div>
 
-        <div class="input-group">
-            <label>Número</label>
-            <input type="text" [(ngModel)]="editavelData.numero" name="numero" placeholder="123">
+        <div class="row">
+            <div class="input-group">
+                <label>Logradouro</label>
+                <input type="text" [(ngModel)]="editavelData.rua" name="rua" placeholder="Rua, Avenida...">
+            </div>
+
+            <div class="input-group">
+                <label>Complemento</label>
+                <input type="text" [(ngModel)]="editavelData.complemento" name="complemento" placeholder="Apto, bloco...">
+            </div>
         </div>
 
-        <div class="input-group">
-            <label>Complemento</label>
-            <input type="text" [(ngModel)]="editavelData.complemento" name="complemento" placeholder="Apto, bloco...">
-        </div>
+        <div class="row">
+            <div class="input-group">
+                <label>Cidade</label>
+                <input type="text" [(ngModel)]="editavelData.cidade" name="cidade" placeholder="Sua cidade">
+            </div>
 
+            <div class="input-group">
+                <label>Estado</label>
+                <input type="text" [(ngModel)]="editavelData.uf" name="uf" placeholder="UF">
+            </div>
+        </div>
         }
 
         }
@@ -119,12 +123,11 @@
             </button>
             }
 
-            @if (step() < 4) { <button type="button" (click)="nextStep()">Avançar</button>
-                }
+            @if (step() < 2) {
+            <button type="button" (click)="nextStep()">Avançar</button>
+            }
 
-                @if (step() === 4) {
-                <button type="submit" [disabled]="isSaving()">{{ isSaving() ? 'Salvando...' : 'Salvar' }}</button>
-                }
+            <button type="submit" style="margin-left: auto;" [disabled]="isSaving()">{{ isSaving() ? 'Salvando...' : 'Salvar' }}</button>
 
         </div>
 

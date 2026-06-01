@@ -42,4 +42,8 @@ export class ClienteService {
   listarMelhoresClientes(): Observable<MelhorCliente[]> {
     return this.http.get<MelhorCliente[]>(`${this.ApiBaseUrl}/melhores-clientes`);
   }
+
+  buscarGerentePorCliente(cpf: string): Observable<{ cpf: string; nome: string | null }> {
+    return this.http.get<{ cpf: string; nome: string | null }>(`${this.ApiBaseUrl}/cliente/${cpf}/gerente`);
+  }
 }
