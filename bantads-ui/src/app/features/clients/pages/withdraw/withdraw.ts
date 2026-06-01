@@ -77,8 +77,8 @@ export class Withdraw implements OnInit {
       return;
     }
 
-    if (valor > conta.saldo) {
-      this.errorMessage.set('O valor nao pode ser maior que o saldo atual.');
+    if (valor > conta.saldo + conta.limite) {
+      this.errorMessage.set('Saldo e limite insuficientes.');
       return;
     }
 

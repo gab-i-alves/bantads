@@ -85,8 +85,8 @@ export class Transfer implements OnInit {
       return;
     }
 
-    if (amountNumber > origem.saldo) {
-      this.errorMessage.set('O valor nao pode ser maior que o saldo atual.');
+    if (amountNumber > origem.saldo + origem.limite) {
+      this.errorMessage.set('Saldo e limite insuficientes.');
       return;
     }
 
