@@ -1,6 +1,12 @@
+:host {
+    display: block;
+    width: 100%;
+    max-width: 450px;
+}
+
 /* Container Principal do Card de Carteira */
 .wallet-card {
-    width: 450px;
+    width: 100%;
     background-color: #000000;
     border-radius: 32px;
     padding: 24px;
@@ -32,29 +38,11 @@
     margin: 4px 0 0 0;
 }
 
-/* Botão "Use Wallet" */
-.btn-use-wallet {
-    background: linear-gradient(180deg, rgba(181, 70, 255, 0.3) 0%, rgba(92, 30, 150, 0.3) 100%);
-    border: 1px solid rgba(134, 100, 255, 0.4);
-    padding: 10px 20px;
-    border-radius: 20px;
-    color: #bca0ff;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-use-wallet:hover {
-    background: rgba(141, 70, 255, 0.5);
-    color: #ffffff;
-    box-shadow: 0 0 15px rgba(70, 90, 255, 0.3);
-}
-
 /* Cartão Visual Interno */
 .inner-card {
-    height: 180px;
+    min-height: 180px;
     border-radius: 24px;
+    gap: 16px;
     position: relative;
     overflow: hidden;
     display: flex;
@@ -77,7 +65,7 @@
 /* Ícones de Círculos (Estilo Mastercard/Visa) */
 .card-circles {
     display: flex;
-    gap: -10px;
+    align-items: center;
 }
 
 .circle {

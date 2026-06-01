@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ContaService } from '../../../../core/services/conta.service';
 import { ContaResumo } from '../../../../core/models/conta.model';
@@ -9,22 +9,22 @@ import { ContaResumo } from '../../../../core/models/conta.model';
   templateUrl: './small-card.html',
   styleUrl: './small-card.css',
 })
-export class SmallCard {
+export class SmallCard implements OnInit {
 
-  authService = inject(AuthService);
+  private authService = inject(AuthService);
   private contaService = inject(ContaService);
 
-  usuario = this.authService.getUsuarioLogado();
-  conta: ContaResumo | null = null;
+  usuario = signal(this.authService.getUsuarioLogado());
+  conta = signal<ContaResumo | null>(null);
 
   ngOnInit() {
-    const cpf = this.usuario?.cpf;
+    const cpf = this.usuario()?.cpf;
     if (!cpf) {
       return;
     }
 
     this.contaService.buscarContaPorClienteCpf(cpf).subscribe({
-      next: conta => this.conta = conta,
+      next: conta => this.conta.set(conta),
       error: error => console.error('Erro ao buscar dados da conta:', error)
     });
   }
