@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Cliente, ClienteCreate, ClienteUpdate, MelhorCliente } from '../models/cliente.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +10,7 @@ import { Cliente, ClienteCreate, ClienteUpdate, MelhorCliente } from '../models/
 export class ClienteService {
 
   private http = inject(HttpClient);
-  private ApiBaseUrl = 'http://localhost:3000';
+  private ApiBaseUrl = environment.apiBaseUrl;
 
   listarClientes(): Observable<Cliente[]> {
     return this.http.get<Cliente[]>(`${this.ApiBaseUrl}/cliente`);

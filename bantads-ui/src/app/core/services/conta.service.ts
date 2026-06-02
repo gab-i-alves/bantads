@@ -2,13 +2,14 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ContaResumo, Extrato, OperacaoContaResponse, SaldoConta, TransferenciaResponse } from '../models/conta.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ContaService {
   private http = inject(HttpClient);
-  private ApiBaseUrl = 'http://localhost:3000';
+  private ApiBaseUrl = environment.apiBaseUrl;
 
   listarContas(): Observable<ContaResumo[]> {
     return this.http.get<ContaResumo[]>(`${this.ApiBaseUrl}/conta`);

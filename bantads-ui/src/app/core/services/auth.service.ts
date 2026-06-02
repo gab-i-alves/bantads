@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { LoginModel } from '../models/login.model';
 import { Router } from '@angular/router';
 import { Cliente, ClienteCreate } from '../models/cliente.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +13,7 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
 
-  private ApiBaseUrl = 'http://localhost:3000';
+  private ApiBaseUrl = environment.apiBaseUrl;
 
   login(email: string, password: string) {
     return this.http.post<LoginModel>(

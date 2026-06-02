@@ -2,13 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DashboardGerente, Gerente, GerenteCreate, GerenteUpdate, RelatorioCliente } from '../models/admin.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
   private http = inject(HttpClient);
-  private ApiBaseUrl = 'http://localhost:3000';
+  private ApiBaseUrl = environment.apiBaseUrl;
 
   listarDashboardGerentes(): Observable<DashboardGerente[]> {
     return this.http.get<DashboardGerente[]>(`${this.ApiBaseUrl}/admin/dashboard`);
