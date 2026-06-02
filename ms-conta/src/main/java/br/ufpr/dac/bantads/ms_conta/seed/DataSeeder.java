@@ -18,6 +18,7 @@ import br.ufpr.dac.bantads.ms_conta.repository.ContaReadRepository;
 import br.ufpr.dac.bantads.ms_conta.repository.ContaRepository;
 import br.ufpr.dac.bantads.ms_conta.repository.MovimentacaoReadRepository;
 import br.ufpr.dac.bantads.ms_conta.repository.MovimentacaoRepository;
+import lombok.extern.slf4j.Slf4j;
 
 // dados pré-cadastrados exigidos na secao 4 do enunciado
 // só insere se o banco estiver vazio (evita duplicar no restart)
@@ -25,6 +26,7 @@ import br.ufpr.dac.bantads.ms_conta.repository.MovimentacaoRepository;
 //
 // CQRS: popula AMBOS os schemas (CUD e Read) diretamente no seed
 // pq o RabbitMQ pode nao estar pronto durante o startup
+@Slf4j
 @Component
 public class DataSeeder implements CommandLineRunner {
 
@@ -188,7 +190,7 @@ public class DataSeeder implements CommandLineRunner {
         );
         movReadRepo.saveAll(movsRead);
 
-        System.out.println("[ms-conta] Seed CQRS: " + contasCud.size() + " contas e "
-                + movsCud.size() + " movimentacoes inseridas (CUD + Read)");
+        log.info("[ms-conta] Seed CQRS: {} contas e {} movimentacoes inseridas (CUD + Read)",
+                contasCud.size(), movsCud.size());
     }
 }

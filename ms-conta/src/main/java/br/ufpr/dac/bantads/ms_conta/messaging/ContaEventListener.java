@@ -10,11 +10,13 @@ import br.ufpr.dac.bantads.ms_conta.model.MovimentacaoRead;
 import br.ufpr.dac.bantads.ms_conta.model.TipoMovimentacao;
 import br.ufpr.dac.bantads.ms_conta.repository.ContaReadRepository;
 import br.ufpr.dac.bantads.ms_conta.repository.MovimentacaoReadRepository;
+import lombok.extern.slf4j.Slf4j;
 
 // listener que consome eventos da fila conta.sync
 // e atualiza o schema de LEITURA (schema_conta_read)
 //
 // fluxo: ContaService grava no CUD → publisher manda evento → este listener atualiza o Read
+@Slf4j
 @Component
 public class ContaEventListener {
 
@@ -32,8 +34,7 @@ public class ContaEventListener {
     @RabbitListener(queues = RabbitConfig.QUEUE)
     @Transactional
     public void onSync(ContaEvent evento) {
-        System.out.println("[CQRS] Evento recebido: " + evento.tipoEvento()
-                + " conta=" + evento.numeroConta());
+        log.info("[CQRS] Evento recebido: {} conta={}", evento.tipoEvento(), evento.numeroConta());
 
         // atualiza o saldo da conta no schema de leitura
         ContaRead conta = contaReadRepo.findByNumero(evento.numeroConta())
@@ -42,8 +43,7 @@ public class ContaEventListener {
         if (conta == null) {
             // se a conta nao existe no read ainda, ignora
             // (acontece se o seed nao populou o read — mas nao deveria)
-            System.out.println("[CQRS] WARN: conta " + evento.numeroConta()
-                    + " nao encontrada no schema_conta_read");
+            log.warn("[CQRS] conta {} nao encontrada no schema_conta_read", evento.numeroConta());
             return;
         }
 
@@ -60,7 +60,6 @@ public class ContaEventListener {
         mov.setValor(evento.valorMovimentacao());
         movReadRepo.save(mov);
 
-        System.out.println("[CQRS] Schema de leitura atualizado: conta="
-                + evento.numeroConta() + " saldo=" + evento.saldoAtual());
+        log.info("[CQRS] Schema de leitura atualizado: conta={} saldo={}", evento.numeroConta(), evento.saldoAtual());
     }
 }

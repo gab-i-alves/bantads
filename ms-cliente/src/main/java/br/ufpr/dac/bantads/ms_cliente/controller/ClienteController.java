@@ -64,8 +64,8 @@ public class ClienteController {
         return ResponseEntity.ok(response);
     }
 
-    // R11: gerente rejeita cliente - motivo recebido mas nao persistido aqui
-    // TODO pendente: enviar motivo por email via rabbitmq
+    // R11: gerente rejeita cliente; o service persiste o motivo e ja loga o mock
+    // de e-mail (o envio real por rabbitmq fica fora do escopo da entrega)
     @PostMapping("/{cpf}/rejeitar")
     public ResponseEntity<ClienteResponseDTO> rejeitar(
             @PathVariable String cpf,

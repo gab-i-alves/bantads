@@ -17,8 +17,8 @@ public class ClienteService {
 
     private final ClienteRepository repository;
 
-    // R1: cria cliente com status PENDENTE, verifica cpf duplicado
-    // TODO pendente: isso vai virar parte da saga de autocadastro via rabbitmq
+    // R1: cria cliente com status PENDENTE, verifica cpf duplicado (passo sincrono;
+    // a saga de autocadastro so dispara na aprovacao R10, via ClienteController)
     @Transactional
     public ClienteResponseDTO criar(ClienteRequestDTO dto) {
         if (repository.existsByCpf(dto.cpf())) {
@@ -81,8 +81,8 @@ public class ClienteService {
         return toResponse(cliente);
     }
 
-    // R4: altera perfil do cliente (tudo menos cpf)
-    // TODO pendente: se salario mudar, ms-conta precisa recalcular limite via saga
+    // R4: altera perfil do cliente (tudo menos cpf); o recalculo de limite no
+    // ms-conta e disparado pela saga de alteracao de perfil no ClienteController
     @Transactional
     public ClienteResponseDTO atualizar(String cpf, ClienteRequestDTO dto) {
         Cliente cliente = repository.findByCpf(cpf)
