@@ -20,6 +20,9 @@ public class RabbitConfig {
     public static final String CMD_QUEUE = "saga.cmd.auth";
     public static final String CMD_ROUTING_KEY = "saga.cmd.auth";
 
+    // routing key onde o ms-saga escuta replies (ele decide o nome da fila)
+    public static final String REPLY_ROUTING_KEY = "saga.reply.orchestrator";
+
     @Bean
     public DirectExchange sagaExchange() {
         return new DirectExchange(SAGA_EXCHANGE);

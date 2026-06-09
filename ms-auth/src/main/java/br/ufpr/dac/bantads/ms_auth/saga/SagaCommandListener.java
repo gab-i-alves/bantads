@@ -23,7 +23,6 @@ import java.util.Optional;
 @Slf4j
 public class SagaCommandListener {
 
-    private static final String REPLY_ROUTING_KEY = "saga.reply.orchestrator";
     private static final String SENHA_CHARSET =
             "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
     private static final int SENHA_LEN = 8;
@@ -38,7 +37,7 @@ public class SagaCommandListener {
     public void onCommand(SagaCommand cmd) {
         log.info("saga cmd ← sagaId={} type={} step={}", cmd.sagaId(), cmd.sagaType(), cmd.step());
         SagaReply reply = handle(cmd);
-        rabbitTemplate.convertAndSend(RabbitConfig.SAGA_EXCHANGE, REPLY_ROUTING_KEY, reply);
+        rabbitTemplate.convertAndSend(RabbitConfig.SAGA_EXCHANGE, RabbitConfig.REPLY_ROUTING_KEY, reply);
         log.info("saga reply → sagaId={} step={} success={}", reply.sagaId(), reply.step(), reply.success());
     }
 

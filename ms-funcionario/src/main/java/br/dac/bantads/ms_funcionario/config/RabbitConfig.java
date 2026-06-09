@@ -16,6 +16,9 @@ public class RabbitConfig {
 
     public static final String SAGA_EXCHANGE = "saga.exchange";
 
+    // routing key da reply que o orquestrador (ms-saga) escuta
+    public static final String REPLY_ROUTING_KEY = "saga.reply.orchestrator";
+
     // fila de comandos endereçados ao ms-funcionario
     public static final String CMD_QUEUE = "saga.cmd.funcionario";
     public static final String CMD_ROUTING_KEY = "saga.cmd.funcionario";

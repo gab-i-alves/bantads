@@ -22,6 +22,7 @@ public class RabbitConfig {
     public static final String SAGA_EXCHANGE = "saga.exchange";
     public static final String SAGA_CMD_QUEUE = "saga.cmd.conta";
     public static final String SAGA_CMD_ROUTING_KEY = "saga.cmd.conta";
+    public static final String SAGA_REPLY_ROUTING_KEY = "saga.reply.orchestrator";
 
     // exchange tipo DIRECT: manda mensagem pra fila que bater a routing key
     @Bean

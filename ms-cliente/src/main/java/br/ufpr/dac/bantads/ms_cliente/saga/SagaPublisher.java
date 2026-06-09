@@ -18,10 +18,6 @@ import java.util.Map;
 @Slf4j
 public class SagaPublisher {
 
-    // routing keys das filas de start do ms-saga (mesma exchange única "saga.exchange")
-    private static final String START_AUTOCADASTRO = "saga.start.autocadastro";
-    private static final String START_ALTERACAO_PERFIL = "saga.start.alteracao_perfil";
-
     private final RabbitTemplate rabbit;
     private final ObjectMapper mapper;
 
@@ -29,7 +25,7 @@ public class SagaPublisher {
     public void dispararAutocadastro(String cpf) {
         try {
             String payload = mapper.writeValueAsString(Map.of("cpf", cpf));
-            rabbit.convertAndSend(RabbitConfig.SAGA_EXCHANGE, START_AUTOCADASTRO, payload);
+            rabbit.convertAndSend(RabbitConfig.SAGA_EXCHANGE, RabbitConfig.START_AUTOCADASTRO_ROUTING_KEY, payload);
             log.info("saga start.autocadastro publicada cpf={}", cpf);
         } catch (Exception e) {
             throw new RuntimeException("falha publicando saga.start.autocadastro", e);
@@ -48,7 +44,7 @@ public class SagaPublisher {
             body.put("salario", dto.salario().toPlainString());
             body.put("endereco", dto.endereco());
             String payload = mapper.writeValueAsString(body);
-            rabbit.convertAndSend(RabbitConfig.SAGA_EXCHANGE, START_ALTERACAO_PERFIL, payload);
+            rabbit.convertAndSend(RabbitConfig.SAGA_EXCHANGE, RabbitConfig.START_ALTERACAO_PERFIL_ROUTING_KEY, payload);
             log.info("saga start.alteracao_perfil publicada cpf={}", cpf);
         } catch (Exception e) {
             throw new RuntimeException("falha publicando saga.start.alteracao_perfil", e);

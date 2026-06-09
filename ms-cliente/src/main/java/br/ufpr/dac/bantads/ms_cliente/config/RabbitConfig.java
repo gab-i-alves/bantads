@@ -27,6 +27,13 @@ public class RabbitConfig {
     public static final String RESPONSE_QUEUE = "saga.response.cliente";
     public static final String RESPONSE_ROUTING_KEY = "saga.response.cliente";
 
+    // routing key onde o ms-saga escuta replies (ele decide o nome da fila)
+    public static final String REPLY_ROUTING_KEY = "saga.reply.orchestrator";
+
+    // routing keys das filas de start do ms-saga (mesma exchange única "saga.exchange")
+    public static final String START_AUTOCADASTRO_ROUTING_KEY = "saga.start.autocadastro";
+    public static final String START_ALTERACAO_PERFIL_ROUTING_KEY = "saga.start.alteracao_perfil";
+
     @Bean
     public DirectExchange sagaExchange() {
         return new DirectExchange(SAGA_EXCHANGE);

@@ -23,9 +23,6 @@ import java.util.Map;
 @Slf4j
 public class SagaCommandListener {
 
-    // routing key onde o ms-saga escuta replies (ele decide o nome da fila)
-    private static final String REPLY_ROUTING_KEY = "saga.reply.orchestrator";
-
     private final RabbitTemplate rabbitTemplate;
     private final ClienteService clienteService;
     private final ObjectMapper objectMapper;
@@ -34,7 +31,7 @@ public class SagaCommandListener {
     public void onCommand(SagaCommand cmd) {
         log.info("saga cmd ← sagaId={} type={} step={}", cmd.sagaId(), cmd.sagaType(), cmd.step());
         SagaReply reply = handle(cmd);
-        rabbitTemplate.convertAndSend(RabbitConfig.SAGA_EXCHANGE, REPLY_ROUTING_KEY, reply);
+        rabbitTemplate.convertAndSend(RabbitConfig.SAGA_EXCHANGE, RabbitConfig.REPLY_ROUTING_KEY, reply);
         log.info("saga reply → sagaId={} step={} success={}", reply.sagaId(), reply.step(), reply.success());
     }
 
