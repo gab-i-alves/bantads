@@ -73,14 +73,12 @@ public class ContaService {
 
     // R3: consultar saldo pra tela inicial do cliente
     public SaldoResponseDTO consultarSaldo(String numeroConta) {
-        ContaRead conta = contaReadRepo.findByNumero(numeroConta)
-                            .orElseThrow(() -> new RuntimeException("Conta não encontrada: " + numeroConta));
+        ContaRead conta = buscarContaReadOuErro(numeroConta);
         return new SaldoResponseDTO(conta.getClienteCpf(), conta.getNumero(), conta.getSaldo());
     }
 
     public ExtratoResponseDTO consultarExtrato(String numeroConta, LocalDate inicio, LocalDate fim) {
-        ContaRead conta = contaReadRepo.findByNumero(numeroConta)
-                .orElseThrow(() -> new RuntimeException("Conta não encontrada: " + numeroConta));
+        ContaRead conta = buscarContaReadOuErro(numeroConta);
 
         List<MovimentacaoRead> movs;
         if (inicio != null && fim != null) {
@@ -239,6 +237,12 @@ public class ContaService {
                 valor, numeroOrigem, numeroDestino, agora));
 
         return new TransferenciaResponseDTO(numeroOrigem, agora, numeroDestino, origem.getSaldo(), valor);
+    }
+
+    // busca no schema READ (pra consultas)
+    private ContaRead buscarContaReadOuErro(String numeroConta) {
+        return contaReadRepo.findByNumero(numeroConta)
+                .orElseThrow(() -> new RuntimeException("Conta não encontrada: " + numeroConta));
     }
 
     // busca no schema CUD (pra operações de escrita)

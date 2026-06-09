@@ -44,7 +44,7 @@ public class Cliente {
     @Column(name = "motivo_rejeicao", length = 500)
     private String motivoRejeicao;
 
-    // relacao 1:1 - cada cliente tem seu proprio endereco (aqui foi uma suposicao, poderia ser diferente. mas o enunciado nao especifica nada sobre endereco, entao deixei assim, poderia ser 1:n mas ai teria que criar uma tabela intermediaria cliente_endereco) TODO: decidir sobre isso na próxima aula
+    // relacao 1:1 - cada cliente tem seu proprio endereco
     // cascade: salvar/deletar cliente salva/deleta endereco junto
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "endereco_id", nullable = false, unique = true)
