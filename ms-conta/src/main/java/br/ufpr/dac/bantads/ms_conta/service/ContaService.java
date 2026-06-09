@@ -183,10 +183,7 @@ public class ContaService {
     public OperacaoResponseDTO sacar(String numeroConta, BigDecimal valor) {
         Conta conta = buscarContaCudOuErro(numeroConta);
 
-        BigDecimal disponivel = conta.getSaldo().add(conta.getLimite());
-        if (disponivel.compareTo(valor) < 0) {
-            throw new IllegalArgumentException("Saldo insuficiente");
-        }
+        validarSaldoSuficiente(conta, valor);
 
         conta.setSaldo(conta.getSaldo().subtract(valor));
         contaRepo.save(conta);
@@ -217,10 +214,7 @@ public class ContaService {
         Conta origem = buscarContaCudOuErro(numeroOrigem);
         Conta destino = buscarContaCudOuErro(numeroDestino);
 
-        BigDecimal disponivel = origem.getSaldo().add(origem.getLimite());
-        if (disponivel.compareTo(valor) < 0) {
-            throw new IllegalArgumentException("Saldo insuficiente");
-        }
+        validarSaldoSuficiente(origem, valor);
 
         origem.setSaldo(origem.getSaldo().subtract(valor));
         destino.setSaldo(destino.getSaldo().add(valor));
@@ -251,5 +245,13 @@ public class ContaService {
     private Conta buscarContaCudOuErro(String numeroConta) {
         return contaRepo.findByNumero(numeroConta)
                 .orElseThrow(() -> new RuntimeException("Conta não encontrada: " + numeroConta));
+    }
+
+    // R6/R7: só permite debitar se saldo + limite cobre o valor
+    private void validarSaldoSuficiente(Conta conta, BigDecimal valor) {
+        BigDecimal disponivel = conta.getSaldo().add(conta.getLimite());
+        if (disponivel.compareTo(valor) < 0) {
+            throw new IllegalArgumentException("Saldo insuficiente");
+        }
     }
 }
