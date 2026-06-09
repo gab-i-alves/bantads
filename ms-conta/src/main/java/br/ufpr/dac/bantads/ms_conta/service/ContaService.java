@@ -109,17 +109,15 @@ public class ContaService {
 
         List<MovimentacaoRead> todasMovs = movReadRepo.findByContaNumero(numeroConta);
 
+        // uma passada só: movs depois de 'fim' recuam o saldo final;
+        // movs dentro de [inicio, fim] acumulam o delta do dia (faixas disjuntas)
         BigDecimal saldoAposFim = saldoAtual;
-        for (MovimentacaoRead m : todasMovs) {
-            if (m.getDataHora().toLocalDate().isAfter(fim)) {
-                saldoAposFim = saldoAposFim.subtract(delta(m, numeroConta));
-            }
-        }
-
         Map<LocalDate, BigDecimal> deltasPorDia = new HashMap<>();
         for (MovimentacaoRead m : todasMovs) {
             LocalDate d = m.getDataHora().toLocalDate();
-            if (!d.isBefore(inicio) && !d.isAfter(fim)) {
+            if (d.isAfter(fim)) {
+                saldoAposFim = saldoAposFim.subtract(delta(m, numeroConta));
+            } else if (!d.isBefore(inicio)) {
                 deltasPorDia.merge(d, delta(m, numeroConta), BigDecimal::add);
             }
         }
