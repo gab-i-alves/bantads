@@ -19,7 +19,8 @@ interface GroupedDay {
   label: string;
   date: string;
   items: TransactionView[];
-  dailyBalance: string;
+  dailyBalance: string | null;
+  semMovimentacao: boolean;
 }
 
 @Component({
@@ -105,29 +106,73 @@ export class TransactionHistory implements OnInit {
   }
 
   private montarGrupos(extrato: Extrato): GroupedDay[] {
-    const saldosDiarios = new Map(
-      (extrato.saldosDiarios ?? []).map(s => [s.data, s.saldo])
-    );
-
-    const grupos = new Map<string, TransactionView[]>();
-
+    const movsPorDia = new Map<string, TransactionView[]>();
     for (const mov of extrato.movimentacoes ?? []) {
       const dia = mov.data.split('T')[0];
-      const lista = grupos.get(dia) ?? [];
+      const lista = movsPorDia.get(dia) ?? [];
       lista.push(this.toView(mov, extrato.conta));
-      grupos.set(dia, lista);
+      movsPorDia.set(dia, lista);
     }
 
-    return Array.from(grupos.entries())
-      .sort((a, b) => b[0].localeCompare(a[0]))
-      .map(([dia, items]) => ({
-        label: this.formatarDia(dia),
-        date: dia,
-        items: items.sort((a, b) => b.dataHora.localeCompare(a.dataHora)),
-        dailyBalance: saldosDiarios.has(dia)
-          ? this.formatarMoeda(saldosDiarios.get(dia)!)
-          : '—',
-      }));
+    const saldos = extrato.saldosDiarios ?? [];
+
+    if (!saldos.length) {
+      return Array.from(movsPorDia.entries())
+        .sort((a, b) => b[0].localeCompare(a[0]))
+        .map(([dia, items]) => ({
+          label: this.formatarDia(dia),
+          date: dia,
+          items: items.sort((a, b) => b.dataHora.localeCompare(a.dataHora)),
+          dailyBalance: null,
+          semMovimentacao: false,
+        }));
+    }
+
+    const diasOrdenados = [...saldos].sort((a, b) => a.data.localeCompare(b.data));
+    const entries: GroupedDay[] = [];
+    let inicioVazio: string | null = null;
+    let fimVazio: string | null = null;
+    let saldoVazio = 0;
+
+    const fecharIntervaloVazio = () => {
+      if (!inicioVazio) {
+        return;
+      }
+      entries.push({
+        label: inicioVazio === fimVazio
+          ? this.formatarDia(inicioVazio)
+          : `${this.formatarDia(inicioVazio)} - ${this.formatarDia(fimVazio!)}`,
+        date: inicioVazio,
+        items: [],
+        dailyBalance: this.formatarMoeda(saldoVazio),
+        semMovimentacao: true,
+      });
+      inicioVazio = null;
+      fimVazio = null;
+    };
+
+    for (const s of diasOrdenados) {
+      const items = movsPorDia.get(s.data);
+      if (items?.length) {
+        fecharIntervaloVazio();
+        entries.push({
+          label: this.formatarDia(s.data),
+          date: s.data,
+          items: items.sort((a, b) => b.dataHora.localeCompare(a.dataHora)),
+          dailyBalance: this.formatarMoeda(s.saldo),
+          semMovimentacao: false,
+        });
+      } else {
+        if (!inicioVazio) {
+          inicioVazio = s.data;
+        }
+        fimVazio = s.data;
+        saldoVazio = s.saldo;
+      }
+    }
+    fecharIntervaloVazio();
+
+    return entries.reverse();
   }
 
   private toView(mov: MovimentacaoExtrato, contaNumero: string): TransactionView {

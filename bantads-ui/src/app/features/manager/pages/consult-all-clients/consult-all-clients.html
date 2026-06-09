@@ -54,11 +54,11 @@
                         </div>
                     </td>
                     <td class="cpf">{{cliente.cpf}}</td>
-                    <td class="salary">R$ {{cliente.salario.toFixed(2).replace('.', ',') }}</td>
+                    <td class="salary">{{ formatarMoeda(cliente.salario) }}</td>
                     <td>{{cliente.endereco?.cidade || cliente.cidade || '--'}}</td>
                     <td>{{cliente.endereco?.estado || cliente.uf || '--'}}</td>
-                    <td>R$ {{(cliente.saldo || 0).toFixed(2).replace('.', ',') }}</td>
-                    <td>R$ {{(cliente.credito || 0).toFixed(2).replace('.', ',') }}</td>
+                    <td>{{ formatarMoeda(cliente.saldo) }}</td>
+                    <td>{{ formatarMoeda(cliente.credito) }}</td>
                 </tr>
                 }
                 }

@@ -76,7 +76,10 @@ export class ConsultClient implements OnInit {
   }
 
   formatarMoeda(valor?: number): string {
-    return `R$ ${(valor || 0).toFixed(2).replace('.', ',')}`;
+    return `R$ ${(valor || 0).toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
   }
 
   limparBusca() {

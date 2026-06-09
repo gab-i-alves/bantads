@@ -73,6 +73,13 @@ export class ConsultAllClients implements OnInit {
       .toUpperCase();
   }
 
+  formatarMoeda(valor?: number): string {
+    return `R$ ${(valor || 0).toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+
   private normalizarTexto(valor: string): string {
     return valor
       .trim()
