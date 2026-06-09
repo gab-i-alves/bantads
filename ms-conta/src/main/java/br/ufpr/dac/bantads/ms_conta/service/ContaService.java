@@ -17,6 +17,7 @@ import br.ufpr.dac.bantads.ms_conta.dto.ExtratoResponseDTO.ItemExtrato;
 import br.ufpr.dac.bantads.ms_conta.dto.OperacaoResponseDTO;
 import br.ufpr.dac.bantads.ms_conta.dto.SaldoResponseDTO;
 import br.ufpr.dac.bantads.ms_conta.dto.TransferenciaResponseDTO;
+import br.ufpr.dac.bantads.ms_conta.exceptions.ContaExceptions;
 import br.ufpr.dac.bantads.ms_conta.messaging.ContaEvent;
 import br.ufpr.dac.bantads.ms_conta.messaging.ContaEventPublisher;
 import br.ufpr.dac.bantads.ms_conta.model.Conta;
@@ -240,13 +241,13 @@ public class ContaService {
     // busca no schema READ (pra consultas)
     private ContaRead buscarContaReadOuErro(String numeroConta) {
         return contaReadRepo.findByNumero(numeroConta)
-                .orElseThrow(() -> new RuntimeException("Conta não encontrada: " + numeroConta));
+                .orElseThrow(() -> new ContaExceptions.NotFoundException(numeroConta));
     }
 
     // busca no schema CUD (pra operações de escrita)
     private Conta buscarContaCudOuErro(String numeroConta) {
         return contaRepo.findByNumero(numeroConta)
-                .orElseThrow(() -> new RuntimeException("Conta não encontrada: " + numeroConta));
+                .orElseThrow(() -> new ContaExceptions.NotFoundException(numeroConta));
     }
 
     // R6/R7: só permite debitar se saldo + limite cobre o valor
