@@ -16,6 +16,13 @@ export class ClienteService {
     return this.http.get<Cliente[]>(`${this.ApiBaseUrl}/cliente`);
   }
 
+  listarClientesPorGerente(): Observable<Cliente[]> {
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+    return this.http.post<Cliente[]>(`${this.ApiBaseUrl}/clientes-por-gerente`, {
+      gerenteCpf: usuario.cpf,
+    });
+  }
+
   listarClientesPendentes(): Observable<Cliente[]> {
     return this.http.get<Cliente[]>(`${this.ApiBaseUrl}/cliente?filtro=para_aprovar`);
   }

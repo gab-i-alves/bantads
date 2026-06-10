@@ -7,6 +7,7 @@ const funcionarioRoutes = require("./funcionario.routes")
 const melhoresClientesRoutes = require("./melhores-clientes.routes")
 const dashboardAdminRoutes = require("./dashboard-admin.routes")
 const relatorioRoutes = require("./relatorio.routes")
+const clientesPorGerenteRoutes = require("./clientes-por-gerente.routes")
 
 const router = express.Router();
 
@@ -15,9 +16,10 @@ router.use("/cliente", clienteRoutes);
 router.use("/conta", contaRoutes);
 router.use("/gerentes", funcionarioRoutes)
 
-// API Composition (R14, R15, R16) agrega dados de 2+ MSs no gateway
+// API Composition agrega dados de 2+ MSs no gateway
 router.use("/melhores-clientes", melhoresClientesRoutes)
 router.use("/admin/dashboard", dashboardAdminRoutes)
 router.use("/admin/relatorio", relatorioRoutes)
+router.use("/clientes-por-gerente", clientesPorGerenteRoutes)
 
 module.exports = router;

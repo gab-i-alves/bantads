@@ -50,7 +50,7 @@ export class ConsultAllClients implements OnInit {
     this.isLoadingClientes.set(true);
     this.errorMessage.set('');
 
-    this.clienteService.listarClientes().subscribe({
+    this.clienteService.listarClientesPorGerente().subscribe({
       next: (clientes) => {
         this.clientes.set(clientes);
         this.isLoadingClientes.set(false);
