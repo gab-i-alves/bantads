@@ -32,6 +32,8 @@ export interface MovimentacaoExtrato {
   tipo: string;
   origem: string | null;
   destino: string | null;
+  nomeOrigem?: string | null;
+  nomeDestino?: string | null;
   valor: number;
 }
 

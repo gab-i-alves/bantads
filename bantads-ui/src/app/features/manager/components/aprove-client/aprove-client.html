@@ -54,7 +54,7 @@
 
         @if(recusar) {
         <div class="recusar-box">
-            <input type="text" placeholder="Adicione um comentário para recusar o pedido..." class="recusar-input">
+            <input type="text" [(ngModel)]="motivoRecusa" placeholder="Adicione um comentário para recusar o pedido..." class="recusar-input">
             <div class="flex justify-between">
                 <button class="btn-enviar" (click)="recurarIsActive()">Cancelar</button>
                 <button class="btn-enviar" (click)="onRecusar()">Enviar</button>

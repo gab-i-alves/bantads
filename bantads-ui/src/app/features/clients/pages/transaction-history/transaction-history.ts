@@ -177,15 +177,17 @@ export class TransactionHistory implements OnInit {
 
   private toView(mov: MovimentacaoExtrato, contaNumero: string): TransactionView {
     const operacao = this.normalizarOperacao(mov.tipo);
-    const ehSaque = operacao === 'SAQUE';
-    const ehTransferenciaSaida = operacao === 'TRANSFERENCIA' && mov.origem === contaNumero;
-    const tipo: 'entrada' | 'saida' = ehSaque || ehTransferenciaSaida ? 'saida' : 'entrada';
+    const isSaque = operacao === 'SAQUE';
+    const isTransferenciaSaida = operacao === 'TRANSFERENCIA' && mov.origem === contaNumero;
+    const tipo: 'entrada' | 'saida' = isSaque || isTransferenciaSaida ? 'saida' : 'entrada';
 
     let clienteRelacionado: string | null = null;
     let description = '';
     if (operacao === 'TRANSFERENCIA') {
-      clienteRelacionado = ehTransferenciaSaida ? mov.destino : mov.origem;
-      description = ehTransferenciaSaida
+      clienteRelacionado = isTransferenciaSaida
+        ? mov.nomeDestino ?? mov.destino
+        : mov.nomeOrigem ?? mov.origem;
+      description = isTransferenciaSaida
         ? `Para conta ${mov.destino}`
         : `De conta ${mov.origem}`;
     }

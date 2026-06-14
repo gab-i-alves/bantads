@@ -8,8 +8,9 @@ export interface Cliente {
   status?: string;
   cidade?: string;
   uf?: string;
+  conta?: string;
   saldo?: number;
-  credito?: number;
+  limite?: number;
   aprovado?: boolean | null;
   endereco?: {
     logradouro: string;

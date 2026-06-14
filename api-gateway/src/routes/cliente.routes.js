@@ -46,6 +46,56 @@ router.get("/:cpf/gerente", auth, requireRole("CLIENTE"), async (request, respon
     }
 });
 
+async function montarClientesComConta(clientes, headers) {
+    const contasRequest = await axios.get(`${services.conta}/contas`, { headers, timeout: 3000 })
+    const contaPorCpf = new Map(contasRequest.data.map(c => [c.clienteCpf, c]))
+    return clientes.map(cliente => {
+        const conta = contaPorCpf.get(cliente.cpf)
+        return conta ? { ...cliente, conta: conta.numero, saldo: conta.saldo, limite: conta.limite } : cliente
+    })
+}
+
+router.get("/", auth, async (request, response, next) => {
+    try {
+        const headers = { Authorization: request.headers.authorization }
+        const clientesRequest = await axios.get(`${services.cliente}/clientes`, {
+            headers, params: request.query, timeout: 3000,
+        })
+
+        if (request.query.filtro === "para_aprovar") {
+            return response.json(clientesRequest.data)
+        }
+
+        response.json(await montarClientesComConta(clientesRequest.data, headers))
+    } catch (error) {
+        if (error.response) {
+            return response.status(error.response.status).json({
+                message: "erro ao listar clientes",
+                data: error.response.data,
+            })
+        }
+        next(error)
+    }
+})
+
+router.get("/:cpf", auth, async (request, response, next) => {
+    try {
+        const headers = { Authorization: request.headers.authorization }
+        const clienteRequest = await axios.get(
+            `${services.cliente}/clientes/${request.params.cpf}`, { headers, timeout: 3000 })
+        const [cliente] = await montarClientesComConta([clienteRequest.data], headers)
+        response.json(cliente)
+    } catch (error) {
+        if (error.response) {
+            return response.status(error.response.status).json({
+                message: "erro ao buscar cliente",
+                data: error.response.data,
+            })
+        }
+        next(error)
+    }
+})
+
 router.use("/", auth, createProxyMiddleware({
     target: services.cliente,
     changeOrigin: true,

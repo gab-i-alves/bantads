@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 type PedidoAutocadastro = {
   id?: number;
@@ -11,7 +12,7 @@ type PedidoAutocadastro = {
 
 @Component({
   selector: 'app-aprove-client',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './aprove-client.html',
   styleUrl: './aprove-client.css',
 })
