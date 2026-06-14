@@ -47,18 +47,19 @@ public class ContaEventListener {
             return;
         }
 
-        // atualiza saldo com o valor que ja veio calculado do service
         conta.setSaldo(evento.saldoAtual());
         contaReadRepo.save(conta);
 
-        // cria a movimentação no schema de leitura
-        MovimentacaoRead mov = new MovimentacaoRead();
-        mov.setDataHora(evento.dataHora());
-        mov.setTipo(TipoMovimentacao.valueOf(evento.tipoEvento()));
-        mov.setContaOrigem(evento.contaOrigem());
-        mov.setContaDestino(evento.contaDestino());
-        mov.setValor(evento.valorMovimentacao());
-        movReadRepo.save(mov);
+        boolean isDestino = evento.numeroConta().equals(evento.contaDestino());
+        if (!isDestino) {
+            MovimentacaoRead mov = new MovimentacaoRead();
+            mov.setDataHora(evento.dataHora());
+            mov.setTipo(TipoMovimentacao.valueOf(evento.tipoEvento()));
+            mov.setContaOrigem(evento.contaOrigem());
+            mov.setContaDestino(evento.contaDestino());
+            mov.setValor(evento.valorMovimentacao());
+            movReadRepo.save(mov);
+        }
 
         log.info("[CQRS] Schema de leitura atualizado: conta={} saldo={}", evento.numeroConta(), evento.saldoAtual());
     }
