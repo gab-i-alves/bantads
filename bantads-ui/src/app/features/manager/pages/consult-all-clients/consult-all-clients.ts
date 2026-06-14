@@ -30,16 +30,16 @@ export class ConsultAllClients implements OnInit {
     const cpfBusca = this.normalizarCpf(busca);
     const clientes = this.clientes();
 
-    if (!termo) {
-      return clientes;
-    }
+    const filtrados = !termo
+      ? clientes
+      : clientes.filter(cliente => {
+        const nomeCliente = this.normalizarTexto(cliente.nome);
+        const cpfCliente = this.normalizarCpf(cliente.cpf);
 
-    return clientes.filter(cliente => {
-      const nomeCliente = this.normalizarTexto(cliente.nome);
-      const cpfCliente = this.normalizarCpf(cliente.cpf);
+        return nomeCliente.includes(termo) || (cpfBusca !== '' && cpfCliente.includes(cpfBusca));
+      });
 
-      return nomeCliente.includes(termo) || (cpfBusca !== '' && cpfCliente.includes(cpfBusca));
-    });
+    return [...filtrados].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
   });
 
   ngOnInit() {
