@@ -20,6 +20,7 @@ export class Deposit implements OnInit {
   successMessage = signal<string | null>(null);
   amount: string = '0,00';
   isActive: boolean = false;
+  animMs = 1300;
 
   ngOnInit() {
     this.carregarConta();
@@ -60,6 +61,8 @@ export class Deposit implements OnInit {
   }
 
   triggerDeposit() {
+    if (this.isActive) return;
+
     const conta = this.conta();
     const valor = parseFloat(this.amount.replace(',', '.'));
 
@@ -77,20 +80,25 @@ export class Deposit implements OnInit {
     }
 
     this.isActive = true;
+    const inicio = Date.now();
     this.contaService.depositar(conta.numero, valor).subscribe({
-      next: (response) => {
+      next: (response) => this.finalizar(inicio, () => {
         this.conta.set({ ...conta, saldo: response.saldo });
         this.amount = '0,00';
         this.successMessage.set('Deposito realizado com sucesso.');
-      },
-      error: (error) => {
+      }),
+      error: (error) => this.finalizar(inicio, () => {
         console.error('Erro ao realizar deposito:', error);
         this.errorMessage.set('Nao foi possivel realizar o deposito.');
-        this.isActive = false;
-      },
-      complete: () => {
-        this.isActive = false;
-      }
+      }),
     });
+  }
+
+  finalizar(inicio: number, acao: () => void) {
+    const restante = Math.max(0, this.animMs - (Date.now() - inicio));
+    setTimeout(() => {
+      acao();
+      this.isActive = false;
+    }, restante);
   }
 }

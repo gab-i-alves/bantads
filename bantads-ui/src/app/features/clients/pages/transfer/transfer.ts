@@ -18,6 +18,7 @@ export class Transfer implements OnInit {
   amount: string = '0,00';
   destino: string = '';
   isActive: boolean = false;
+  animMs = 1300;
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
 
@@ -58,6 +59,8 @@ export class Transfer implements OnInit {
   }
 
   transferir() {
+    if (this.isActive) return;
+
     const origem = this.contaOrigem();
     const destino = this.destino.trim();
     const amountNumber = parseFloat(this.amount.replace(',', '.'));
@@ -91,21 +94,26 @@ export class Transfer implements OnInit {
     }
 
     this.isActive = true;
+    const inicio = Date.now();
     this.contaService.transferir(origem.numero, destino, amountNumber).subscribe({
-      next: (response) => {
+      next: (response) => this.finalizar(inicio, () => {
         this.contaOrigem.set({ ...origem, saldo: response.saldo });
         this.amount = '0,00';
         this.destino = '';
         this.successMessage.set('Transferencia realizada com sucesso.');
-      },
-      error: (error) => {
+      }),
+      error: (error) => this.finalizar(inicio, () => {
         console.error('Erro ao realizar transferencia:', error);
         this.errorMessage.set('Nao foi possivel realizar a transferencia. Verifique o numero da conta destino.');
-        this.isActive = false;
-      },
-      complete: () => {
-        this.isActive = false;
-      }
+      }),
     });
+  }
+
+  finalizar(inicio: number, acao: () => void) {
+    const restante = Math.max(0, this.animMs - (Date.now() - inicio));
+    setTimeout(() => {
+      acao();
+      this.isActive = false;
+    }, restante);
   }
 }

@@ -18,6 +18,7 @@ export class Withdraw implements OnInit {
 
   amount: string = '0,00';
   isActive: boolean = false;
+  animMs = 1300;
   conta = signal<ContaResumo | null>(null);
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
@@ -61,6 +62,8 @@ export class Withdraw implements OnInit {
   }
 
   triggerWithdraw() {
+    if (this.isActive) return;
+
     const conta = this.conta();
     const valor = parseFloat(this.amount.replace(',', '.'));
 
@@ -83,20 +86,25 @@ export class Withdraw implements OnInit {
     }
 
     this.isActive = true;
+    const inicio = Date.now();
     this.contaService.sacar(conta.numero, valor).subscribe({
-      next: (response) => {
+      next: (response) => this.finalizar(inicio, () => {
         this.conta.set({ ...conta, saldo: response.saldo });
         this.amount = '0,00';
         this.successMessage.set('Saque realizado com sucesso.');
-      },
-      error: (error) => {
+      }),
+      error: (error) => this.finalizar(inicio, () => {
         console.error('Erro ao realizar saque:', error);
         this.errorMessage.set('Nao foi possivel realizar o saque.');
-        this.isActive = false;
-      },
-      complete: () => {
-        this.isActive = false;
-      }
+      }),
     });
+  }
+
+  finalizar(inicio: number, acao: () => void) {
+    const restante = Math.max(0, this.animMs - (Date.now() - inicio));
+    setTimeout(() => {
+      acao();
+      this.isActive = false;
+    }, restante);
   }
 }

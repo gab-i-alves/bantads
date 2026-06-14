@@ -27,7 +27,7 @@
             </div>
         </div>
 
-        <div class="anim-container" [class.active]="isActive">
+        <div class="anim-container" (click)="transferir()" [class.active]="isActive">
             <div class="left-side">
                 <div class="card">
                     <div class="card-line"></div>
@@ -40,7 +40,7 @@
                     </div>
                 </div>
             </div>
-            <div class="right-side" (click)="transferir()">
+            <div class="right-side">
                 <div class="new">Confirmar Transferência</div>
                 <svg viewBox="0 0 451.846 451.847" class="arrow" xmlns="http://www.w3.org/2000/svg">
                     <path fill="#ffffff"

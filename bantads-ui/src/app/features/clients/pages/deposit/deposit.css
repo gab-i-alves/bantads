@@ -19,6 +19,16 @@ input::-webkit-inner-spin-button {
     border: 1px solid #2d2d30;
 }
 
+.anim-container.active {
+    pointer-events: none;
+    cursor: default;
+    background-color: #3f3f46;
+}
+
+.anim-container.active .right-side {
+    opacity: 0.5;
+}
+
 .anim-container.active .left-side {
     width: 100%;
 }
