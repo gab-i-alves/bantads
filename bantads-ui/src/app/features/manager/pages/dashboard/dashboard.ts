@@ -64,11 +64,11 @@ export class DashboardManager implements OnInit {
           clientes.filter(cliente => cliente.cpf !== pedido.cpf)
         );
         this.fecharModal();
-        alert('Cliente aprovado. A saga de autocadastro vai criar o login e a conta.');
+        alert('Cliente aprovado. O login e a conta serão criados automaticamente.');
       },
       error: (error) => {
         console.error('Erro ao aprovar cliente:', error);
-        alert('Nao foi possivel aprovar o cliente. Verifique se os microsservicos e o RabbitMQ estao rodando.');
+        alert('Não foi possível aprovar o cliente. Tente novamente em instantes.');
       }
     });
   }

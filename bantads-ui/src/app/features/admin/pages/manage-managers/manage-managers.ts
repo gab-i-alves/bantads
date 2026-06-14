@@ -88,6 +88,11 @@ export class ManageManagers implements OnInit {
   }
 
   deletar(gerente: Gerente) {
+    if (this.gerentes().length <= 1) {
+      alert('Não é possível remover o último gerente do banco.');
+      return;
+    }
+
     const confirmar = confirm(`Deseja remover o gerente ${gerente.nome}?`);
 
     if (!confirmar) {
@@ -99,7 +104,7 @@ export class ManageManagers implements OnInit {
         this.gerentes.update(gerentes =>
           gerentes.filter(item => item.cpf !== gerente.cpf)
         );
-        alert('Remocao de gerente iniciada. As contas serao reatribuidas pela saga.');
+        alert('Remoção de gerente iniciada. As contas dele serão reatribuídas automaticamente.');
       },
       error: (error) => {
         console.error('Erro ao remover gerente:', error);
