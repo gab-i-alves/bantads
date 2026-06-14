@@ -69,7 +69,7 @@
 
                     <div class="input-group">
                         <label>CPF</label>
-                        <input type="text" [(ngModel)]="registroData.cpf" name="cpf" placeholder="000.000.000-00">
+                        <input type="text" [value]="registroData.cpf" (input)="formatCpf($event.target.value)" name="cpf" maxlength="14" placeholder="000.000.000-00">
                     </div>
 
 
@@ -89,7 +89,7 @@
 
                     <div class="input-group">
                         <label>Telefone</label>
-                        <input type="text" [(ngModel)]="registroData.telefone" name="telefone" placeholder="(00) 00000-0000">
+                        <input type="text" [value]="registroData.telefone" (input)="formatTelefone($event.target.value)" name="telefone" maxlength="15" placeholder="(00) 00000-0000">
                     </div>
 
                     }
@@ -107,7 +107,12 @@
 
                     <div class="input-group">
                         <label>Estado</label>
-                        <input type="text" [(ngModel)]="registroData.uf" name="uf" placeholder="UF">
+                        <select [(ngModel)]="registroData.uf" name="uf">
+                            <option value="" disabled selected>UF</option>
+                            @for (uf of ufs; track uf) {
+                            <option [value]="uf">{{ uf }}</option>
+                            }
+                        </select>
                     </div>
                     }
 

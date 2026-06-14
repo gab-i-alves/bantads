@@ -127,6 +127,24 @@ export class Login {
     });
   }
 
+  ufs = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS',
+    'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
+
+  formatCpf(value: string) {
+    this.registroData.cpf = this.onlyDigits(value)
+      .slice(0, 11)
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  }
+
+  formatTelefone(value: string) {
+    this.registroData.telefone = this.onlyDigits(value)
+      .slice(0, 11)
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{4,5})(\d{4})$/, '$1-$2');
+  }
+
   private onlyDigits(value: string): string {
     return value.replace(/\D/g, '');
   }
@@ -165,7 +183,7 @@ export class Login {
     }
 
     if (error?.status === 0) {
-      return 'Nao foi possivel conectar ao servidor. Verifique se o gateway esta rodando.';
+      return 'Não foi possível conectar ao servidor. Tente novamente em instantes.';
     }
 
     return error?.error?.error || 'Erro ao realizar cadastro. Tente novamente.';
