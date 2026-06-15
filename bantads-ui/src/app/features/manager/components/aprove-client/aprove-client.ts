@@ -18,6 +18,8 @@ type PedidoAutocadastro = {
 })
 export class AproveClient {
   @Input() pedido: PedidoAutocadastro | null = null;
+  // Indica que a aprovacao/recusa esta em andamento para travar os botoes e evitar duplo envio.
+  @Input() processando = false;
   @Output() fecharModal = new EventEmitter<void>();
   @Output() aprovarPedido = new EventEmitter<PedidoAutocadastro>();
   @Output() recusarPedido = new EventEmitter<{ pedido: PedidoAutocadastro; motivo: string }>();

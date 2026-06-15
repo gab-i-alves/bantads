@@ -40,6 +40,7 @@ public class FuncionarioService {
                 dto.getCpf(),
                 dto.getNome(),
                 dto.getEmail(),
+                dto.getTelefone(),
                 dto.getRole() != null ? dto.getRole() : Role.GERENTE
         );
         funcionarioRepository.save(funcionario);
@@ -99,6 +100,8 @@ public class FuncionarioService {
         return new FuncionarioResponseDTO(funcionario);
     }
 
+    // R20: atualiza nome, email e telefone. NÃO mexe no role (rota de edição de
+    // gerente não muda o tipo). Se vier senha, avisa o ms-auth de forma best-effort.
     @Transactional
     public FuncionarioResponseDTO update(String cpf, UpdateFuncionarioRequestDTO dto) {
         Funcionario funcionario = funcionarioRepository.findByCpf(cpf).orElseThrow(
@@ -106,9 +109,32 @@ public class FuncionarioService {
         );
         funcionario.setNome(dto.getNome());
         funcionario.setEmail(dto.getEmail());
-        funcionario.setRole(dto.getRole());
+        funcionario.setTelefone(dto.getTelefone());
+
+        if (dto.getSenha() != null && !dto.getSenha().isBlank()) {
+            publicarAtualizacaoSenha(cpf, dto.getSenha());
+        }
 
         return new FuncionarioResponseDTO(funcionario);
+    }
+
+    // Mensagem leve pro ms-auth trocar a senha. Best-effort: falha no publish não
+    // pode derrubar o update do gerente, por isso o erro é só logado.
+    private void publicarAtualizacaoSenha(String cpf, String senha) {
+        Map<String, String> payload = new LinkedHashMap<>();
+        payload.put("cpf", cpf);
+        payload.put("senha", senha);
+        try {
+            String json = objectMapper.writeValueAsString(payload);
+            rabbitTemplate.convertAndSend(
+                    RabbitConfig.SAGA_EXCHANGE,
+                    RabbitConfig.AUTH_UPDATE_SENHA_ROUTING_KEY,
+                    json
+            );
+        } catch (JsonProcessingException e) {
+            // não propaga: a troca de senha é acessória ao update do gerente (R20)
+            System.err.println("falha ao publicar atualização de senha pro ms-auth: " + e.getMessage());
+        }
     }
 
     @Transactional(readOnly = true)

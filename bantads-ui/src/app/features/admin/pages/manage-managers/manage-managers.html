@@ -23,6 +23,7 @@
                     <th>NOME</th>
                     <th>CPF</th>
                     <th>Email</th>
+                    <th>Telefone</th>
                     <th>Clientes</th>
                     <th>Ações</th>
                 </tr>
@@ -31,15 +32,15 @@
             <tbody>
                 @if (isLoadingGerentes()) {
                 <tr>
-                    <td colspan="5" class="feedback">Carregando gerentes...</td>
+                    <td colspan="6" class="feedback">Carregando gerentes...</td>
                 </tr>
                 } @else if (errorMessage()) {
                 <tr>
-                    <td colspan="5" class="feedback error">{{ errorMessage() }}</td>
+                    <td colspan="6" class="feedback error">{{ errorMessage() }}</td>
                 </tr>
                 } @else if (!gerentes().length) {
                 <tr>
-                    <td colspan="5" class="feedback">Nenhum gerente encontrado.</td>
+                    <td colspan="6" class="feedback">Nenhum gerente encontrado.</td>
                 </tr>
                 } @else {
 
@@ -53,6 +54,7 @@
                     </td>
                     <td class="cpf">{{gerente.cpf}}</td>
                     <td>{{gerente.email}}</td>
+                    <td>{{ formatarTelefone(gerente.telefone) }}</td>
                     <td class="salary">{{gerente.clientes?.length || 0}}</td>
                     <td>
                         <div class="actions">
@@ -65,7 +67,7 @@
                                         d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
                                 </svg>
                             </button>
-                            <button class="btn btn-excluir" (click)="deletar(gerente)">
+                            <button class="btn btn-excluir" (click)="deletar(gerente)" [disabled]="removendoCpf() === gerente.cpf">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" class="lucide lucide-trash-2-icon lucide-trash-2">
@@ -87,11 +89,11 @@
 </section>
 
 @if(adicionarGerenteIsActive()) {
-<app-new-manager (fecharModal)="fecharModalAdicionar()"
+<app-new-manager [salvando]="isSalvandoGerente()" (fecharModal)="fecharModalAdicionar()"
     (adicionarGerente)="adicionarNovoGerente($event)"></app-new-manager>
 }
 
 @if(editarGerenteIsActive()) {
-<app-edit-manager [gerente]="gerenteSelecionado()" (fecharModal)="fecharModalEditar()"
+<app-edit-manager [gerente]="gerenteSelecionado()" [salvando]="isSalvandoGerente()" (fecharModal)="fecharModalEditar()"
     (salvarGerente)="editarGerente($event)"></app-edit-manager>
 }

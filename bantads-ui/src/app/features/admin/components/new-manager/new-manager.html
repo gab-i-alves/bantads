@@ -16,14 +16,22 @@
 
             <input type="text" placeholder="Nome" [ngModel]="nome()" (ngModelChange)="nome.set($event)">
 
-            <input type="text" placeholder="CPF" [ngModel]="cpf()" (ngModelChange)="cpf.set($event)">
+            <input type="text" placeholder="000.000.000-00" maxlength="14" [value]="cpf()"
+                (input)="formatCpf($event.target.value)">
 
             <input type="email" placeholder="Email" [ngModel]="email()" (ngModelChange)="email.set($event)">
 
+            <input type="text" placeholder="(00) 00000-0000" maxlength="15" [value]="telefone()"
+                (input)="formatTelefone($event.target.value)">
+
             <input type="password" placeholder="Senha" [ngModel]="senha()" (ngModelChange)="senha.set($event)">
 
-            <button class="save-button" (click)="salvarGerente()">
-                Salvar gerente
+            @if (erro()) {
+            <p class="text-red-500 text-sm">{{ erro() }}</p>
+            }
+
+            <button class="save-button" (click)="salvarGerente()" [disabled]="salvando">
+                {{ salvando ? 'Salvando...' : 'Salvar gerente' }}
             </button>
 
         </div>

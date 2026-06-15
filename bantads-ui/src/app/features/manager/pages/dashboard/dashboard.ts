@@ -1,9 +1,11 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
 import { HeaderManager } from '../../../../shared/components/header-manager/header-manager';
 import { AproveClient } from '../../components/aprove-client/aprove-client';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ClienteService } from '../../../../core/services/cliente.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { Cliente } from '../../../../core/models/cliente.model';
 
 type PedidoAutocadastro = Cliente;
@@ -20,11 +22,14 @@ export class DashboardManager implements OnInit {
   selectedPedido = signal<PedidoAutocadastro | null>(null);
   isModalOpen = signal(false);
   isLoadingPendentes = signal(false);
+  // Loading da operacao de aprovar/rejeitar para travar os botoes do modal enquanto a saga corre.
+  isProcessando = signal(false);
   errorMessage = signal('');
 
   authService = inject(AuthService);
   private router = inject(Router);
   private clienteService = inject(ClienteService);
+  private notify = inject(NotificationService);
 
   ngOnInit() {
     this.carregarClientesPendentes();
@@ -58,34 +63,49 @@ export class DashboardManager implements OnInit {
   }
 
   aprovarPedido(pedido: PedidoAutocadastro) {
-    this.clienteService.aprovarCliente(pedido.cpf).subscribe({
-      next: () => {
-        this.clientesPendentes.update(clientes =>
-          clientes.filter(cliente => cliente.cpf !== pedido.cpf)
-        );
-        this.fecharModal();
-        alert('Cliente aprovado. O login e a conta serão criados automaticamente.');
-      },
-      error: (error) => {
-        console.error('Erro ao aprovar cliente:', error);
-        alert('Não foi possível aprovar o cliente. Tente novamente em instantes.');
-      }
-    });
+    if (this.isProcessando()) {
+      return;
+    }
+
+    this.isProcessando.set(true);
+    this.clienteService.aprovarCliente(pedido.cpf)
+      .pipe(finalize(() => this.isProcessando.set(false)))
+      .subscribe({
+        next: () => {
+          this.clientesPendentes.update(clientes =>
+            clientes.filter(cliente => cliente.cpf !== pedido.cpf)
+          );
+          this.fecharModal();
+          this.notify.sucesso('Cliente aprovado. O login e a conta serao criados automaticamente.');
+        },
+        error: (error) => {
+          console.error('Erro ao aprovar cliente:', error);
+          this.notify.erroHttp(error, 'Nao foi possivel aprovar o cliente. Tente novamente em instantes.');
+        }
+      });
   }
 
   recusarPedido(evento: { pedido: PedidoAutocadastro; motivo: string }) {
-    this.clienteService.rejeitarCliente(evento.pedido.cpf, evento.motivo).subscribe({
-      next: () => {
-        this.clientesPendentes.update(clientes =>
-          clientes.filter(cliente => cliente.cpf !== evento.pedido.cpf)
-        );
-        this.fecharModal();
-      },
-      error: (error) => {
-        console.error('Erro ao rejeitar cliente:', error);
-        alert('Nao foi possivel rejeitar o cliente.');
-      }
-    });
+    if (this.isProcessando()) {
+      return;
+    }
+
+    this.isProcessando.set(true);
+    this.clienteService.rejeitarCliente(evento.pedido.cpf, evento.motivo)
+      .pipe(finalize(() => this.isProcessando.set(false)))
+      .subscribe({
+        next: () => {
+          this.clientesPendentes.update(clientes =>
+            clientes.filter(cliente => cliente.cpf !== evento.pedido.cpf)
+          );
+          this.fecharModal();
+          this.notify.sucesso('Cliente recusado com sucesso.');
+        },
+        error: (error) => {
+          console.error('Erro ao rejeitar cliente:', error);
+          this.notify.erroHttp(error, 'Nao foi possivel rejeitar o cliente.');
+        }
+      });
   }
 
   navegarPara(rota: string) {

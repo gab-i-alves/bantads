@@ -75,6 +75,23 @@ EOF
     echo ""
 }
 
+# NF9: depois que o gateway sobe, dispara um unico GET /reboot nele. O gateway
+# fan-out pros 4 MSs (auth/cliente/conta/funcionario), entao 1 chamada reseeda
+# todas as bases. Faz polling porque o gateway leva um tempo pra ficar de pe.
+gateway_reboot() {
+    echo -ne "  ${ARROW} Aguardando gateway e reseedando bases..."
+    for _ in $(seq 1 30); do
+        if curl -fsS --max-time 15 "http://localhost:3000/reboot" -o /dev/null; then
+            echo -e "\r  ${CHECK} Bases recarregadas via gateway   "
+            return 0
+        fi
+        sleep 2
+    done
+    echo -e "\r  ${CROSS} Gateway nao respondeu /reboot a tempo   "
+    ERRORS+=("Reboot via gateway|gateway nao respondeu GET /reboot em :3000")
+    return 1
+}
+
 show_result() {
     echo ""
     echo -e "  ${DIM}────────────────────────────────────────────────────────────────${NC}"
@@ -100,6 +117,7 @@ show_result() {
         echo -e "  ${ARROW} MS Conta        ${YELLOW}http://localhost:8083${NC}"
         echo -e "  ${ARROW} MS Funcionario  ${YELLOW}http://localhost:8084${NC}"
         echo -e "  ${ARROW} MS Saga         ${YELLOW}http://localhost:8085${NC}"
+        echo -e "  ${ARROW} Frontend (UI)   ${YELLOW}http://localhost:4200${NC}"
         echo -e "  ${ARROW} RabbitMQ UI     ${YELLOW}http://localhost:15672${NC}"
         echo ""
         echo -e "  ${DIM}────────────────────────────────────────────────────────────────${NC}"
@@ -196,6 +214,12 @@ case "${1:-up}" in
 
         run_step "Microsserviços (auth, cliente, conta, funcionario, saga)" $DC up -d ms-auth ms-cliente ms-conta ms-funcionario ms-saga
         run_step "API Gateway" $DC up -d api-gateway
+        run_step "Frontend (UI)" $DC up -d bantads-ui
+
+        # NF9: reboot automatico das bases assim que o gateway responde.
+        # || true: a falha do reseed ja e registrada em ERRORS e mostrada no
+        # show_result; sem isso o set -e abortaria antes do resumo.
+        gateway_reboot || true
 
         echo ""
         echo -e "  ${DIM}[████████████████████████████████████████] 100%%${NC}"

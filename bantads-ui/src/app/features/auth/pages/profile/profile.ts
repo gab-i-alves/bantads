@@ -4,6 +4,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { ClienteService } from '../../../../core/services/cliente.service';
 import { ContaService } from '../../../../core/services/conta.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { Cliente, ClienteUpdate } from '../../../../core/models/cliente.model';
 import { CpfPipe } from '../../../../shared/pipes/cpf.pipe';
 import { finalize } from 'rxjs';
@@ -19,6 +20,7 @@ export class Profile implements OnInit {
   authService = inject(AuthService);
   private clienteService = inject(ClienteService);
   private contaService = inject(ContaService);
+  private notify = inject(NotificationService);
 
   meuDados = signal<Cliente | null>(null);
   saldo = signal<number | null>(null);
@@ -31,11 +33,11 @@ export class Profile implements OnInit {
   saldoNegativo = computed(() => (this.saldo() ?? 0) < 0);
   saldoFormatado = computed(() => this.formatarMoeda(this.saldo() ?? 0));
 
-  // Dados editáveis
+  // Dados editáveis (salario como texto mascarado, NF15)
   editavelData = {
     nome: '',
     email: '',
-    salario: 0,
+    salario: '',
     telefone: '',
     cep: '',
     cidade: '',
@@ -97,15 +99,63 @@ export class Profile implements OnInit {
     this.editavelData = {
       nome: cliente.nome || '',
       email: cliente.email || '',
-      salario: cliente.salario || 0,
-      telefone: cliente.telefone || '',
-      cep: cliente.endereco?.cep || '',
+      salario: this.formatarSalarioInput(cliente.salario || 0),
+      telefone: this.formatarTelefone(cliente.telefone || ''),
+      cep: this.formatarCep(cliente.endereco?.cep || ''),
       cidade: cliente.endereco?.cidade || '',
       uf: cliente.endereco?.estado || '',
       rua: cliente.endereco?.logradouro || '',
       numero: cliente.endereco?.numero || '',
       complemento: cliente.endereco?.complemento || ''
     };
+  }
+
+  // NF16: mascara de telefone aplicada na digitacao.
+  onTelefoneInput(value: string) {
+    this.editavelData.telefone = this.formatarTelefone(value);
+  }
+
+  // NF16: mascara de CEP aplicada na digitacao.
+  onCepInput(value: string) {
+    this.editavelData.cep = this.formatarCep(value);
+  }
+
+  // NF15: salario como texto mascarado em Real.
+  onSalarioInput(value: string) {
+    this.editavelData.salario = this.formatarSalarioInput(value);
+  }
+
+  private formatarTelefone(value: string): string {
+    return value.replace(/\D/g, '')
+      .slice(0, 11)
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{4,5})(\d{4})$/, '$1-$2');
+  }
+
+  private formatarCep(value: string): string {
+    return value.replace(/\D/g, '')
+      .slice(0, 8)
+      .replace(/(\d{5})(\d{1,3})$/, '$1-$2');
+  }
+
+  private formatarSalarioInput(value: string | number): string {
+    const digitos = typeof value === 'number'
+      ? String(Math.round(value * 100))
+      : value.replace(/\D/g, '');
+
+    if (!digitos) {
+      return '';
+    }
+
+    return (Number(digitos) / 100).toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
+
+  private parseSalario(value: string): number {
+    const normalizado = value.replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '');
+    return Number(normalizado);
   }
 
   salvarDados() {
@@ -138,8 +188,8 @@ export class Profile implements OnInit {
       cpf: clienteAtual.cpf,
       nome: this.editavelData.nome,
       email: this.editavelData.email,
-      telefone: this.editavelData.telefone,
-      salario: Number(this.editavelData.salario),
+      telefone: this.editavelData.telefone.replace(/\D/g, ''),
+      salario: this.parseSalario(this.editavelData.salario),
       endereco: {
         logradouro: this.editavelData.rua,
         numero: this.editavelData.numero,
@@ -172,10 +222,13 @@ export class Profile implements OnInit {
           localStorage.setItem('usuario', JSON.stringify(cliente));
           this.preencherFormulario(cliente);
           this.successMessage.set('Dados atualizados com sucesso.');
+          this.notify.sucesso('Dados atualizados com sucesso.');
         },
         error: (error) => {
           console.error('Erro ao atualizar perfil do cliente:', error);
-          this.errorMessage.set('Nao foi possivel atualizar os dados.');
+          const mensagem = this.notify.mensagemDeErroHttp(error, 'Nao foi possivel atualizar os dados.');
+          this.errorMessage.set(mensagem);
+          this.notify.erro(mensagem);
         }
       });
   }

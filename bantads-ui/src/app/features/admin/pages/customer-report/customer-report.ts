@@ -66,7 +66,11 @@ export class CustomerReport implements OnInit {
   formatarMoeda(valor: number | string | null | undefined): string {
     const numero = Number(valor || 0);
 
-    return numero.toFixed(2).replace('.', ',');
+    // Padrao brasileiro com separador de milhar (NF15).
+    return new Intl.NumberFormat('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(Number.isFinite(numero) ? numero : 0);
   }
 
   rolarTabela(direcao: 'esquerda' | 'direita') {

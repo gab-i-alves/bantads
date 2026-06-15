@@ -131,6 +131,13 @@ services:
         - ms-cliente
         - ms-conta
         - ms-funcionario
+    bantads-ui:
+      build: ./bantads-ui
+      restart: unless-stopped
+      ports:
+        - "4200:80"
+      depends_on:
+        - api-gateway
 
 volumes:
     postgres-data:

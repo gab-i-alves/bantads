@@ -25,6 +25,7 @@ export interface Gerente {
   cpf: string;
   nome: string;
   email: string;
+  telefone?: string;
   role: string;
   clientes?: unknown[];
 }
@@ -33,6 +34,7 @@ export interface GerenteCreate {
   cpf: string;
   nome: string;
   email: string;
+  telefone?: string;
   senha: string;
   role?: string;
 }
@@ -40,5 +42,7 @@ export interface GerenteCreate {
 export interface GerenteUpdate {
   nome: string;
   email: string;
-  role: string;
+  telefone?: string;
+  // Senha opcional: so e enviada quando o admin troca a senha do gerente (R20).
+  senha?: string;
 }

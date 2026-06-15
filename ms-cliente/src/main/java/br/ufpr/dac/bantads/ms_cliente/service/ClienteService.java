@@ -21,6 +21,11 @@ public class ClienteService {
     // a saga de autocadastro so dispara na aprovacao R10, via ClienteController)
     @Transactional
     public ClienteResponseDTO criar(ClienteRequestDTO dto) {
+        // R1: rejeita cpf invalido antes de qualquer persistencia. O teste de
+        // integracao gera cpfs validos por mod-11, entao cpf valido passa direto.
+        if (!cpfValido(dto.cpf())) {
+            throw new CpfInvalidoException(dto.cpf());
+        }
         if (repository.existsByCpf(dto.cpf())) {
             throw new ClienteJaCadastradoException(dto.cpf());
         }
@@ -123,6 +128,36 @@ public class ClienteService {
         cliente.setStatus(StatusCliente.PENDENTE);
         cliente.setDataDecisao(null);
         repository.save(cliente);
+        // R1: a saga R10 falhou apos a aprovacao e o cliente voltou pra PENDENTE.
+        // Mesma logica do mock de rejeicao (R11): o cliente precisa ser avisado.
+        log.info("[MOCK EMAIL] R1 falha no cadastro -> para={} | motivo=falha ao concluir abertura de conta",
+                cliente.getEmail());
+    }
+
+    // R4 (compensacao): restaura o perfil anterior do cliente a partir dos dados
+    // que o orquestrador capturou antes do ATUALIZAR_CLIENTE. Nao mexe em status
+    // nem cpf (cpf e imutavel; status nao faz parte da alteracao de perfil).
+    @Transactional
+    public ClienteResponseDTO reverterAtualizacao(String cpf, ClienteRequestDTO anterior) {
+        Cliente cliente = repository.findByCpf(cpf)
+                .orElseThrow(() -> new ClienteNaoEncontradoException(cpf));
+
+        cliente.setNome(anterior.nome());
+        cliente.setEmail(anterior.email());
+        cliente.setTelefone(anterior.telefone());
+        cliente.setSalario(anterior.salario());
+
+        Endereco endereco = cliente.getEndereco();
+        endereco.setLogradouro(anterior.endereco().logradouro());
+        endereco.setNumero(anterior.endereco().numero());
+        endereco.setComplemento(anterior.endereco().complemento());
+        endereco.setCep(anterior.endereco().cep());
+        endereco.setCidade(anterior.endereco().cidade());
+        endereco.setEstado(anterior.endereco().estado());
+
+        Cliente salvo = repository.save(cliente);
+        log.info("REVERTER_ATUALIZACAO_CLIENTE: cpf={} perfil restaurado", cpf);
+        return toResponse(salvo);
     }
 
     @Transactional
@@ -160,6 +195,36 @@ public class ClienteService {
         );
     }
 
+    // --- validacao ---
+
+    // Valida cpf por digito verificador (mod-11). Aceita com ou sem mascara
+    // (pontos/traco sao ignorados). Rejeita tamanho != 11 e todos os digitos
+    // iguais (ex 11111111111), que passam na conta mas nao sao cpfs reais.
+    static boolean cpfValido(String cpf) {
+        if (cpf == null) return false;
+        String digitos = cpf.replaceAll("\\D", "");
+        if (digitos.length() != 11) return false;
+        if (digitos.chars().distinct().count() == 1) return false;
+
+        int[] n = new int[11];
+        for (int i = 0; i < 11; i++) {
+            n[i] = digitos.charAt(i) - '0';
+        }
+        if (digitoVerificador(n, 9, 10) != n[9]) return false;
+        return digitoVerificador(n, 10, 11) == n[10];
+    }
+
+    // soma ponderada dos primeiros `qtd` digitos com pesos decrescentes a partir
+    // de `pesoInicial`; resto < 2 vira 0 (regra do mod-11 do cpf)
+    private static int digitoVerificador(int[] n, int qtd, int pesoInicial) {
+        int soma = 0;
+        for (int i = 0; i < qtd; i++) {
+            soma += n[i] * (pesoInicial - i);
+        }
+        int resto = soma % 11;
+        return resto < 2 ? 0 : 11 - resto;
+    }
+
     // --- exceptions ---
 
     public static class ClienteNaoEncontradoException extends RuntimeException {
@@ -171,6 +236,16 @@ public class ClienteService {
     public static class ClienteJaCadastradoException extends RuntimeException {
         public ClienteJaCadastradoException(String cpf) {
             super("cliente ja cadastrado ou aguardando aprovacao: " + cpf);
+        }
+    }
+
+    // estende ClienteJaCadastradoException pra reaproveitar o ExceptionHandler ja
+    // existente (HTTP 400/409 no ClienteController). O caminho REST de R1 ja barra
+    // cpf invalido por bean-validation (@CpfValido) antes de chegar aqui; este check
+    // e a rede de seguranca pro caminho da saga, que nao passa por @Valid.
+    public static class CpfInvalidoException extends ClienteJaCadastradoException {
+        public CpfInvalidoException(String cpf) {
+            super(cpf);
         }
     }
 }

@@ -16,12 +16,18 @@
             <div class="balance-amount" [class.negative]="saldoNegativo()">
                 @if(isLoadingConta()) {
                 ...
+                } @else if(errorMessage()) {
+                --
                 } @else {
                 {{ saldoFormatado() }}
                 }
             </div>
             <div class="balance-label p-2">Saldo total</div>
+            @if(errorMessage()) {
+            <div class="balance-label p-2 text-red-300">{{ errorMessage() }}</div>
+            } @else {
             <div class="balance-label p-2">Limite {{ limiteFormatado() }}</div>
+            }
         </div>
     </div>
 </div>

@@ -47,8 +47,8 @@
         <!-- Footer do Modal -->
         <div class="modal-footer">
             @if(!recusar) {
-            <button class="btn btn-recusar" (click)="recurarIsActive()">Recusar Pedido</button>
-            <button class="btn btn-aprovar" (click)="onAprovar()">Aprovar Pedido</button>
+            <button class="btn btn-recusar" (click)="recurarIsActive()" [disabled]="processando">Recusar Pedido</button>
+            <button class="btn btn-aprovar" (click)="onAprovar()" [disabled]="processando">{{ processando ? 'Processando...' : 'Aprovar Pedido' }}</button>
             }
         </div>
 
@@ -56,8 +56,8 @@
         <div class="recusar-box">
             <input type="text" [(ngModel)]="motivoRecusa" placeholder="Adicione um comentário para recusar o pedido..." class="recusar-input">
             <div class="flex justify-between">
-                <button class="btn-enviar" (click)="recurarIsActive()">Cancelar</button>
-                <button class="btn-enviar" (click)="onRecusar()">Enviar</button>
+                <button class="btn-enviar" (click)="recurarIsActive()" [disabled]="processando">Cancelar</button>
+                <button class="btn-enviar" (click)="onRecusar()" [disabled]="processando">{{ processando ? 'Enviando...' : 'Enviar' }}</button>
             </div>
 
         </div>

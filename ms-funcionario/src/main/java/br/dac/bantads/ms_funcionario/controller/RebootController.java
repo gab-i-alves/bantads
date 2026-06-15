@@ -1,6 +1,6 @@
 package br.dac.bantads.ms_funcionario.controller;
 
-import br.dac.bantads.ms_funcionario.model.Funcionario;
+import br.dac.bantads.ms_funcionario.dto.FuncionarioResponseDTO;
 import br.dac.bantads.ms_funcionario.service.RebootService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +16,9 @@ public class RebootController {
     @Autowired
     private RebootService rebootService;
 
+    // NF10: devolve DTOs, não a entidade JPA.
     @GetMapping
-    public List<Funcionario> reboot() {
+    public List<FuncionarioResponseDTO> reboot() {
         return rebootService.reboot();
     }
 

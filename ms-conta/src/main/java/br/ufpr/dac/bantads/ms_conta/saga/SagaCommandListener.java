@@ -51,6 +51,7 @@ public class SagaCommandListener {
                 case "CONSULTAR_GERENTE_MENOS_CONTAS" -> consultarGerentePorContagem(cmd, false);
                 case "REATRIBUIR_CONTA" -> reatribuirConta(cmd);
                 case "REATRIBUIR_TODAS_CONTAS" -> reatribuirTodasContas(cmd);
+                case "REVERTER_REATRIBUICAO" -> reverterReatribuicao(cmd);
                 case "CRIAR_CONTA" -> criarConta(cmd);
                 case "REMOVER_CONTA" -> removerConta(cmd);
                 case "RECALCULAR_LIMITE" -> recalcularLimite(cmd);
@@ -79,6 +80,16 @@ public class SagaCommandListener {
         return new SagaReply(cmd.sagaId(), cmd.step(), true, payload, null);
     }
 
+    // Limitação conhecida (R18, mais=false / "menos contas"): o ms-conta só conhece
+    // gerentes que aparecem em alguma conta, porque a única fonte aqui é a tabela de
+    // contas. Um gerente com 0 contas (recém-criado, ainda sem reatribuição) nunca
+    // entra na contagem e, portanto, nunca é escolhido como "menos contas" — mesmo
+    // sendo o candidato ideal por ter zero contas.
+    // Resolver isso direito exigiria a lista completa de gerentes, que mora no
+    // ms-funcionario. Como o payload do comando não a traz e uma chamada
+    // cross-service nova sairia do escopo (e do desenho da saga, que é orquestrada),
+    // não é tratado aqui. Se no futuro o payload passar a carregar os cpfs de todos
+    // os gerentes, dá pra preferir um com 0 contas antes de cair na contagem.
     private String gerenteCpfPorContagem(boolean mais, String excluirCpf) {
         List<Conta> contasFiltradas = contaRepository.findAll().stream()
                 .filter(c -> excluirCpf == null || !excluirCpf.equals(c.getGerenteCpf()))
@@ -185,6 +196,46 @@ public class SagaCommandListener {
                 "para", cpfDestino
         ));
         log.info("REATRIBUIR_TODAS_CONTAS: {} contas {} → {}", numeros.size(), cpfRemovido, cpfDestino);
+        return new SagaReply(cmd.sagaId(), cmd.step(), true, payload, null);
+    }
+
+    // R18 (compensação): desfaz REATRIBUIR_TODAS_CONTAS movendo as contas que estão
+    // hoje no gerenteDestino de volta pro gerenteRemovido. Espelho reverso do passo
+    // direto — atualiza cud e read.
+    // Limitação conhecida: move TODAS as contas atuais do destino, não só as que
+    // vieram do removido. No fluxo R18 o destino é escolhido como "menos contas" e a
+    // compensação roda logo em seguida, então o risco de over-revert é baixo; um
+    // tracking fino exigiria persistir a lista de números movidos.
+    @Transactional
+    public SagaReply reverterReatribuicao(SagaCommand cmd) throws Exception {
+        JsonNode root = objectMapper.readTree(cmd.payload());
+        String cpfRemovido = root.path("gerenteRemovido").asText(null);
+        String cpfDestino = root.path("gerenteDestino").asText(null);
+
+        if (cpfRemovido == null || cpfRemovido.isBlank()) {
+            return new SagaReply(cmd.sagaId(), cmd.step(), false, null, "payload sem gerenteRemovido");
+        }
+        if (cpfDestino == null || cpfDestino.isBlank()) {
+            return new SagaReply(cmd.sagaId(), cmd.step(), false, null, "payload sem gerenteDestino");
+        }
+
+        List<Conta> contas = contaRepository.findByGerenteCpf(cpfDestino);
+        for (Conta c : contas) {
+            c.setGerenteCpf(cpfRemovido);
+            contaRepository.save(c);
+            contaReadRepository.findByNumero(c.getNumero()).ifPresent(cr -> {
+                cr.setGerenteCpf(cpfRemovido);
+                contaReadRepository.save(cr);
+            });
+        }
+        List<String> numeros = contas.stream().map(Conta::getNumero).toList();
+        String payload = objectMapper.writeValueAsString(Map.of(
+                "revertidas", numeros.size(),
+                "numeros", numeros,
+                "de", cpfDestino,
+                "para", cpfRemovido
+        ));
+        log.info("REVERTER_REATRIBUICAO: {} contas {} → {}", numeros.size(), cpfDestino, cpfRemovido);
         return new SagaReply(cmd.sagaId(), cmd.step(), true, payload, null);
     }
 

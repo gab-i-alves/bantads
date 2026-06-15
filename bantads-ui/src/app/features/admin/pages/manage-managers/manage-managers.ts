@@ -1,8 +1,10 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { finalize } from 'rxjs';
 import { HeaderAdmin } from '../../../../shared/components/header-admin/header-admin';
 import { NewManager } from '../../components/new-manager/new-manager';
 import { EditManager } from '../../components/edit-manager/edit-manager';
 import { AdminService } from '../../../../core/services/admin.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { Gerente, GerenteCreate, GerenteUpdate } from '../../../../core/models/admin.model';
 
 @Component({
@@ -13,6 +15,7 @@ import { Gerente, GerenteCreate, GerenteUpdate } from '../../../../core/models/a
 })
 export class ManageManagers implements OnInit {
   private adminService = inject(AdminService);
+  private notify = inject(NotificationService);
 
   gerentes = signal<Gerente[]>([]);
   isLoadingGerentes = signal(false);
@@ -21,6 +24,10 @@ export class ManageManagers implements OnInit {
   adicionarGerenteIsActive = signal(false);
   editarGerenteIsActive = signal(false);
   gerenteSelecionado = signal<Gerente | null>(null);
+  // Loading das operacoes de criar/editar/remover gerente para travar os botoes correspondentes.
+  isSalvandoGerente = signal(false);
+  // CPF do gerente em remocao, para mostrar o estado de loading apenas na linha certa.
+  removendoCpf = signal<string | null>(null);
 
   ngOnInit() {
     this.carregarGerentes();
@@ -52,16 +59,24 @@ export class ManageManagers implements OnInit {
   }
 
   adicionarNovoGerente(gerente: GerenteCreate) {
-    this.adminService.criarGerente(gerente).subscribe({
-      next: () => {
-        this.fecharModalAdicionar();
-        this.carregarGerentes();
-      },
-      error: (error) => {
-        console.error('Erro ao criar gerente:', error);
-        alert('Nao foi possivel criar o gerente.');
-      }
-    });
+    if (this.isSalvandoGerente()) {
+      return;
+    }
+
+    this.isSalvandoGerente.set(true);
+    this.adminService.criarGerente(gerente)
+      .pipe(finalize(() => this.isSalvandoGerente.set(false)))
+      .subscribe({
+        next: () => {
+          this.fecharModalAdicionar();
+          this.notify.sucesso('Gerente criado com sucesso.');
+          this.carregarGerentes();
+        },
+        error: (error) => {
+          console.error('Erro ao criar gerente:', error);
+          this.notify.erroHttp(error, 'Nao foi possivel criar o gerente.');
+        }
+      });
   }
 
   toggleeditarGerente(gerente: Gerente) {
@@ -75,21 +90,33 @@ export class ManageManagers implements OnInit {
   }
 
   editarGerente(evento: { cpf: string; gerente: GerenteUpdate }) {
-    this.adminService.atualizarGerente(evento.cpf, evento.gerente).subscribe({
-      next: () => {
-        this.fecharModalEditar();
-        this.carregarGerentes();
-      },
-      error: (error) => {
-        console.error('Erro ao atualizar gerente:', error);
-        alert('Nao foi possivel atualizar o gerente.');
-      }
-    });
+    if (this.isSalvandoGerente()) {
+      return;
+    }
+
+    this.isSalvandoGerente.set(true);
+    this.adminService.atualizarGerente(evento.cpf, evento.gerente)
+      .pipe(finalize(() => this.isSalvandoGerente.set(false)))
+      .subscribe({
+        next: () => {
+          this.fecharModalEditar();
+          this.notify.sucesso('Gerente atualizado com sucesso.');
+          this.carregarGerentes();
+        },
+        error: (error) => {
+          console.error('Erro ao atualizar gerente:', error);
+          this.notify.erroHttp(error, 'Nao foi possivel atualizar o gerente.');
+        }
+      });
   }
 
   deletar(gerente: Gerente) {
+    if (this.removendoCpf()) {
+      return;
+    }
+
     if (this.gerentes().length <= 1) {
-      alert('Não é possível remover o último gerente do banco.');
+      this.notify.erro('Nao e possivel remover o ultimo gerente do banco.');
       return;
     }
 
@@ -99,18 +126,21 @@ export class ManageManagers implements OnInit {
       return;
     }
 
-    this.adminService.removerGerente(gerente.cpf).subscribe({
-      next: () => {
-        this.gerentes.update(gerentes =>
-          gerentes.filter(item => item.cpf !== gerente.cpf)
-        );
-        alert('Remoção de gerente iniciada. As contas dele serão reatribuídas automaticamente.');
-      },
-      error: (error) => {
-        console.error('Erro ao remover gerente:', error);
-        alert('Nao foi possivel remover o gerente.');
-      }
-    });
+    this.removendoCpf.set(gerente.cpf);
+    this.adminService.removerGerente(gerente.cpf)
+      .pipe(finalize(() => this.removendoCpf.set(null)))
+      .subscribe({
+        next: () => {
+          this.gerentes.update(gerentes =>
+            gerentes.filter(item => item.cpf !== gerente.cpf)
+          );
+          this.notify.sucesso('Remocao de gerente iniciada. As contas dele serao reatribuidas automaticamente.');
+        },
+        error: (error) => {
+          console.error('Erro ao remover gerente:', error);
+          this.notify.erroHttp(error, 'Nao foi possivel remover o gerente.');
+        }
+      });
   }
 
   iniciais(nome: string): string {
@@ -121,6 +151,19 @@ export class ManageManagers implements OnInit {
     }
 
     return partes.map(parte => parte.charAt(0)).join('').toUpperCase();
+  }
+
+  formatarTelefone(telefone?: string): string {
+    const digitos = (telefone || '').replace(/\D/g, '');
+
+    if (!digitos) {
+      return '--';
+    }
+
+    return digitos
+      .slice(0, 11)
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{4,5})(\d{4})$/, '$1-$2');
   }
 
 }

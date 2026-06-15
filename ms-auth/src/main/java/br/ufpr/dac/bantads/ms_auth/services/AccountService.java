@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -46,18 +45,22 @@ public class AccountService {
         Account account = accountRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Email or password are incorrect"));
 
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        if (!passwordEncoder.matches(request.getPassword(), account.getPassword())) {
+        // verifica com SHA256+SALT (NF11): mesmo esquema/ordem do seed e da saga.
+        if (!PasswordHasher.verificar(request.getPassword(), account.getSalt(), account.getPassword())) {
             throw new RuntimeException("Email or password are incorrect");
         }
 
-        String token = jwtService.buildToken(account);
+        // resolve o usuario antes de assinar o token pra reaproveitar o cpf que
+        // veio do ms-cliente/ms-funcionario como claim no JWT (necessária pro gateway).
+        Map<String, Object> usuario = buscarDadosUsuario(account);
+        String cpf = usuario.get("cpf") != null ? usuario.get("cpf").toString() : null;
+        String token = jwtService.buildToken(account, cpf);
 
         LoginResponseDTO response = new LoginResponseDTO();
         response.setAccessToken(token);
         response.setTipo(account.getRole());
         response.setRole(account.getRole());
-        response.setUsuario(buscarDadosUsuario(account));
+        response.setUsuario(usuario);
         return response;
     }
 

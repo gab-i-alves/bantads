@@ -16,6 +16,7 @@ export class CashBalance implements OnInit {
   usuario = signal(this.authService.getUsuarioLogado());
   conta = signal<ContaResumo | null>(null);
   isLoadingConta = signal(false);
+  errorMessage = signal<string | null>(null);
 
   saldoFormatado = computed(() => this.formatarMoeda(this.conta()?.saldo ?? 0));
   limiteFormatado = computed(() => this.formatarMoeda(this.conta()?.limite ?? 0));
@@ -24,10 +25,12 @@ export class CashBalance implements OnInit {
   ngOnInit() {
     const cpf = this.usuario()?.cpf;
     if (!cpf) {
+      this.errorMessage.set('Usuario nao identificado.');
       return;
     }
 
     this.isLoadingConta.set(true);
+    this.errorMessage.set(null);
     this.contaService.buscarContaPorClienteCpf(cpf).subscribe({
       next: (conta) => {
         this.conta.set(conta);
@@ -35,6 +38,7 @@ export class CashBalance implements OnInit {
       },
       error: (error) => {
         console.error('Erro ao buscar conta do cliente:', error);
+        this.errorMessage.set('Nao foi possivel carregar o saldo.');
         this.isLoadingConta.set(false);
       }
     });

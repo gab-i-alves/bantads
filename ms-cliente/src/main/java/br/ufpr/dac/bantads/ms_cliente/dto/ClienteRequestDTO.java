@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 public record ClienteRequestDTO(
     @NotBlank String nome,
     @NotBlank @Email String email,
-    @NotBlank String cpf,
+    @NotBlank @CpfValido String cpf,
     @NotBlank String telefone,
     @NotNull @Positive BigDecimal salario,
     @Valid @NotNull EnderecoDTO endereco

@@ -5,6 +5,7 @@ import br.dac.bantads.ms_funcionario.dto.FuncionarioResponseDTO;
 import br.dac.bantads.ms_funcionario.dto.UpdateFuncionarioRequestDTO;
 import br.dac.bantads.ms_funcionario.model.Role;
 import br.dac.bantads.ms_funcionario.service.FuncionarioService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class FuncionarioController {
     }
 
     @PostMapping
-    public ResponseEntity<FuncionarioResponseDTO> create(@RequestBody CreateFuncionarioRequestDTO dto) {
+    public ResponseEntity<FuncionarioResponseDTO> create(@Valid @RequestBody CreateFuncionarioRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(funcionarioService.create(dto));
     }
 
@@ -43,7 +44,7 @@ public class FuncionarioController {
     }
 
     @PutMapping("/{cpf}")
-    public ResponseEntity<FuncionarioResponseDTO> update(@PathVariable String cpf, @RequestBody UpdateFuncionarioRequestDTO dto) {
+    public ResponseEntity<FuncionarioResponseDTO> update(@PathVariable String cpf, @Valid @RequestBody UpdateFuncionarioRequestDTO dto) {
         return ResponseEntity.ok(funcionarioService.update(cpf, dto));
     }
 
