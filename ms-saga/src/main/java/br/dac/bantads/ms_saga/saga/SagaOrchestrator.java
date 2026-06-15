@@ -185,6 +185,71 @@ public class SagaOrchestrator {
         }
     }
 
+    // R4 — Compensação: se ATUALIZAR_CLIENTE completou e um step posterior falhou,
+    // restaura o perfil anterior. O snapshot "anterior" veio no reply do ATUALIZAR
+    // e está guardado no context sob "cliente".
+    private void compensarAlteracaoPerfil(String sagaId, SagaState state, String stepFalhou) {
+        if (!state.getStepsCompleted().contains("ATUALIZAR_CLIENTE")) {
+            log.info("compensação R4 no-op: ATUALIZAR_CLIENTE não completou (sagaId={})", sagaId);
+            return;
+        }
+        try {
+            JsonNode cliente = mapper.readTree(asJson(state.getContext().get("cliente")));
+            JsonNode anterior = cliente.path("anterior");
+            if (anterior.isMissingNode() || anterior.isNull()) {
+                log.warn("compensação R4: snapshot anterior ausente, não dá pra reverter (sagaId={})", sagaId);
+                return;
+            }
+            // remonta o payload no formato que o ms-cliente lê (ClienteRequestDTO + cpf).
+            // remove "status": não faz parte do ClienteRequestDTO e o cpf é fixo.
+            ObjectNode payload = (ObjectNode) anterior.deepCopy();
+            payload.remove("status");
+            payload.put("cpf", cliente.path("cpf").asText(""));
+            avancarStep(sagaId, "REVERTER_ATUALIZACAO_CLIENTE",
+                    RabbitConfig.CMD_CLIENTE_ROUTING_KEY, payload.toString());
+        } catch (Exception e) {
+            log.warn("compensação R4 falhou ao montar reversão (sagaId={}): {}", sagaId, e.getMessage());
+        }
+    }
+
+    // R17 — Compensação: o registro do funcionário já foi criado síncrono pelo
+    // ms-funcionario antes da saga, então tenta REMOVER_GERENTE como best-effort
+    // e desfaz o auth (CRIAR_AUTH_GERENTE) se ele tiver completado. Email/cpf vêm
+    // do startPayload ({cpf,nome,email,senha}).
+    private void compensarInsercaoGerente(String sagaId, SagaState state, String stepFalhou) {
+        String email = readString(state.getStartPayload(), "email");
+        String cpf = readString(state.getStartPayload(), "cpf");
+
+        // best-effort: remove o gerente persistido síncrono (idempotente no ms-funcionario)
+        if (!cpf.isBlank()) {
+            avancarStep(sagaId, "REMOVER_GERENTE", RabbitConfig.CMD_FUNCIONARIO_ROUTING_KEY,
+                    json(Map.of("cpf", cpf)));
+        }
+        if (state.getStepsCompleted().contains("CRIAR_AUTH_GERENTE") && !email.isBlank()) {
+            avancarStep(sagaId, "REMOVER_AUTH_GERENTE", RabbitConfig.CMD_AUTH_ROUTING_KEY,
+                    json(Map.of("email", email)));
+        }
+    }
+
+    // R18 — Compensação: se REATRIBUIR_TODAS_CONTAS completou mas um step posterior
+    // falhou, devolve as contas pro gerente removido (move de volta gerenteDestino →
+    // gerenteRemovido). Ambos os cpfs estão no context.
+    private void compensarRemocaoGerente(String sagaId, SagaState state, String stepFalhou) {
+        if (!state.getStepsCompleted().contains("REATRIBUIR_TODAS_CONTAS")) {
+            log.info("compensação R18 no-op: REATRIBUIR_TODAS_CONTAS não completou (sagaId={})", sagaId);
+            return;
+        }
+        String cpfRemovido = (String) state.getContext().get("cpfRemovido");
+        String cpfDestino = readString(state.getContext().get("gerenteDestino"), "gerenteCpf");
+        if (cpfRemovido == null || cpfRemovido.isBlank() || cpfDestino.isBlank()) {
+            log.warn("compensação R18: cpfs ausentes (removido={} destino={}), não reverte (sagaId={})",
+                    cpfRemovido, cpfDestino, sagaId);
+            return;
+        }
+        avancarStep(sagaId, "REVERTER_REATRIBUICAO", RabbitConfig.CMD_CONTA_ROUTING_KEY,
+                json(Map.of("gerenteRemovido", cpfRemovido, "gerenteDestino", cpfDestino)));
+    }
+
     // =========================================================================
     // R17 — Inserção de Gerente (já implementado, mantido)
     // =========================================================================
@@ -291,10 +356,9 @@ public class SagaOrchestrator {
     private void compensar(String sagaId, SagaState state, String stepFalhou, String erro) {
         switch (state.getType()) {
             case "AUTOCADASTRO" -> compensarAutocadastro(sagaId, state, stepFalhou);
-            // R17, R4, R18: compensação no projeto acadêmico é só log — esses fluxos
-            // não introduzem efeito colateral persistido antes do step que falha
-            // (R17 só persiste auth+reatribuição no final; R4 atualiza cliente mas
-            // recalcular é idempotente; R18 falha antes de modificar se VERIFICAR falhar)
+            case "ALTERACAO_PERFIL" -> compensarAlteracaoPerfil(sagaId, state, stepFalhou);
+            case "INSERCAO_GERENTE" -> compensarInsercaoGerente(sagaId, state, stepFalhou);
+            case "REMOCAO_GERENTE" -> compensarRemocaoGerente(sagaId, state, stepFalhou);
             default -> log.warn("saga {} ({}) falhou em {} sem compensação automática: {}",
                     sagaId, state.getType(), stepFalhou, erro);
         }
@@ -318,6 +382,18 @@ public class SagaOrchestrator {
             return mapper.writeValueAsString(new LinkedHashMap<>(body));
         } catch (Exception e) {
             throw new RuntimeException("falha serializando payload da saga", e);
+        }
+    }
+
+    // Normaliza um valor do context (String JSON ou objeto) pra texto JSON parseável.
+    private String asJson(Object source) {
+        if (source == null) return "{}";
+        if (source instanceof String s) return s.isBlank() ? "{}" : s;
+        try {
+            return mapper.writeValueAsString(source);
+        } catch (Exception e) {
+            log.warn("falha serializando valor do context: {}", e.getMessage());
+            return "{}";
         }
     }
 

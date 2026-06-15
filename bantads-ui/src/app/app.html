@@ -1,1 +1,11 @@
 <router-outlet />
+
+<!-- toasts globais de feedback (sucesso/erro/info) ao consumir o gateway -->
+<div class="toast-container">
+  @for (n of notificacoes(); track n.id) {
+    <div class="toast notificacao-{{ n.tipo }}" role="status">
+      <span class="toast-msg">{{ n.mensagem }}</span>
+      <button type="button" class="toast-fechar" (click)="dispensar(n.id)" aria-label="Fechar">&times;</button>
+    </div>
+  }
+</div>

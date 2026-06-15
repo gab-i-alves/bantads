@@ -46,6 +46,7 @@ public class SagaCommandListener {
                 case "REVERTER_APROVACAO" -> reverterAprovacao(cmd);
                 case "REJEITAR_CLIENTE" -> rejeitarCliente(cmd);
                 case "ATUALIZAR_CLIENTE" -> atualizarCliente(cmd);
+                case "REVERTER_ATUALIZACAO_CLIENTE" -> reverterAtualizacao(cmd);
                 default ->
                         new SagaReply(cmd.sagaId(), cmd.step(), false, null, "step desconhecido: " + cmd.step());
             };
@@ -89,16 +90,37 @@ public class SagaCommandListener {
     }
 
     // R4 (passo principal): aplica os dados novos. Orquestrador encadeia RECALCULAR_LIMITE
-    // no ms-conta passando o salário novo no contexto.
+    // no ms-conta passando o salário novo no contexto. O reply leva tambem o perfil
+    // ANTERIOR (campo "anterior") pra que o orquestrador possa compensar com
+    // REVERTER_ATUALIZACAO_CLIENTE caso um step posterior da saga falhe.
     private SagaReply atualizarCliente(SagaCommand cmd) throws Exception {
         JsonNode root = objectMapper.readTree(cmd.payload());
         String cpf = root.path("cpf").asText(null);
         if (cpf == null || cpf.isBlank()) {
             return new SagaReply(cmd.sagaId(), cmd.step(), false, null, "payload sem cpf");
         }
+        // snapshot do perfil corrente antes de sobrescrever (fonte da compensacao)
+        ClienteResponseDTO anterior = clienteService.buscarPorCpf(cpf);
         ClienteRequestDTO dto = objectMapper.readValue(cmd.payload(), ClienteRequestDTO.class);
         ClienteResponseDTO atualizado = clienteService.atualizar(cpf, dto);
-        return new SagaReply(cmd.sagaId(), cmd.step(), true, serializeCliente(atualizado), null);
+
+        Map<String, Object> body = clienteToMap(atualizado);
+        body.put("anterior", clienteToMap(anterior));
+        return new SagaReply(cmd.sagaId(), cmd.step(), true, objectMapper.writeValueAsString(body), null);
+    }
+
+    // R4 (compensação): restaura o perfil anterior do cliente. O payload traz os
+    // campos a restaurar (nome/email/salario/telefone/endereco) no formato do
+    // ClienteRequestDTO, montado pelo orquestrador a partir do snapshot "anterior".
+    private SagaReply reverterAtualizacao(SagaCommand cmd) throws Exception {
+        JsonNode root = objectMapper.readTree(cmd.payload());
+        String cpf = root.path("cpf").asText(null);
+        if (cpf == null || cpf.isBlank()) {
+            return new SagaReply(cmd.sagaId(), cmd.step(), false, null, "payload sem cpf");
+        }
+        ClienteRequestDTO anterior = objectMapper.readValue(cmd.payload(), ClienteRequestDTO.class);
+        clienteService.reverterAtualizacao(cpf, anterior);
+        return new SagaReply(cmd.sagaId(), cmd.step(), true, null, null);
     }
 
     private String readCpf(String payload) throws Exception {
@@ -118,5 +140,28 @@ public class SagaCommandListener {
         body.put("salario", c.salario().toPlainString());
         body.put("status", c.status());
         return objectMapper.writeValueAsString(body);
+    }
+
+    // mapa com o perfil completo (inclui telefone/endereco), no formato que tanto o
+    // orquestrador quanto o ClienteRequestDTO sabem ler — usado no fluxo R4 pra
+    // carregar o snapshot "anterior" e depois remonta-lo na compensacao
+    private Map<String, Object> clienteToMap(ClienteResponseDTO c) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("cpf", c.cpf());
+        body.put("nome", c.nome());
+        body.put("email", c.email());
+        body.put("telefone", c.telefone());
+        body.put("salario", c.salario().toPlainString());
+        body.put("status", c.status());
+
+        Map<String, Object> end = new LinkedHashMap<>();
+        end.put("logradouro", c.endereco().logradouro());
+        end.put("numero", c.endereco().numero());
+        end.put("complemento", c.endereco().complemento());
+        end.put("cep", c.endereco().cep());
+        end.put("cidade", c.endereco().cidade());
+        end.put("estado", c.endereco().estado());
+        body.put("endereco", end);
+        return body;
     }
 }

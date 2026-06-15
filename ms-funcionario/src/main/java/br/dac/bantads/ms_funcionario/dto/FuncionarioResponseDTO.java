@@ -11,12 +11,16 @@ public class FuncionarioResponseDTO {
     private String cpf;
     private String nome;
     private String email;
+    private String telefone;
+    // mantido como "role" de propósito: o gateway remapeia role→tipo e outras
+    // rotas filtram por role === "GERENTE". Renomear aqui quebraria o gateway.
     private Role role;
 
     public FuncionarioResponseDTO(Funcionario funcionario) {
         this.cpf = funcionario.getCpf();
         this.nome = funcionario.getNome();
         this.email = funcionario.getEmail();
+        this.telefone = funcionario.getTelefone();
         this.role = funcionario.getRole();
     }
 }

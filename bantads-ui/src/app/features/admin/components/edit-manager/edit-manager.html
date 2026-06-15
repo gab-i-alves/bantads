@@ -21,8 +21,18 @@
 
             <input type="email" [(ngModel)]="gerente.email" placeholder="Email">
 
-            <button class="save-button" (click)="salvarEdicao()">
-                Salvar gerente
+            <input type="text" placeholder="(00) 00000-0000" maxlength="15" [value]="gerente.telefone || ''"
+                (input)="formatTelefone($event.target.value)">
+
+            <input type="password" placeholder="Nova senha (opcional)" [ngModel]="senha()"
+                (ngModelChange)="senha.set($event)">
+
+            @if (erro()) {
+            <p class="text-red-500 text-sm">{{ erro() }}</p>
+            }
+
+            <button class="save-button" (click)="salvarEdicao()" [disabled]="salvando">
+                {{ salvando ? 'Salvando...' : 'Salvar gerente' }}
             </button>
 
         </div>

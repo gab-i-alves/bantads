@@ -1,25 +1,20 @@
 const express = require("express");
 
 const authRoutes = require("./auth.routes");
+const rebootRoutes = require("./reboot.routes");
 const clienteRoutes = require("./cliente.routes");
 const contaRoutes = require("./conta.routes");
-const funcionarioRoutes = require("./funcionario.routes")
-const melhoresClientesRoutes = require("./melhores-clientes.routes")
-const dashboardAdminRoutes = require("./dashboard-admin.routes")
-const relatorioRoutes = require("./relatorio.routes")
-const clientesPorGerenteRoutes = require("./clientes-por-gerente.routes")
+const funcionarioRoutes = require("./funcionario.routes");
 
 const router = express.Router();
 
-router.use("/auth", authRoutes);
-router.use("/cliente", clienteRoutes);
-router.use("/conta", contaRoutes);
-router.use("/gerentes", funcionarioRoutes)
+// endpoints públicos de sessão e reset (sem prefixo)
+router.use("/", authRoutes);
+router.use("/", rebootRoutes);
 
-// API Composition agrega dados de 2+ MSs no gateway
-router.use("/melhores-clientes", melhoresClientesRoutes)
-router.use("/admin/dashboard", dashboardAdminRoutes)
-router.use("/admin/relatorio", relatorioRoutes)
-router.use("/clientes-por-gerente", clientesPorGerenteRoutes)
+// recursos no plural, como o contrato do testador espera
+router.use("/clientes", clienteRoutes);
+router.use("/contas", contaRoutes);
+router.use("/gerentes", funcionarioRoutes);
 
 module.exports = router;

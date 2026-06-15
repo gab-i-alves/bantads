@@ -45,7 +45,7 @@
                         <input type="password" [(ngModel)]="senha" name="senha" placeholder="Enter your password">
                     </div>
 
-                    <button type="submit">Login</button>
+                    <button type="submit" [disabled]="isLogando()">{{ isLogando() ? 'Entrando...' : 'Login' }}</button>
 
                 </form>
                 }
@@ -79,7 +79,7 @@
                     @case (2) {
                     <div class="input-group">
                         <label>Salário</label>
-                        <input type="number" [(ngModel)]="registroData.salario" name="salario" placeholder="R$ 0,00">
+                        <input type="text" [value]="registroData.salario" (input)="formatSalario($event.target.value)" name="salario" inputmode="numeric" placeholder="R$ 0,00">
                     </div>
 
                     <div class="input-group">
@@ -97,7 +97,7 @@
                     @case (3) {
                     <div class="input-group">
                         <label>CEP</label>
-                        <input type="text" [(ngModel)]="registroData.cep" name="cep" placeholder="00000-000">
+                        <input type="text" [value]="registroData.cep" (input)="formatCep($event.target.value)" name="cep" maxlength="9" placeholder="00000-000">
                     </div>
 
                     <div class="input-group">
@@ -154,7 +154,7 @@
                             }
 
                             @if (step === 4) {
-                            <button type="submit">Cadastrar</button>
+                            <button type="submit" [disabled]="isRegistering">{{ isRegistering ? 'Enviando...' : 'Cadastrar' }}</button>
                             }
 
                     </div>

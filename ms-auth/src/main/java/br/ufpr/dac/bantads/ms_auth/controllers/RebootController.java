@@ -1,6 +1,6 @@
 package br.ufpr.dac.bantads.ms_auth.controllers;
 
-import br.ufpr.dac.bantads.ms_auth.models.Account;
+import br.ufpr.dac.bantads.ms_auth.dtos.AccountResumoDTO;
 import br.ufpr.dac.bantads.ms_auth.services.RebootService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +17,10 @@ public class RebootController {
     private RebootService rebootService;
 
     @GetMapping
-    public List<Account> reboot() {
-        return rebootService.initialize();
+    public List<AccountResumoDTO> reboot() {
+        return rebootService.initialize().stream()
+                .map(AccountResumoDTO::de)
+                .toList();
     }
 
 }

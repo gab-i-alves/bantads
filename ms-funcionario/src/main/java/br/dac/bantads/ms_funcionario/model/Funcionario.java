@@ -24,6 +24,11 @@ public class Funcionario {
     @Column(nullable = false, unique = true)
     private String email;
 
+    // R19: telefone do gerente. Nullable porque o seed legado não tinha o campo
+    // e clientes antigos podem não enviá-lo.
+    @Column(name = "telefone", length = 20)
+    private String telefone;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Role role;

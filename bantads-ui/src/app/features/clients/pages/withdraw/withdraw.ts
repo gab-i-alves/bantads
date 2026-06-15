@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { Header } from '../../../../shared/components/header/header';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ContaService } from '../../../../core/services/conta.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { ContaResumo } from '../../../../core/models/conta.model';
 
 @Component({
@@ -15,6 +16,7 @@ export class Withdraw implements OnInit {
 
   authService = inject(AuthService);
   private contaService = inject(ContaService);
+  private notify = inject(NotificationService);
 
   amount: string = '0,00';
   isActive: boolean = false;
@@ -92,10 +94,13 @@ export class Withdraw implements OnInit {
         this.conta.set({ ...conta, saldo: response.saldo });
         this.amount = '0,00';
         this.successMessage.set('Saque realizado com sucesso.');
+        this.notify.sucesso('Saque realizado com sucesso.');
       }),
       error: (error) => this.finalizar(inicio, () => {
         console.error('Erro ao realizar saque:', error);
-        this.errorMessage.set('Nao foi possivel realizar o saque.');
+        const mensagem = this.notify.mensagemDeErroHttp(error, 'Nao foi possivel realizar o saque.');
+        this.errorMessage.set(mensagem);
+        this.notify.erro(mensagem);
       }),
     });
   }

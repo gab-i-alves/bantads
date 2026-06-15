@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Header } from '../../../../shared/components/header/header';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ContaService } from '../../../../core/services/conta.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { ContaResumo } from '../../../../core/models/conta.model';
 
 @Component({
@@ -14,6 +15,7 @@ import { ContaResumo } from '../../../../core/models/conta.model';
 export class Transfer implements OnInit {
   private authService = inject(AuthService);
   private contaService = inject(ContaService);
+  private notify = inject(NotificationService);
 
   amount: string = '0,00';
   destino: string = '';
@@ -101,10 +103,13 @@ export class Transfer implements OnInit {
         this.amount = '0,00';
         this.destino = '';
         this.successMessage.set('Transferencia realizada com sucesso.');
+        this.notify.sucesso('Transferencia realizada com sucesso.');
       }),
       error: (error) => this.finalizar(inicio, () => {
         console.error('Erro ao realizar transferencia:', error);
-        this.errorMessage.set('Nao foi possivel realizar a transferencia. Verifique o numero da conta destino.');
+        const mensagem = this.notify.mensagemDeErroHttp(error, 'Nao foi possivel realizar a transferencia. Verifique o numero da conta destino.');
+        this.errorMessage.set(mensagem);
+        this.notify.erro(mensagem);
       }),
     });
   }

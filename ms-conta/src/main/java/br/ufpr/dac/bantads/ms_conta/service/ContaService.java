@@ -1,8 +1,10 @@
 package br.ufpr.dac.bantads.ms_conta.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,6 +80,14 @@ public class ContaService {
         return new SaldoResponseDTO(conta.getClienteCpf(), conta.getNumero(), conta.getSaldo());
     }
 
+    // dono da conta, pra checagem de autorização do cliente (R5/R6/R7).
+    // devolve null quando a conta não existe.
+    public String clienteDaConta(String numeroConta) {
+        return contaReadRepo.findByNumero(numeroConta)
+                .map(ContaRead::getClienteCpf)
+                .orElse(null);
+    }
+
     public ExtratoResponseDTO consultarExtrato(String numeroConta, LocalDate inicio, LocalDate fim) {
         ContaRead conta = buscarContaReadOuErro(numeroConta);
 
@@ -133,7 +143,9 @@ public class ContaService {
         LocalDate dia = inicio;
         while (!dia.isAfter(fim)) {
             saldoCorrente = saldoCorrente.add(deltasPorDia.getOrDefault(dia, BigDecimal.ZERO));
-            resultado.add(new ExtratoResponseDTO.SaldoDiario(dia, saldoCorrente));
+            // NF13: padroniza 2 casas no saldo diário do extrato
+            resultado.add(new ExtratoResponseDTO.SaldoDiario(
+                    dia, saldoCorrente.setScale(2, RoundingMode.HALF_UP)));
             dia = dia.plusDays(1);
         }
         return resultado;
@@ -159,7 +171,9 @@ public class ContaService {
         conta.setSaldo(conta.getSaldo().add(valor));
         contaRepo.save(conta);
 
-        LocalDateTime agora = LocalDateTime.now();
+        // trunca pra microssegundos: o Postgres guarda em micros, então sem isso
+        // o valor da resposta da operação e o do extrato (lido do banco) divergem.
+        LocalDateTime agora = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
         Movimentacao mov = new Movimentacao();
         mov.setDataHora(agora);
         mov.setTipo(TipoMovimentacao.DEPOSITO);
@@ -185,7 +199,9 @@ public class ContaService {
         conta.setSaldo(conta.getSaldo().subtract(valor));
         contaRepo.save(conta);
 
-        LocalDateTime agora = LocalDateTime.now();
+        // trunca pra microssegundos: o Postgres guarda em micros, então sem isso
+        // o valor da resposta da operação e o do extrato (lido do banco) divergem.
+        LocalDateTime agora = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
         Movimentacao mov = new Movimentacao();
         mov.setDataHora(agora);
         mov.setTipo(TipoMovimentacao.SAQUE);
@@ -218,7 +234,9 @@ public class ContaService {
         contaRepo.save(origem);
         contaRepo.save(destino);
 
-        LocalDateTime agora = LocalDateTime.now();
+        // trunca pra microssegundos: o Postgres guarda em micros, então sem isso
+        // o valor da resposta da operação e o do extrato (lido do banco) divergem.
+        LocalDateTime agora = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
         Movimentacao mov = new Movimentacao();
         mov.setDataHora(agora);
         mov.setTipo(TipoMovimentacao.TRANSFERENCIA);

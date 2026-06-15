@@ -13,6 +13,8 @@ public class Account {
     @Id
     private String accountId;
     private String password;
+    // salt por conta usado no SHA256+SALT (NF11); regravado a cada reseed/reboot.
+    private String salt;
     private String email;
     private Role role;
 }

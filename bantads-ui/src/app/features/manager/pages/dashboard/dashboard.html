@@ -116,6 +116,7 @@
 </section>
 
 @if(isModalOpen()){
-<app-aprove-client [pedido]="selectedPedido()" (fecharModal)="fecharModal()" (aprovarPedido)="aprovarPedido($event)"
+<app-aprove-client [pedido]="selectedPedido()" [processando]="isProcessando()" (fecharModal)="fecharModal()"
+    (aprovarPedido)="aprovarPedido($event)"
     (recusarPedido)="recusarPedido($event)"></app-aprove-client>
 }
