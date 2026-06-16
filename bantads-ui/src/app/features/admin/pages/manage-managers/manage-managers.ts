@@ -39,7 +39,9 @@ export class ManageManagers implements OnInit {
 
     this.adminService.listarGerentes().subscribe({
       next: (gerentes) => {
-        this.gerentes.set(gerentes.filter(gerente => gerente.role === 'GERENTE'));
+        // o gateway (GET /gerentes) ja devolve so gerentes (filtra role no servidor)
+        // e expoe o papel como `tipo`, nao `role` - por isso nao filtramos aqui.
+        this.gerentes.set(gerentes);
         this.isLoadingGerentes.set(false);
       },
       error: (error) => {
@@ -164,6 +166,15 @@ export class ManageManagers implements OnInit {
       .slice(0, 11)
       .replace(/(\d{2})(\d)/, '($1) $2')
       .replace(/(\d{4,5})(\d{4})$/, '$1-$2');
+  }
+
+  // CPF mascarado (000.000.000-00); padStart preserva zero a esquerda.
+  formatarCpf(cpf?: string): string {
+    const digitos = String(cpf ?? '').replace(/\D/g, '');
+    if (!digitos) {
+      return '--';
+    }
+    return digitos.padStart(11, '0').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
   }
 
 }
