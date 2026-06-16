@@ -174,6 +174,29 @@ router.get("/:cpf", auth, async (request, response, next) => {
     }
 });
 
+// Gerente dono da conta do cliente, pra tela de perfil do cliente. Net-new, fora
+// do contrato do testador: resolve cpf -> conta -> gerenteCpf e busca o nome no
+// ms-funcionario (enriquecimento opcional). Um cliente não pode chamar
+// /gerentes/:cpf direto (rota só de admin), por isso a resolução é server-side.
+router.get("/:cpf/gerente", auth, async (request, response, next) => {
+    try {
+        const headers = { Authorization: request.headers.authorization };
+        const conta = (await buscarContaPorCpf(headers)).get(request.params.cpf);
+        if (!conta || !conta.gerenteCpf) {
+            return response.json({ cpf: null, nome: null });
+        }
+        const gerente = await opcional(
+            axios.get(`${services.funcionario}/gerentes/${conta.gerenteCpf}`, { headers, timeout: 3000 })
+                .then((r) => r.data), null);
+        response.json({ cpf: conta.gerenteCpf, nome: gerente?.nome ?? null });
+    } catch (error) {
+        if (error.response) {
+            return response.status(error.response.status).json(error.response.data);
+        }
+        next(error);
+    }
+});
+
 // R4: alteração de perfil. Repassa o corpo adaptado; o ms-cliente já dispara a
 // saga de recálculo de limite.
 router.put("/:cpf", auth, express.json(), async (request, response, next) => {

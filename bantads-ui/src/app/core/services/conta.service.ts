@@ -12,7 +12,7 @@ export class ContaService {
   private ApiBaseUrl = environment.apiBaseUrl;
 
   listarContas(): Observable<ContaResumo[]> {
-    return this.http.get<ContaResumo[]>(`${this.ApiBaseUrl}/conta`);
+    return this.http.get<ContaResumo[]>(`${this.ApiBaseUrl}/contas`);
   }
 
   buscarContaPorClienteCpf(cpf: string): Observable<ContaResumo | null> {
@@ -22,26 +22,26 @@ export class ContaService {
   }
 
   consultarSaldo(numero: string): Observable<SaldoConta> {
-    return this.http.get<SaldoConta>(`${this.ApiBaseUrl}/conta/${numero}/saldo`);
+    return this.http.get<SaldoConta>(`${this.ApiBaseUrl}/contas/${numero}/saldo`);
   }
 
   depositar(numero: string, valor: number): Observable<OperacaoContaResponse> {
     return this.http.post<OperacaoContaResponse>(
-      `${this.ApiBaseUrl}/conta/${numero}/depositar`,
+      `${this.ApiBaseUrl}/contas/${numero}/depositar`,
       { valor }
     );
   }
 
   sacar(numero: string, valor: number): Observable<OperacaoContaResponse> {
     return this.http.post<OperacaoContaResponse>(
-      `${this.ApiBaseUrl}/conta/${numero}/sacar`,
+      `${this.ApiBaseUrl}/contas/${numero}/sacar`,
       { valor }
     );
   }
 
   transferir(numeroOrigem: string, numeroDestino: string, valor: number): Observable<TransferenciaResponse> {
     return this.http.post<TransferenciaResponse>(
-      `${this.ApiBaseUrl}/conta/${numeroOrigem}/transferir`,
+      `${this.ApiBaseUrl}/contas/${numeroOrigem}/transferir`,
       { destino: numeroDestino, valor }
     );
   }
@@ -54,6 +54,6 @@ export class ContaService {
     if (fim) {
       params = params.set('fim', fim);
     }
-    return this.http.get<Extrato>(`${this.ApiBaseUrl}/conta/${numero}/extrato`, { params });
+    return this.http.get<Extrato>(`${this.ApiBaseUrl}/contas/${numero}/extrato`, { params });
   }
 }

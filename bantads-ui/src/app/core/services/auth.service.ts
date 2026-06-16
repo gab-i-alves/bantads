@@ -16,14 +16,15 @@ export class AuthService {
   private ApiBaseUrl = environment.apiBaseUrl;
 
   login(email: string, password: string) {
+    // contrato do gateway/testador: POST /login com {login, senha}
     return this.http.post<LoginModel>(
-      `${this.ApiBaseUrl}/auth/login`,
-      { email, password }
+      `${this.ApiBaseUrl}/login`,
+      { login: email, senha: password }
     );
   }
 
   autocadastro(cliente: ClienteCreate) {
-    return this.http.post(`${this.ApiBaseUrl}/cliente`, cliente);
+    return this.http.post(`${this.ApiBaseUrl}/clientes`, cliente);
   }
 
   handleLoginSuccess(response: LoginModel) {

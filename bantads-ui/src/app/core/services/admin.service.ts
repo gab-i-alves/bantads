@@ -16,7 +16,7 @@ export class AdminService {
   }
 
   listarRelatorioClientes(): Observable<RelatorioCliente[]> {
-    return this.http.get<RelatorioCliente[]>(`${this.ApiBaseUrl}/admin/relatorio`);
+    return this.http.get<RelatorioCliente[]>(`${this.ApiBaseUrl}/clientes?filtro=adm_relatorio_clientes`);
   }
 
   listarGerentes(): Observable<Gerente[]> {

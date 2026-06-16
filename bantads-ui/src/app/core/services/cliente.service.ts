@@ -13,45 +13,43 @@ export class ClienteService {
   private ApiBaseUrl = environment.apiBaseUrl;
 
   listarClientes(): Observable<Cliente[]> {
-    return this.http.get<Cliente[]>(`${this.ApiBaseUrl}/cliente`);
+    return this.http.get<Cliente[]>(`${this.ApiBaseUrl}/clientes`);
   }
 
   listarClientesPorGerente(): Observable<Cliente[]> {
-    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
-    return this.http.post<Cliente[]>(`${this.ApiBaseUrl}/clientes-por-gerente`, {
-      gerenteCpf: usuario.cpf,
-    });
+    // GET /clientes sem filtro: o gateway escopa pelos clientes do gerente do token (R12)
+    return this.http.get<Cliente[]>(`${this.ApiBaseUrl}/clientes`);
   }
 
   listarClientesPendentes(): Observable<Cliente[]> {
-    return this.http.get<Cliente[]>(`${this.ApiBaseUrl}/cliente?filtro=para_aprovar`);
+    return this.http.get<Cliente[]>(`${this.ApiBaseUrl}/clientes?filtro=para_aprovar`);
   }
 
   buscarCliente(cpf: string): Observable<Cliente> {
-    return this.http.get<Cliente>(`${this.ApiBaseUrl}/cliente/${cpf}`);
+    return this.http.get<Cliente>(`${this.ApiBaseUrl}/clientes/${cpf}`);
   }
 
   criarCliente(cliente: ClienteCreate): Observable<Cliente> {
-    return this.http.post<Cliente>(`${this.ApiBaseUrl}/cliente`, cliente);
+    return this.http.post<Cliente>(`${this.ApiBaseUrl}/clientes`, cliente);
   }
 
   atualizarCliente(cpf: string, dados: ClienteUpdate): Observable<Cliente> {
-    return this.http.put<Cliente>(`${this.ApiBaseUrl}/cliente/${cpf}`, dados);
+    return this.http.put<Cliente>(`${this.ApiBaseUrl}/clientes/${cpf}`, dados);
   }
 
   aprovarCliente(cpf: string): Observable<Cliente> {
-    return this.http.post<Cliente>(`${this.ApiBaseUrl}/cliente/${cpf}/aprovar`, {});
+    return this.http.post<Cliente>(`${this.ApiBaseUrl}/clientes/${cpf}/aprovar`, {});
   }
 
   rejeitarCliente(cpf: string, motivo: string): Observable<Cliente> {
-    return this.http.post<Cliente>(`${this.ApiBaseUrl}/cliente/${cpf}/rejeitar`, { motivo });
+    return this.http.post<Cliente>(`${this.ApiBaseUrl}/clientes/${cpf}/rejeitar`, { motivo });
   }
 
   listarMelhoresClientes(): Observable<MelhorCliente[]> {
-    return this.http.get<MelhorCliente[]>(`${this.ApiBaseUrl}/melhores-clientes`);
+    return this.http.get<MelhorCliente[]>(`${this.ApiBaseUrl}/clientes?filtro=melhores_clientes`);
   }
 
   buscarGerentePorCliente(cpf: string): Observable<{ cpf: string; nome: string | null }> {
-    return this.http.get<{ cpf: string; nome: string | null }>(`${this.ApiBaseUrl}/cliente/${cpf}/gerente`);
+    return this.http.get<{ cpf: string; nome: string | null }>(`${this.ApiBaseUrl}/clientes/${cpf}/gerente`);
   }
 }
