@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 import { HeaderAdmin } from '../../../../shared/components/header-admin/header-admin';
 import { NewManager } from '../../components/new-manager/new-manager';
 import { EditManager } from '../../components/edit-manager/edit-manager';
@@ -18,6 +18,9 @@ export class ManageManagers implements OnInit {
   private notify = inject(NotificationService);
 
   gerentes = signal<Gerente[]>([]);
+  // nº de clientes por gerente (cpf -> qtd), vindo do dashboard (R15); GET /gerentes
+  // sozinho nao traz essa contagem.
+  clientesPorGerente = signal<Record<string, number>>({});
   isLoadingGerentes = signal(false);
   errorMessage = signal('');
 
@@ -37,11 +40,21 @@ export class ManageManagers implements OnInit {
     this.isLoadingGerentes.set(true);
     this.errorMessage.set('');
 
-    this.adminService.listarGerentes().subscribe({
-      next: (gerentes) => {
+    // combina a lista (R19: nome/cpf/email/telefone) com o dashboard (R15), que
+    // tem a contagem de clientes por gerente, pra preencher a coluna "Clientes".
+    forkJoin({
+      gerentes: this.adminService.listarGerentes(),
+      dashboard: this.adminService.listarDashboardGerentes(),
+    }).subscribe({
+      next: ({ gerentes, dashboard }) => {
         // o gateway (GET /gerentes) ja devolve so gerentes (filtra role no servidor)
         // e expoe o papel como `tipo`, nao `role` - por isso nao filtramos aqui.
         this.gerentes.set(gerentes);
+        const contagem: Record<string, number> = {};
+        for (const d of dashboard) {
+          contagem[d.cpf] = d.clientes;
+        }
+        this.clientesPorGerente.set(contagem);
         this.isLoadingGerentes.set(false);
       },
       error: (error) => {

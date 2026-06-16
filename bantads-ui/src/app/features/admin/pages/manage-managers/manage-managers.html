@@ -55,7 +55,7 @@
                     <td class="cpf">{{ formatarCpf(gerente.cpf) }}</td>
                     <td>{{gerente.email}}</td>
                     <td>{{ formatarTelefone(gerente.telefone) }}</td>
-                    <td class="salary">{{gerente.clientes?.length || 0}}</td>
+                    <td class="salary">{{ clientesPorGerente()[gerente.cpf] || 0 }}</td>
                     <td>
                         <div class="actions">
                             <button class="btn btn-editar" (click)="toggleeditarGerente(gerente)">
