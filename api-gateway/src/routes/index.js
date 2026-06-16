@@ -5,7 +5,6 @@ const rebootRoutes = require("./reboot.routes");
 const clienteRoutes = require("./cliente.routes");
 const contaRoutes = require("./conta.routes");
 const funcionarioRoutes = require("./funcionario.routes");
-const adminRoutes = require("./admin.routes");
 
 const router = express.Router();
 
@@ -17,8 +16,5 @@ router.use("/", rebootRoutes);
 router.use("/clientes", clienteRoutes);
 router.use("/contas", contaRoutes);
 router.use("/gerentes", funcionarioRoutes);
-
-// agregações da UI fora do contrato do testador (ex: dashboard do admin)
-router.use("/admin", adminRoutes);
 
 module.exports = router;

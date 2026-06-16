@@ -1,8 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { DashboardGerente, Gerente, GerenteCreate, GerenteUpdate, RelatorioCliente } from '../models/admin.model';
 import { environment } from '../../../environments/environment';
+
+// R15 no contrato do testador: GET /gerentes?filtro=dashboard, com itens no
+// formato { gerente:{cpf,nome}, clientes:[contas], saldo_positivo, saldo_negativo }.
+interface DashboardItemApi {
+  gerente: { cpf: string; nome: string };
+  clientes: unknown[];
+  saldo_positivo: number;
+  saldo_negativo: number;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +21,17 @@ export class AdminService {
   private ApiBaseUrl = environment.apiBaseUrl;
 
   listarDashboardGerentes(): Observable<DashboardGerente[]> {
-    return this.http.get<DashboardGerente[]>(`${this.ApiBaseUrl}/admin/dashboard`);
+    // R15: consome o contrato do testador e adapta pro shape da tela.
+    return this.http.get<DashboardItemApi[]>(`${this.ApiBaseUrl}/gerentes?filtro=dashboard`).pipe(
+      map((lista) => lista.map((item) => ({
+        cpf: item.gerente?.cpf ?? '',
+        nome: item.gerente?.nome ?? '',
+        email: '',
+        clientes: Array.isArray(item.clientes) ? item.clientes.length : 0,
+        saldosPositivos: item.saldo_positivo ?? 0,
+        saldosNegativos: item.saldo_negativo ?? 0,
+      })))
+    );
   }
 
   listarRelatorioClientes(): Observable<RelatorioCliente[]> {
