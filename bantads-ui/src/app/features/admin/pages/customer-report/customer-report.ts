@@ -53,6 +53,16 @@ export class CustomerReport implements OnInit {
     return [...resultado].sort((a, b) => a.nome.localeCompare(b.nome));
   }
 
+  // R16: CPF exibido mascarado (000.000.000-00). pad p/ preservar zero a esquerda;
+  // vazio (ex: conta sem gerente) vira "-".
+  formatarCpf(cpf: string | null | undefined): string {
+    const digitos = String(cpf ?? '').replace(/\D/g, '');
+    if (!digitos) {
+      return '-';
+    }
+    return digitos.padStart(11, '0').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  }
+
   iniciais(nome: string): string {
     const partes = nome.trim().split(/\s+/).slice(0, 2);
 
