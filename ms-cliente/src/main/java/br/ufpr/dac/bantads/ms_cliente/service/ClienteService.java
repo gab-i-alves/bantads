@@ -3,6 +3,7 @@ package br.ufpr.dac.bantads.ms_cliente.service;
 import br.ufpr.dac.bantads.ms_cliente.dto.*;
 import br.ufpr.dac.bantads.ms_cliente.model.*;
 import br.ufpr.dac.bantads.ms_cliente.repository.ClienteRepository;
+import br.ufpr.dac.bantads.ms_cliente.saga.SagaPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.List;
 public class ClienteService {
 
     private final ClienteRepository repository;
+    private final SagaPublisher sagaPublisher;
 
     // R1: cria cliente com status PENDENTE, verifica cpf duplicado (passo sincrono;
     // a saga de autocadastro so dispara na aprovacao R10, via ClienteController)
@@ -93,6 +95,15 @@ public class ClienteService {
         Cliente cliente = repository.findByCpf(cpf)
                 .orElseThrow(() -> new ClienteNaoEncontradoException(cpf));
 
+        String emailAntigo = cliente.getEmail();
+        repository.findByEmail(dto.email())
+                .filter(outro -> !outro.getCpf().equals(cpf))
+                .ifPresent(outro -> { throw new EmailJaCadastradoException(dto.email()); });
+
+        repository.findByCpf(dto.cpf())
+                .filter(outro -> !outro.getCpf().equals(cpf))
+                .ifPresent(outro -> { throw new ClienteJaCadastradoException(dto.cpf()); });
+
         cliente.setNome(dto.nome());
         cliente.setEmail(dto.email());
         cliente.setTelefone(dto.telefone());
@@ -107,6 +118,11 @@ public class ClienteService {
         endereco.setEstado(dto.endereco().estado());
 
         Cliente salvo = repository.save(cliente);
+
+        if (!dto.email().equals(emailAntigo)) {
+            sagaPublisher.dispararAtualizacaoCredenciais(emailAntigo, dto.email());
+        }
+
         return toResponse(salvo);
     }
 
@@ -236,6 +252,12 @@ public class ClienteService {
     public static class ClienteJaCadastradoException extends RuntimeException {
         public ClienteJaCadastradoException(String cpf) {
             super("cliente ja cadastrado ou aguardando aprovacao: " + cpf);
+        }
+    }
+
+    public static class EmailJaCadastradoException extends RuntimeException {
+        public EmailJaCadastradoException(String email) {
+            super("Este e-mail já está em uso por outro cliente.");
         }
     }
 

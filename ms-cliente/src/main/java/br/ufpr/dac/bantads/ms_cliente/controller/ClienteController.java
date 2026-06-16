@@ -87,6 +87,12 @@ public class ClienteController {
                 .body(Map.of("error", ex.getMessage()));
     }
 
+    @ExceptionHandler(ClienteService.EmailJaCadastradoException.class)
+    public ResponseEntity<Map<String, String>> handleEmailConflict(ClienteService.EmailJaCadastradoException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", ex.getMessage()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
         Map<String, String> fields = new LinkedHashMap<>();

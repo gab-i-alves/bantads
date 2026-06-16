@@ -39,6 +39,8 @@ public class RabbitConfig {
     public static final String START_AUTOCADASTRO_ROUTING_KEY = "saga.start.autocadastro";
     public static final String START_ALTERACAO_PERFIL_ROUTING_KEY = "saga.start.alteracao_perfil";
 
+    public static final String AUTH_UPDATE_CREDENCIAIS_ROUTING_KEY = "saga.cmd.auth.update_credenciais";
+
     // dead-letter exchange compartilhado (NF8): a mensagem que estoura o retry cai aqui
     // em vez de voltar pra fila original e virar poison message reprocessada pra sempre.
     public static final String DLX = "bantads.dlx";

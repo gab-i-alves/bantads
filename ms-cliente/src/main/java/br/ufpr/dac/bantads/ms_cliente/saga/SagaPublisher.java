@@ -50,4 +50,17 @@ public class SagaPublisher {
             throw new RuntimeException("falha publicando saga.start.alteracao_perfil", e);
         }
     }
+
+    public void dispararAtualizacaoCredenciais(String emailAntigo, String emailNovo) {
+        try {
+            Map<String, String> body = new LinkedHashMap<>();
+            body.put("emailAntigo", emailAntigo);
+            body.put("email", emailNovo);
+            String payload = mapper.writeValueAsString(body);
+            rabbit.convertAndSend(RabbitConfig.SAGA_EXCHANGE, RabbitConfig.AUTH_UPDATE_CREDENCIAIS_ROUTING_KEY, payload);
+            log.info("auth update_credenciais publicada: {} -> {}", emailAntigo, emailNovo);
+        } catch (Exception e) {
+            log.warn("falha publicando auth.update_credenciais: {}", e.getMessage());
+        }
+    }
 }
