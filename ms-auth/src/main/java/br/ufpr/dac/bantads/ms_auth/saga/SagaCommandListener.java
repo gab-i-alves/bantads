@@ -40,6 +40,44 @@ public class SagaCommandListener {
         log.info("saga reply → sagaId={} step={} success={}", reply.sagaId(), reply.step(), reply.success());
     }
 
+    // R20: troca de email/senha de gerente vinda do ms-funcionario (fora da saga).
+    // O Account é localizado por email, então o payload traz o email antigo pra
+    // achar a conta, mais o email novo e/ou a senha nova. Falha aqui é só logada:
+    // a edição do gerente no ms-funcionario já aconteceu.
+    @RabbitListener(queues = RabbitConfig.AUTH_UPDATE_CREDENCIAIS_QUEUE)
+    public void onUpdateCredenciais(String json) {
+        try {
+            JsonNode root = objectMapper.readTree(json);
+            String emailAntigo = root.path("emailAntigo").asText(null);
+            String emailNovo = root.path("email").asText(null);
+            String senha = root.path("senha").asText(null);
+
+            if (emailAntigo == null || emailAntigo.isBlank()) {
+                log.warn("update credenciais sem emailAntigo, ignorando");
+                return;
+            }
+            Optional<Account> opt = accountRepository.findByEmail(emailAntigo);
+            if (opt.isEmpty()) {
+                log.warn("update credenciais: nenhuma account para email={}", emailAntigo);
+                return;
+            }
+            Account account = opt.get();
+            if (emailNovo != null && !emailNovo.isBlank()) {
+                account.setEmail(emailNovo);
+            }
+            if (senha != null && !senha.isBlank()) {
+                // novo salt + hash SHA256+SALT (NF11), mesmo esquema do login/seed.
+                String salt = PasswordHasher.gerarSalt();
+                account.setSalt(salt);
+                account.setPassword(PasswordHasher.hash(senha, salt));
+            }
+            accountRepository.save(account);
+            log.info("R20 credenciais atualizadas: {} -> email={}", emailAntigo, account.getEmail());
+        } catch (Exception e) {
+            log.warn("falha ao atualizar credenciais (R20): {}", e.getMessage());
+        }
+    }
+
     private SagaReply handle(SagaCommand cmd) {
         try {
             return switch (cmd.step()) {

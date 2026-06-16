@@ -34,9 +34,11 @@ public class RabbitConfig {
     // routing key usada pelo DELETE /gerentes/{cpf} pra disparar a saga R18 no ms-saga
     public static final String START_REMOCAO_GERENTE_ROUTING_KEY = "saga.start.remocao_gerente";
 
-    // routing key dedicada pro PUT /gerentes/{cpf} avisar o ms-auth a trocar a senha.
-    // best-effort, fora da saga: ms-auth deve bindar uma fila própria nesta routing key.
-    public static final String AUTH_UPDATE_SENHA_ROUTING_KEY = "saga.cmd.auth.update_senha";
+    // routing key dedicada pro PUT /gerentes/{cpf} (R20) avisar o ms-auth a trocar
+    // email e/ou senha do gerente. best-effort, fora da saga: ms-auth binda uma fila
+    // própria nesta routing key. o ms-auth loga por email, então o payload carrega o
+    // email antigo (pra localizar a conta) além do novo email e da senha.
+    public static final String AUTH_UPDATE_CREDENCIAIS_ROUTING_KEY = "saga.cmd.auth.update_credenciais";
 
     // dead-letter exchange compartilhado (NF8): a mensagem que estoura o retry cai aqui
     // em vez de voltar pra fila original e virar poison message reprocessada pra sempre.

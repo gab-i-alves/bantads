@@ -28,6 +28,11 @@ public class RabbitConfig {
     // routing key onde o ms-saga escuta replies (ele decide o nome da fila)
     public static final String REPLY_ROUTING_KEY = "saga.reply.orchestrator";
 
+    // R20: fila própria pra troca de email/senha de gerente vinda do ms-funcionario
+    // (fora da saga, best-effort). mesma routing key literal usada pelo publisher.
+    public static final String AUTH_UPDATE_CREDENCIAIS_QUEUE = "saga.cmd.auth.update_credenciais";
+    public static final String AUTH_UPDATE_CREDENCIAIS_ROUTING_KEY = "saga.cmd.auth.update_credenciais";
+
     // dead-letter exchange compartilhado (NF8): comando que estoura o retry cai aqui
     // em vez de voltar pra fila e virar poison message reprocessada pra sempre.
     public static final String DLX = "bantads.dlx";
@@ -56,6 +61,19 @@ public class RabbitConfig {
     @Bean
     public Binding cmdBinding(Queue sagaCmdQueue, DirectExchange sagaExchange) {
         return BindingBuilder.bind(sagaCmdQueue).to(sagaExchange).with(CMD_ROUTING_KEY);
+    }
+
+    @Bean
+    public Queue authUpdateCredenciaisQueue() {
+        return QueueBuilder.durable(AUTH_UPDATE_CREDENCIAIS_QUEUE)
+                .withArgument("x-dead-letter-exchange", DLX)
+                .withArgument("x-dead-letter-routing-key", CMD_QUEUE_DLQ)
+                .build();
+    }
+
+    @Bean
+    public Binding authUpdateCredenciaisBinding(Queue authUpdateCredenciaisQueue, DirectExchange sagaExchange) {
+        return BindingBuilder.bind(authUpdateCredenciaisQueue).to(sagaExchange).with(AUTH_UPDATE_CREDENCIAIS_ROUTING_KEY);
     }
 
     @Bean

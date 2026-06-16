@@ -107,33 +107,41 @@ public class FuncionarioService {
         Funcionario funcionario = funcionarioRepository.findByCpf(cpf).orElseThrow(
                 FuncionarioExceptions.NotFoundException::new
         );
+        // guarda o email atual ANTES de sobrescrever: o ms-auth localiza a conta por
+        // email, então precisa do antigo pra achar e do novo pra atualizar (R20).
+        String emailAntigo = funcionario.getEmail();
         funcionario.setNome(dto.getNome());
         funcionario.setEmail(dto.getEmail());
         funcionario.setTelefone(dto.getTelefone());
 
-        if (dto.getSenha() != null && !dto.getSenha().isBlank()) {
-            publicarAtualizacaoSenha(cpf, dto.getSenha());
+        boolean emailMudou = dto.getEmail() != null && !dto.getEmail().equals(emailAntigo);
+        boolean trocaSenha = dto.getSenha() != null && !dto.getSenha().isBlank();
+        if (emailMudou || trocaSenha) {
+            publicarAtualizacaoCredenciais(emailAntigo, dto.getEmail(), trocaSenha ? dto.getSenha() : null);
         }
 
         return new FuncionarioResponseDTO(funcionario);
     }
 
-    // Mensagem leve pro ms-auth trocar a senha. Best-effort: falha no publish não
-    // pode derrubar o update do gerente, por isso o erro é só logado.
-    private void publicarAtualizacaoSenha(String cpf, String senha) {
+    // R20: propaga troca de email/senha do gerente pro ms-auth (que autentica por
+    // email). Best-effort: falha no publish não pode derrubar o update, só loga.
+    private void publicarAtualizacaoCredenciais(String emailAntigo, String emailNovo, String senha) {
         Map<String, String> payload = new LinkedHashMap<>();
-        payload.put("cpf", cpf);
-        payload.put("senha", senha);
+        payload.put("emailAntigo", emailAntigo);
+        payload.put("email", emailNovo);
+        if (senha != null) {
+            payload.put("senha", senha);
+        }
         try {
             String json = objectMapper.writeValueAsString(payload);
             rabbitTemplate.convertAndSend(
                     RabbitConfig.SAGA_EXCHANGE,
-                    RabbitConfig.AUTH_UPDATE_SENHA_ROUTING_KEY,
+                    RabbitConfig.AUTH_UPDATE_CREDENCIAIS_ROUTING_KEY,
                     json
             );
         } catch (JsonProcessingException e) {
-            // não propaga: a troca de senha é acessória ao update do gerente (R20)
-            System.err.println("falha ao publicar atualização de senha pro ms-auth: " + e.getMessage());
+            // não propaga: a sincronização de credenciais é acessória ao update (R20)
+            System.err.println("falha ao publicar atualização de credenciais pro ms-auth: " + e.getMessage());
         }
     }
 
